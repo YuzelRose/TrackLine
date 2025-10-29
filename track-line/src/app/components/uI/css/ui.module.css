@@ -1,0 +1,19 @@
+#hg {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;  
+    text-align: center;
+}
+
+#profile {
+    border: solid 1px var(--foreground);
+    border-radius: 100%;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    -o-border-radius: 100%;
+}
