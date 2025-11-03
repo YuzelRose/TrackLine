@@ -1,0 +1,10 @@
+
+> track-line@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://10.73.146.53:3000
+
+ ✓ Starting...
+[?25h

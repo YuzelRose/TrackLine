@@ -11,8 +11,8 @@ import BoxChekedSVG from '@/app/media/boxChekedSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
 
-const URI_START = process.env.REACT_APP_BACK_URL || 'https://librosmaldonado.shop'
-const URI = `${URI_START}user/login/atempt`;
+const URI_START = 'http://localhost:5000'//process.env.REACT_APP_BACK_URL || 'https://librosmaldonado.shop'
+const URI = `${URI_START}/trckln/user/LoginAttempt`;
 
 export default function Login({ onWaitingChange }){
     const [show, setShow] = useState(false)
@@ -35,8 +35,8 @@ export default function Login({ onWaitingChange }){
         
         const formData = new FormData(e.target)
         const data = {
-            user: formData.get('user'),
-            pass: formData.get('pass')
+            Mail: formData.get('user'),
+            Pass: formData.get('pass')
         }
         
         await handleLogin(data) 

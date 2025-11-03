@@ -15,7 +15,7 @@ export default function Footer(){
             <section id={styles.info}>
                 <figure>
                     <TrackLineSVG dim="80%"/>
-                    <h5>Siguiendo tu aprendisaje para brindar orientacion</h5>
+                    <h5>Siguiendo tu aprendizaje para brindar orientacion</h5>
                 </figure>
                 <article>
                     <div id={styles.reg}>
@@ -26,7 +26,7 @@ export default function Footer(){
                 </article>
             </section>
             <article id={styles.conditions} className='topline'> 
-                <h6>Sitio desarrollado por <a  className="link" href="https://github.com/YuzelRose">@YuzelRose</a></h6>
+                <h6>Sitio desarrollado por <a  className="link" href="https://github.com/YuzelRose">@YuzelRose</a> y <a  className="link" href="https://github.com/SpacialHarbort">@SpacialHarbort</a></h6>
                 <h6 onClick={handleNavigate}><span className="link" onClick={handleNavigate}>Términos de servicio</span></h6>
                 <h6>Track Line ©2025</h6>
             </article>

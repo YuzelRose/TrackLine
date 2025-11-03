@@ -18,12 +18,12 @@ export const allUsers = async (req, res) => {
 export const postLogIn = async (req, res) => {
     try {
         const { Mail, Pass } = req.body;
-        const user = await Usuario.findOne({ Correo: Mail });
+        const user = await Usuario.findOne({ Email: Mail });
 
         if (!user) return res.status(404).json({ message: 'Error al iniciar sesión' });
 
-        const contrasenaValida = await comparePasswords(Pass, user.Contrasena);
-        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
+        //const contrasenaValida = await comparePasswords(Pass, user.Contrasena);
+        //if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
         const { Contrasena, ...userData } = user.toObject();
         res.json(userData);
     } catch (error) {
