@@ -15,7 +15,6 @@ const app = express();
 
 app.use(cors({
     origin: [
-        'http://localhost:3000',
         WWW_TRACT_ORIGIN,
         TRACT_ORIGIN
     ],
@@ -35,5 +34,6 @@ app.use(`${REQUEST_URL}/content`, ContentRoutes)
 
 app.listen(BACK_POT, '0.0.0.0', () => {
     console.log(`Servidor en ejecución, puerto: ${BACK_POT}`);
-    
+    console.log(`Resiviendo peticiones de: ${WWW_TRACT_ORIGIN} y ${TRACT_ORIGIN}`);  
+    console.log(`Con subfijo: ${REQUEST_URL}`);    
 });

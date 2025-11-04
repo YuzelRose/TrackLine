@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-
+import { GMAIL_PASS } from '../config';
 export const helpMail = async (req, res) => {
     const { email } = req.body; 
 
@@ -10,7 +10,7 @@ export const helpMail = async (req, res) => {
         secure: true, 
         auth: {
             user: 'librosmaldonado68@gmail.com',       
-            pass: 'xzym wpfq kwms gbdj'     
+            pass:   GMAIL_PASS   
         }
     });
 

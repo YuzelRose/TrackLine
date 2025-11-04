@@ -11,8 +11,8 @@ import BoxChekedSVG from '@/app/media/boxChekedSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
 
-const URI_START = 'http://localhost:5000'//process.env.REACT_APP_BACK_URL || 'https://librosmaldonado.shop'
-const URI = `${URI_START}/trckln/user/LoginAttempt`;
+const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
+const URI = `${URI_START}/trckln/user/login-attempt`;
 
 export default function Login({ onWaitingChange }){
     const [show, setShow] = useState(false)
@@ -29,37 +29,52 @@ export default function Login({ onWaitingChange }){
 
     const handleSubmit = async (e) => { 
         e.preventDefault()
-        onWaitingChange(true)
-        setWatingStatus(false)
-        setError({ message: '', state: false })
-        
-        const formData = new FormData(e.target)
-        const data = {
-            Mail: formData.get('user'),
-            Pass: formData.get('pass')
-        }
-        
-        await handleLogin(data) 
-    }
-
-    const handleLogin = async (data) => { 
         try {
-            const response = await axios.post(URI, data, { 
-                headers: {
-                    'Content-Type': 'application/json'
+            console.log(`Haciendo peticion a: ${URI}`);
+            onWaitingChange(true)
+            setWatingStatus(false)
+            setError({ message: '', state: false })
+            
+            const formData = new FormData(e.target)
+            const data = {
+                email: formData.get('user'),
+                Pass: formData.get('pass')
+            }
+        
+            const response = await axios.post(URI, { email: data.email, Pass: data.Pass });
+            
+            const user = response.data;
+            
+            //localStorage.setItem('userSession', initData());
+
+            //setAuthUser(user.Correo);
+            //setAuthUserName(user.Nombre);
+            //setIsLogged(true);
+            //if (check) {
+            //    keepSession({AuthUserName: user.Nombre, AuthUser: user.Correo})
+            //}
+            // ir a tablero principal
+        } catch (exError) {
+            console.error("Error al iniciar sesión:", exError);
+            if (exError.response) {
+                if (exError.response.status === 404 || exError.response.status === 401) {
+                    setError({
+                        message: 'Correo o contraseña incorrectos.',
+                        state: true
+                    })
+                } else {
+                    setError({
+                        message: 'Ocurrió un error. Inténtelo más tarde.',
+                        state: true
+                    })
                 }
-            })
-            console.log('Login exitoso:', response.data)
-        } catch (error) {
-            console.error('Error:', error.response?.data)
-            setError({
-                message: error.response?.data?.message || 'Error en el login',
-                state: true
-            })
-        } finally {
-            setWatingStatus(true)
-            onWaitingChange(false)
-        }
+            } else {
+                setError({
+                    message: 'Ocurrió un error. Inténtelo más tarde.',
+                    state: true
+                })
+            }
+        } 
     }
 
     return(

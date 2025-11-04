@@ -15,7 +15,7 @@ const UserModel = new mongoose.Schema({
         type:String,
         required:true,
     },
-    CRUP:{
+    CURP:{
         type:String,
         required:true,
         unique:true,

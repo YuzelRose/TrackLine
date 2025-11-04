@@ -9,7 +9,7 @@ import RegisterSVG from '@/app/media/RegisterSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
 
-const URI_START = 'http://localhost:3000'//process.env.REACT_APP_BACK_URL || 'https://librosmaldonado.shop'
+const URI_START = 'http://localhost:5000'//process.env.REACT_APP_BACK_URL || 'https://librosmaldonado.shop'
 const URI = `${URI_START}/trckln/user/`;
 
 export default function Reguister({ onWaitingChange }){
