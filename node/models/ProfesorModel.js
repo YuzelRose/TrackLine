@@ -1,45 +1,29 @@
 import mongoose from 'mongoose';
 
-const ProfesorModel = new mongoose.Schema({
-    Name:{
-        type:String,
+import User from './UserModel';
+
+const profesorSchema = new mongoose.Schema({
+    RFC: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    NCount: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    Cedula: {
+        type: String,
         required: true,
     },
-    Email:{
-        type:String,
-        required: true,
-        unique:true,
-        lowercase: true,
-    },
-    Pass:{
-        type:String,
-        required:true,
-    },
-    CURP:{
-        type:String,
-        required:true,
-        unique:true,
-    },
-    RFC:{
-        type:String,
-        required:true,
-        unique:true,
-    },
-    NCount:{
-        type:String,
-        required:true,
-        unique:true,
-    },
-    Birth:{
-        type:String,
-        required:true,
-    },
-    Cedula:{
-        type:String,
-        required:true,
-    },
+    Tabloid:[{
+        NTabloid:{
+            type: String,
+            unique: true
+        }
+    }]
+});
 
-},{collection:'profesor'});
-
-const Profesor = mongoose.model('Profesor',ProfesorModel);
+const Profesor = User.discriminator('profesor', profesorSchema);
 export default Profesor;

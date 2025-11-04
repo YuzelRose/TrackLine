@@ -1,30 +1,17 @@
 import mongoose from 'mongoose';
 
-const TutorModels = new mongoose.Schema({
-    Name:{
-        type:String,
+import User from './UserModel';
+
+const tutorSchema = new mongoose.Schema({
+    Phone: {
+        type: String,
         required: true,
     },
-    Email:{
-        type:String,
+    RelatedEmail: {
+        type: String,
         required: true,
-        unique:true,
-        lowercase: true,
-    },
-    Pass:{
-        type:String,
-        required:true,
-    },
-    Phone:{
-        type:String,
-        required:true,
-    },
-    RelatedEmail:{
-        type:String,
-        required:true,
     }
+});
 
-},{collection:'tutor'});
-
-const Tutor = mongoose.model('Tutor',TutorModels);
+const Tutor = User.discriminator('tutor', tutorSchema);
 export default Tutor;

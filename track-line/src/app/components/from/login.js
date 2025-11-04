@@ -1,5 +1,6 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation';
 import axios from 'axios'
 import styles from './css/login.module.css'
 import User from '@/app/media/userSVG'
@@ -10,11 +11,13 @@ import BoxSVG from '@/app/media/boxSVG'
 import BoxChekedSVG from '@/app/media/boxChekedSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
+import { keepSession } from '@/app/utils/JsonManage'
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/login-attempt`;
 
 export default function Login({ onWaitingChange }){
+    const navigate = useRouter();
     const [show, setShow] = useState(false)
     const [check, setCheck] = useState(false)
     const [watingStatus, setWatingStatus] = useState(true)
@@ -41,19 +44,14 @@ export default function Login({ onWaitingChange }){
                 Pass: formData.get('pass')
             }
         
-            const response = await axios.post(URI, { email: data.email, Pass: data.Pass });
+            const response = await axios.post(URI, { email: data.email, pass: data.Pass });
             
             const user = response.data;
             
-            //localStorage.setItem('userSession', initData());
-
-            //setAuthUser(user.Correo);
-            //setAuthUserName(user.Nombre);
-            //setIsLogged(true);
-            //if (check) {
-            //    keepSession({AuthUserName: user.Nombre, AuthUser: user.Correo})
-            //}
-            // ir a tablero principal
+            if (check) {
+                keepSession({AuthUserName: user.Nombre, AuthMail: user.Correo, Token: user.Token})
+            }
+            navigate.push('/tabloid/main');
         } catch (exError) {
             console.error("Error al iniciar sesión:", exError);
             if (exError.response) {

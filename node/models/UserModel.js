@@ -1,31 +1,48 @@
 import mongoose from 'mongoose';
 
-const UserModel = new mongoose.Schema({
-    Name:{
-        type:String,
+const UserSchema = new mongoose.Schema({
+    Name: {
+        type: String,
         required: true,
     },
-    Email:{
-        type:String,
+    Email: {
+        type: String,
         required: true,
-        unique:true,
+        unique: true,
         lowercase: true,
     },
-    Pass:{
-        type:String,
-        required:true,
+    Pass: {
+        type: String,
+        required: true,
     },
-    CURP:{
-        type:String,
-        required:true,
-        unique:true,
+    CURP: {
+        type: String,
+        required: true,
+        unique: true,
     },
-    Birth:{
-        type:String,
-        required:true,
+    Birth: {
+        type: String,
+        required: true,
     },
+    userType: {
+        type: String,
+        enum: ['student', 'profesor', 'tutor'],
+        required: true
+    }
+}, { 
+    collection: 'users',
+    discriminatorKey: 'userType'  // ← Clave que discrimina el tipo
+});
 
-},{collection:'User'});
-
-const User = mongoose.model('User',UserModel);
+const User = mongoose.model('User', UserSchema);
 export default User;
+
+/*
+colection name: users
+"Name": "Javier",
+"Email": "zelinkmd@gmail.com",
+"Pass": "1234",
+"CURP": "adawdd2q4ds",
+"Birth": "09-03-2005",
+"userType": "student"
+*/

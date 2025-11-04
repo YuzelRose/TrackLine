@@ -1,36 +1,40 @@
-import Usuario from '../models/UserModel.js'
-import nodemailer from 'nodemailer';
+import User from '../models/UserModel.js';
 import bcrypt from 'bcrypt';
 
 export const comparePasswords = async (plainPassword, hashedPassword) => {
     return await bcrypt.compare(plainPassword, hashedPassword);
 };
 
-export const allUsers = async (req, res) => {
-    try {
-        const users = await Usuario.find();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ message: error.message})
-    }
-};
+export const postSupRegister = async (req, res) => {
+    
+}
 
 export const postLogIn = async (req, res) => {
     try {
         const { email, pass } = req.body;
-        const user = await Usuario.findOne({ Email: email });
+        const user = await User.findOne({ Email: email });
         console.log(`Login Attempt: ${email}`);
-        if (!user) return res.status(404).json({ message: 'Correo no valido' });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'Correo no válido' });
+        }
 
-        //const contrasenaValida = await comparePasswords(pass, user.Contrasena);
-        //if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
-        const { Contrasena, ...userData } = user.toObject();
+        // Verificar contraseña (descomenta cuando tengas comparePasswords)
+        // const contrasenaValida = await comparePasswords(pass, user.Pass);
+        // if (!contrasenaValida) {
+        //     return res.status(401).json({ message: 'Error al iniciar sesión' });
+        // }
+
+        // Excluir la contraseña de la respuesta
+        const { Pass, ...userData } = user.toObject();
+        
         res.json(userData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+/*
 export const getUserById = async (req, res) => {
     try {
         const user = await Usuario.findById(req.params.id);
@@ -165,3 +169,13 @@ export const ChangeCount = async (req, res) => {
         res.status(500).json({ message: error.message }); 
     }
 };
+
+export const allUsers = async (res) => {
+    try {
+        const users = await Usuario.find();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message})
+    }
+};
+*/

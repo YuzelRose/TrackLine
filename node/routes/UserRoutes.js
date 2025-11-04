@@ -6,7 +6,7 @@ import { postLogIn, /*postRegister*/ }  from '../controllers/UserController.js'
 const router = express.Router();
 
 router.post('/login-attempt', postLogIn);
-//router.post('/PreRegister', postRegister);
+//router.post('/frst-register', postSupRegister);
 
 
 export default router;

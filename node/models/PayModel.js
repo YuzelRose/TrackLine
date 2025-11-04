@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 
 const PayModel = new mongoose.Schema({
-    UserRef: {
+    NRef: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Usuario',
         required: true
     },
     Amaunt: [{
@@ -19,9 +18,6 @@ const PayModel = new mongoose.Schema({
         enum: ['pendiente', 'completado', 'fallido'],
         default: 'pendiente'
     }],
-    referencia: [{
-        type: String
-    }]
 }, { collection: 'Pay' });
 
 const Pay = mongoose.model('Pay',PayModel);

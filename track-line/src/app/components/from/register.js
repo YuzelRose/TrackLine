@@ -9,8 +9,8 @@ import RegisterSVG from '@/app/media/RegisterSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
 
-const URI_START = 'http://localhost:5000'//process.env.REACT_APP_BACK_URL || 'https://librosmaldonado.shop'
-const URI = `${URI_START}/trckln/user/`;
+const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
+const URI = `${URI_START}/trckln/user/frst-register`;
 
 export default function Reguister({ onWaitingChange }){
     const [show, setShow] = useState(false)
