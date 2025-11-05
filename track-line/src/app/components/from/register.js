@@ -1,18 +1,21 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
-import styles from './css/login.module.css'
+import styles from './css/login-register.module.css'
 import User from '@/app/media/userSVG'
 import ClosedEye from '@/app/media/closedEyeSVG'
 import Eye from '@/app/media/eyeSVG'
-import RegisterSVG from '@/app/media/RegisterSVG'
+import SendSVG from '@/app/media/SendSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
+import CheckBoxButton from '../uI/CheckBoxButton'
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/frst-register`;
 
 export default function Reguister({ onWaitingChange }){
+    const [button, setButton] = useState(false)
+    const [conditios, setConditios] = useState(false)
     const [show, setShow] = useState(false)
     const [watingStatus, setWatingStatus] = useState(true)
     const [error, setError] = useState({
@@ -20,44 +23,57 @@ export default function Reguister({ onWaitingChange }){
         state:false
     })
 
-    const handleShow = () => {
-        setShow(!show)
-    }
-
-    const handleSubmit = async (e) => { 
+    const handleRegister = async (e) => { 
         e.preventDefault()
-        onWaitingChange(true)
-        setWatingStatus(false)
-        setError({ message: '', state: false })
-        
-        const formData = new FormData(e.target)
-        const data = {
-            user: formData.get('user'),
-            pass: formData.get('pass')
+        try {
+            onWaitingChange(true)
+            setWatingStatus(false)
+            setError({ message: '', state: false })
+            
+            const formData = new FormData(e.target)
+            const data = {
+                email: formData.get('user'),
+                Pass: formData.get('pass')
+            }
+            const response = await axios.post(URI, { email: data.email })
+            const res = response.data;
+            if(res.response.status === 200){
+                alert('Revisa tu correo para terminar tu registro')
+                // genera un json con tok y pass que se destruya tras x tiempo
+            }
+        } catch (exError) {
+            console.error("Error al iniciar sesión:", exError);
+            if (exError.response) {
+                if (exError.response.status === 404 || exError.response.status === 401) {
+                    setError({
+                        message: 'Correo o contraseña incorrectos.',
+                        state: true
+                    })
+                } else {
+                    setError({
+                        message: 'Ocurrió un error. Inténtelo más tarde.',
+                        state: true
+                    })
+                }
+            } else {
+                setError({
+                    message: 'Ocurrió un error. Inténtelo más tarde.',
+                    state: true
+                })
+            }
+        } finally {
+            onWaitingChange(false)
+            setWatingStatus(true)
         }
-        
-        await handleLogin(data) 
     }
 
-    const handleLogin = async (data) => { 
-        try {
-            const response = await axios.post(URI, data, { 
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            console.log('Login exitoso:', response.data)
-        } catch (error) {
-            console.error('Error:', error.response?.data)
-            setError({
-                message: error.response?.data?.message || 'Error en el login',
-                state: true
-            })
-        } finally {
-            setWatingStatus(true)
-            onWaitingChange(false)
+    const handleDownload = () =>{
+        if(conditios === false) {
+            setConditios(true)
+            window.open('/documents/Términos_y_Condiciones _de_Uso_Track_Line_04-11-2025.pdf', '_blank');
         }
     }
+
     return(
         <AnimatePresence mode="wait">
         {watingStatus ? (
@@ -68,7 +84,7 @@ export default function Reguister({ onWaitingChange }){
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
             >
-                <form onSubmit={handleSubmit} id={styles.form}>
+                <form onSubmit={handleRegister} id={styles.form}>
                     <span className={styles.group}>
                         <input type="email" name='user' placeholder='correo@proveedor.com' required className={styles.text} />
                         <User/>
@@ -76,22 +92,50 @@ export default function Reguister({ onWaitingChange }){
                     <span className={styles.group}>
                         { show ? <>
                             <input type="text" name='pass' placeholder='Contraseña' required className={styles.text} />
-                            <Eye onClick={handleShow}/> 
+                            <Eye onClick={() => setShow(!show)}/> 
                         </> : <>
                             <input type="password" name='pass' placeholder='Contraseña' required className={styles.text} />
-                            <ClosedEye onClick={handleShow}/>
+                            <ClosedEye onClick={() => setShow(!show)}/>
                         </> }
                     </span>
-                    <span className={styles.group}>
-                        { show ? <>
-                            <input type="text" name='passconf' placeholder='Confirme su contraseña' required className={styles.text} />
-                            <Eye onClick={handleShow}/> 
-                        </> : <>
-                            <input type="password" name='passconf' placeholder='Confirme su contraseña' required className={styles.text} />
-                            <ClosedEye onClick={handleShow}/>
-                        </> }
-                    </span>
-                    <button type='submit' className='button'>Registrarse <RegisterSVG/></button>
+                    <CheckBoxButton 
+                    text="Descargar los terminos y condiciones" 
+                    onclick={handleDownload}
+                    onlychange={true}
+                    />
+                    <AnimatePresence>
+                        {conditios && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20, height: 0 }}
+                                animate={{ opacity: 1, y: 0, height: "auto" }}
+                                exit={{ opacity: 0, y: -20, height: 0 }}
+                                transition={{ duration: 0.3 }}
+                                style={{ overflow: "hidden" }}
+                            >
+                                <CheckBoxButton
+                                    text="Lei y acepto los terminos y condiciones" 
+                                    onclick={() => setButton(!button)} 
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Botón de enviar con animación */}
+                    <AnimatePresence>
+                        {button && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                style={{ display: "flex", justifyContent: "center" }}
+                            >
+                                <button type='submit' className='button'>
+                                    Enviar confirmación <SendSVG/>
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </form>
                 {error.state ? <p title='ocultar' onClick={() => setError({state: false})} className='error-text'>{error.message}</p> : null}
             </motion.div>

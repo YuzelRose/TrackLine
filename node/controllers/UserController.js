@@ -1,33 +1,72 @@
 import User from '../models/UserModel.js';
+import nodemailer from 'nodemailer';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import { GMAIL_PASS, TRACT_ORIGIN } from '../config.js';
+import { compileEmailTemplate } from '../email-teplates/utils.js';
 
 export const comparePasswords = async (plainPassword, hashedPassword) => {
     return await bcrypt.compare(plainPassword, hashedPassword);
 };
+const genTok = () => crypto.randomBytes(32).toString('hex');
 
 export const postSupRegister = async (req, res) => {
-    
-}
+    try {
+        const { email } = req.body;
+        const tok = genTok();
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            service: 'gmail',
+            port: 465,
+            secure: true, 
+            auth: {
+                user: 'trackline.edu@gmail.com',       
+                pass: GMAIL_PASS    
+            }
+        });
+
+        const htmlContent = await compileEmailTemplate({
+            email: email,
+        });
+
+        const mailOptions = {
+            from: {
+                name: 'Track-Line',
+                address: 'trackline.edu@gmail.com',
+            },
+            to: email,
+            subject: 'Confirma tu registro en Track-Line',
+            html: htmlContent
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('Correo enviado exitosamente');
+        res.status(200).json({ 
+            message: 'Revise su correo', 
+            token: tok
+        });
+    } catch (error) {
+        console.log(`Error al enviar el correo: ${error}`);
+    }
+
+};
 
 export const postLogIn = async (req, res) => {
     try {
         const { email, pass } = req.body;
         const user = await User.findOne({ Email: email });
         console.log(`Login Attempt: ${email}`);
-        
         if (!user) {
             return res.status(404).json({ message: 'Correo no válido' });
         }
-
-        // Verificar contraseña (descomenta cuando tengas comparePasswords)
-        // const contrasenaValida = await comparePasswords(pass, user.Pass);
-        // if (!contrasenaValida) {
-        //     return res.status(401).json({ message: 'Error al iniciar sesión' });
-        // }
-
-        // Excluir la contraseña de la respuesta
-        const { Pass, ...userData } = user.toObject();
+        const contrasenaValida = await comparePasswords(pass, user.Pass);
+        if (!contrasenaValida) {
+            return res.status(401).json({ message: 'Error al iniciar sesión' });
+        }
+        const tok = genTok();
         
+        const { Pass, ...userData } = user.toObject();
+        userData.token = tok;
         res.json(userData);
     } catch (error) {
         res.status(500).json({ message: error.message });

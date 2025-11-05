@@ -2,16 +2,15 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation';
 import axios from 'axios'
-import styles from './css/login.module.css'
+import styles from './css/login-register.module.css'
 import User from '@/app/media/userSVG'
 import ClosedEye from '@/app/media/closedEyeSVG'
 import Eye from '@/app/media/eyeSVG'
 import LoginSVG from '@/app/media/loginSVG'
-import BoxSVG from '@/app/media/boxSVG'
-import BoxChekedSVG from '@/app/media/boxChekedSVG'
 import { useState } from 'react'
 import HgWait from '../uI/hgWait'
 import { keepSession } from '@/app/utils/JsonManage'
+import CheckBoxButton from '../uI/CheckBoxButton';
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/login-attempt`;
@@ -26,14 +25,9 @@ export default function Login({ onWaitingChange }){
         state:false
     })
 
-    const handleShow = () => {
-        setShow(!show)
-    }
-
     const handleSubmit = async (e) => { 
         e.preventDefault()
         try {
-            console.log(`Haciendo peticion a: ${URI}`);
             onWaitingChange(true)
             setWatingStatus(false)
             setError({ message: '', state: false })
@@ -43,13 +37,10 @@ export default function Login({ onWaitingChange }){
                 email: formData.get('user'),
                 Pass: formData.get('pass')
             }
-        
             const response = await axios.post(URI, { email: data.email, pass: data.Pass });
-            
             const user = response.data;
-            
             if (check) {
-                keepSession({AuthUserName: user.Nombre, AuthMail: user.Correo, Token: user.Token})
+                keepSession({AuthUserEmail: user.Email, Token: user.token})
             }
             navigate.push('/tabloid/main');
         } catch (exError) {
@@ -72,7 +63,10 @@ export default function Login({ onWaitingChange }){
                     state: true
                 })
             }
-        } 
+        } finally {
+            onWaitingChange(false)
+            setWatingStatus(true)
+        }
     }
 
     return(
@@ -93,19 +87,13 @@ export default function Login({ onWaitingChange }){
                     <span className={styles.group}>
                         { show ? <>
                             <input type="text" name='pass' placeholder='Contraseña' required className={styles.text} />
-                            <Eye onClick={handleShow}/> 
+                            <Eye onClick={() => setShow(!show)}/> 
                         </> : <>
                             <input type="password" name='pass' placeholder='Contraseña' required className={styles.text} />
-                            <ClosedEye onClick={handleShow}/>
+                            <ClosedEye onClick={() => setShow(!show)}/>
                         </> }
                     </span>
-                    <div id={styles.keep} onClick={() => setCheck(!check)}>
-                        { check ? 
-                            <BoxChekedSVG /> 
-                        : 
-                            <BoxSVG /> 
-                        } Mantener sesión
-                    </div>
+                    <CheckBoxButton text="Mantener sesión" onclick={() => setCheck(!check)}/>
                     <button type='submit' className='button'>Ingresar <LoginSVG/></button>
                 </form>
                 {error.state ? <p title='ocultar' onClick={() => setError({state: false})} className='error-text'>{error.message}</p> : null}

@@ -127,6 +127,8 @@ p { font-size: 1.125rem; }
 }
 
 .button{
+  align-self: center;
+  width: 15em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,6 +262,10 @@ footer { background-color: var(--muted); }
 
 #hg-svg {
   animation: rotate180 3s infinite;
+}
+
+.accent{
+  color: var(--accent);
 }
 
 @keyframes rotate180 {

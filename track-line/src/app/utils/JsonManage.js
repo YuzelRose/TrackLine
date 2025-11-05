@@ -1,48 +1,66 @@
 const LOCAL_STORAGE_KEY = 'trckln';
+const LOCAL_STORAGE_KEY_REGISTER = 'trckln/register';
 const LOCAL_STORAGE_KEY_KEEP = 'trckln/keep';
 
-export const keepSession = ({ AuthUserName, AuthUser }) => {
+export const keepSession = ({ AuthUserEmail, AuthTok }) => {
     const sessionData = {
-        AuthUserName: AuthUserName,
-        IsLogged: true,
-        AuthUser: AuthUser
+        Email: AuthUserEmail,
+        Token: AuthTok,
+        date: Date.now()
     };
-    localStorage.setItem(LOCAL_STORAGE_KEY_KEEP, JSON.stringify(sessionData));
+    saveData({data: sessionData, key: LOCAL_STORAGE_KEY_KEEP})
 };
 
-const generateJSON = () => {
-    return `
-    {
-        "cart": [],
-        "list": []
+export const registerData = ({ AuthPass, AuthTok }) => {
+    const sessionData = {
+        Pass: AuthPass,
+        AuthUser: AuthTok
+    };
+    saveData({data: sessionData, key: LOCAL_STORAGE_KEY_REGISTER})
+};
+
+export const isSessionValid = () => {
+    const data = getData(LOCAL_STORAGE_KEY_KEEP);
+    
+    if (!data || !data.date || data.token) {
+        alert("Su sesion a caducado")
+        deleteJSON(LOCAL_STORAGE_KEY_KEEP);
+        return false;
     }
-    `;
-}
-
-
-
-// Limpiar el carrito de compras
-export const clearCart = () => {
-    const currentData = getData();
-    currentData.cart = []; 
-    saveData(currentData); 
+    if ((Date.now() - data.date) > (4 * 60 * 60 * 1000)) {
+        alert(`Sesion caduca ${data.date}`)
+        deleteJSON(LOCAL_STORAGE_KEY_KEEP);
+        alert("Su sesion a caducado")
+        return false;
+    }
+    data.date = Date.now();
+    saveData({data: data, key: LOCAL_STORAGE_KEY_KEEP})
+    return true;
 };
 
+// Función para guardar datos en el Local Storage
+const saveData = ({data,key}) => {
+    localStorage.setItem(key, JSON.stringify(data));
+};
+// Funcion para borrar datos
+export const deleteJSON = (key) => {
+    localStorage.removeItem(key); 
+};
+
+const getData = (key) => {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+};
+
+/*
 
 export const initData = () => {
     localStorage.setItem(LOCAL_STORAGE_KEY, generateJSON());
 }
-
 // Función para obtener los datos del Local Storage
-const getData = () => {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return data ? JSON.parse(data) : { cart: [], list: [] };
-};
 
-// Función para guardar datos en el Local Storage
-const saveData = (data) => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-};
+
+
 
 // Función para agregar un item al cart
 export const addToCart = (newItem, cant = 1) => {
@@ -57,94 +75,6 @@ export const addToCart = (newItem, cant = 1) => {
     }
     saveData(currentData);
 };
-
-
-// Función para actualizar la cantidad de un item en el cart
-export const updateCartItem = (id, amount) => {
-    const currentData = getData();
-    const item = currentData.cart.find(item => item.ID === id);
-    if (item) {
-        item.cant += amount;
-        if (item.cant <= 0) {
-            deleteCartItem(id);
-        } else {
-            saveData(currentData);
-        }
-    }
-};
-
-export const changeCartToList = (id) => {
-    const currentData = getData();
-    const existingItem = currentData.list.find(item => item.ID === id);
-    if (!existingItem) {
-        currentData.list.push({ "ID": id });
-    }
-    currentData.cart = currentData.cart.filter(item => item.ID !== id);
-    alert("Movido a la lista");
-    saveData(currentData);
-}
-
-// Función para eliminar un item del cart
-export const deleteCartItem = (id) => {
-    const currentData = getData();
-    currentData.cart = currentData.cart.filter(item => item.ID !== id);
-    alert("Eliminado del carrito");
-    saveData(currentData);
-};
-
-// Función para agregar un item a la list
-export const addToList = (newItem) => {
-    const currentData = getData();
-    const existingItem = currentData.list.find(item => item.ID === newItem);
-    if (!existingItem) {
-        currentData.list.push({ "ID": newItem });
-        alert("Agregado a la lista");
-        saveData(currentData);
-    }
-    
-};
-
-// Función para eliminar un item de la list
-export const deleteListItem = (id) => {
-    const currentData = getData();
-    currentData.list = currentData.list.filter(item => item.ID !== id);
-    alert("Eliminado de favoritos");
-    saveData(currentData);
-};
-
-// Función para obtener items del cart y list
-export const getCart = () => {
-    return getData().cart;
-};
-
-export const getList = () => {
-    return getData().list;
-};
-
-export const getListItemIds = () => {
-    const currentData = getData(); 
-    return currentData.list.map(item => item.ID); 
-};
-
-export const getCartItemIds = () => {
-    const currentData = getData();
-    return currentData.cart.map(item => item.ID); 
-};
-
-export const getCartItemCants = () => {
-    const currentData = getData();
-    return currentData.cart.reduce((acc, item) => {
-        acc[item.ID] = item.cant;
-        return acc;
-    }, {});
- 
-};
-
-export const deleteJSON = () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY); 
-    localStorage.removeItem(LOCAL_STORAGE_KEY_KEEP); 
-};
-
 
 export const generatePayPalJson = (cartItems, quantities, finalCost) => {
     const currency = 'MXN'; 
@@ -193,4 +123,4 @@ export const generatePayPalJson = (cartItems, quantities, finalCost) => {
     };
     localStorage.setItem('paypalJson', JSON.stringify(paypalData));
     return paypalData;
-};
+};*/

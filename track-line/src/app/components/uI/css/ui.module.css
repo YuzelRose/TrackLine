@@ -17,3 +17,18 @@
     -ms-border-radius: 100%;
     -o-border-radius: 100%;
 }
+
+#keep {
+   display: flex;
+   flex-direction: row;
+   width: fit-content;
+   align-items: center;
+   justify-content: start;
+   padding-bottom: 0.5em;
+}
+
+#keep:hover {
+    color: var(--ring);
+    cursor: pointer;
+    text-decoration: underline;
+}

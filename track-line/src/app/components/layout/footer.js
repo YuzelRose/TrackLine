@@ -6,8 +6,8 @@ import EmailButton from '../from/mailconsult.js'
 import styles from './css/footer.module.css'
 export default function Footer(){
     const router = useRouter()
-    const handleNavigate = () => {
-        router.push('/profile/blank')
+    const handleTerminos = () => {
+        window.open('/documents/Términos_y_Condiciones _de_Uso_Track_Line_04-11-2025.pdf', '_blank');
     }
     return(
         <footer>
@@ -27,8 +27,9 @@ export default function Footer(){
             </section>
             <article id={styles.conditions} className='topline'> 
                 <h6>Sitio desarrollado por <a  className="link" href="https://github.com/YuzelRose">@YuzelRose</a> y <a  className="link" href="https://github.com/SpacialHarbort">@SpacialHarbort</a></h6>
-                <h6 onClick={handleNavigate}><span className="link" onClick={handleNavigate}>Términos de servicio</span></h6>
-                <h6>Track Line ©2025</h6>
+                <h6><span className='accent'>trackline.edu@gmail.com</span> y <span className='accent'>trackline.service@gmail.com</span>  son los correos oficiales de <strong>©Track-Line</strong></h6>
+                <h6><span className="link" onClick={handleTerminos}>Términos de servicio</span></h6>
+                <h6>© 2025 Track-Line. Todos los derechos reservados.</h6>
             </article>
         </footer>
     )

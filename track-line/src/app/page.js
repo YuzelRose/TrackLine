@@ -1,16 +1,27 @@
 'use client'
 import { motion, AnimatePresence } from "framer-motion"
-import { useState } from "react";
-import Login from "./components/from/login";
-import Register from "./components/from/register";
-import Image from "next/image";
+import { useEffect, useState } from "react"
+import Login from "./components/from/Login.js"
+import Register from "./components/from/Register"
+import Image from "next/image"
 import backgroundImage from '@/app/media/pexels-august-de-richelieu-4260475.jpg'
-import ArrowSVG from "./media/arrowSVG";
+import ArrowSVG from "./media/arrowSVG"
 import styles from './page.module.css'
+import { isSessionValid } from "./utils/JsonManage.js"
+import { useRouter } from 'next/navigation';
+
 export default function Home() {
+  const router  = useRouter();
   const [login,setLogin] = useState(true)
   const [isAnimating, setIsAnimating] = useState(false)
   const [wait, setWait] = useState(false)
+
+  useEffect(() => {
+      if (isSessionValid()) {
+        router.push('/tabloid/main'); // ✅ CORRECTO
+      } else {}
+  }, [router]);
+
 
   const handleToggle = () => {
     if (!wait && !isAnimating) {
@@ -79,10 +90,10 @@ export default function Home() {
           </section>
         </div>
         <div className={styles.text} id={styles.txt1}> 
-          <h3>Nuestra Misión</h3>
-          <h5>
+          <h5>Nuestra Misión</h5>
+          <p>
             Somos Track Line, una plataforma educativa que impulsa el aprendizaje digital y facilita la comunicación entre estudiantes, maestros y padres de familia. Promovemos que los padres estén siempre informados sobre los métodos de enseñanza y el desempeño académico de sus hijos, creando un puente sólido entre el hogar y la institución educativa.
-          </h5>
+          </p>
         </div>
         <figure id={styles.img}>
           <Image
@@ -92,10 +103,10 @@ export default function Home() {
           />
         </figure>
         <div className={styles.text} id={styles.txt2}>
-          <h3>Nuestro Compromiso</h3>
-          <h5>
+          <h5>Nuestro Compromiso</h5>
+          <p>
             Nuestro objetivo es fortalecer la participación de toda la comunidad escolar mediante herramientas innovadoras que faciliten el acceso a la información, la organización de actividades y el acompañamiento constante en el proceso educativo.
-          </h5>
+          </p>
           <h5>
             Creemos en la educación como motor fundamental del desarrollo personal y académico, por lo que hemos creado un espacio seguro, moderno e inclusivo donde cada estudiante puede aprender de manera efectiva y cada familia puede involucrarse activamente en el crecimiento de sus hijos.
           </h5>
