@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import PayPalLogoSVG from '../../media/paypalSVG.js'
-import TrackLineSVG from '../../media/track-lineSVG.js'
+import PayPalLogoSVG from '../../media/PaypalSVG.js'
+import TrackLineSVG from '../../media/Track-lineSVG.js'
 import EmailButton from '../from/mailconsult.js'
 import styles from './css/footer.module.css'
 export default function Footer(){

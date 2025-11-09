@@ -26,7 +26,9 @@ export const postSupRegister = async (req, res) => {
         });
 
         const htmlContent = await compileEmailTemplate({
+            token: tok,
             email: email,
+            origin: TRACT_ORIGIN
         });
 
         const mailOptions = {

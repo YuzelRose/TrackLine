@@ -5,7 +5,7 @@ import Login from "./components/from/Login.js"
 import Register from "./components/from/Register"
 import Image from "next/image"
 import backgroundImage from '@/app/media/pexels-august-de-richelieu-4260475.jpg'
-import ArrowSVG from "./media/arrowSVG"
+import ArrowSVG from "./media/ArrowSVG.js"
 import styles from './page.module.css'
 import { isSessionValid } from "./utils/JsonManage.js"
 import { useRouter } from 'next/navigation';
@@ -18,16 +18,9 @@ export default function Home() {
 
   useEffect(() => {
       if (isSessionValid()) {
-        router.push('/tabloid/main'); // ✅ CORRECTO
-      } else {}
+        router.push('/tabloid');
+      }
   }, [router]);
-
-
-  const handleToggle = () => {
-    if (!wait && !isAnimating) {
-      setLogin(!login)
-    }
-  }
 
   const setWaitingStatus = (waiting) => {
     setWait(waiting)
@@ -39,7 +32,7 @@ export default function Home() {
         <div id={styles.log}> 
           <section id={styles.conteiner}>
             <h3 
-              onClick={handleToggle} 
+              onClick={() => setLogin(!login)} 
               id={styles.h3}
               style={{ 
                 cursor: wait ? 'not-allowed' : 'pointer',

@@ -27,8 +27,58 @@
    padding-bottom: 0.5em;
 }
 
-#keep:hover {
+.bright:hover {
     color: var(--ring);
     cursor: pointer;
     text-decoration: underline;
+}
+
+.brightless{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: brightness(0.7);
+  -webkit-filter: brightness(0.7);
+}
+
+.dropList {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 10em;
+    position: relative;
+    border: 0.125em solid var(--border);
+    background: var(--background);
+    cursor: pointer;
+    border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -ms-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
+}
+
+.dropHeader {
+    padding: 0.5em 0.7em;
+}
+
+.dropContent {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--background);
+    border: 0.125em solid var(--border);
+    border-top: none;
+    z-index: 10;
+}
+
+.dropItem {
+    padding: 0.5em 0.7em;
+    margin: 0;
+    border-bottom: 0.125em solid var(--border);
+}
+
+.dropItem:hover {
+    color: var(--ring);
 }

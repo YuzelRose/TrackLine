@@ -1,9 +1,9 @@
 'use client'
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from 'react'
-import TrackLine from '../../media/track-lineSVG.js'
-
-export default function Icon({ icon }){
+import TrackLine from '../../media/Track-lineSVG.js'
+// No se esta usando este componente actualmente 
+export default function Icon({ icon }) {
     const [isOnLanding, setIsOnLanding] = useState(true)    
     const router = useRouter()
     const pathname = usePathname()
@@ -13,8 +13,8 @@ export default function Icon({ icon }){
     }, [])
 
     const handleNavigate = () => {
-        if(pathname !== '/' && pathname !== '/main-page') 
-            router.push('/main-page')
+        if(pathname !== '/') 
+            router.push('/')
     }
     
     return(

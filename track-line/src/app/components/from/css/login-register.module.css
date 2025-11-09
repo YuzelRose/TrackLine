@@ -1,40 +1,7 @@
 #form {
     display: flex;
     flex-direction: column;
+    gap: 0.5em;
     width: 100%;
     padding-bottom: 1em;
-}
-
-.group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding-bottom: 2vh;
-    gap: 1em;
-    margin-bottom: 0.75em;
-    padding: 0.75em 1em;
-    background-color: var(--input);
-    border: 0.125em solid var(--border);
-    border-radius: 1em;
-    -webkit-border-radius: 1em;
-    -moz-border-radius: 1em;
-    -ms-border-radius: 1em;
-    -o-border-radius: 1em;
-    transition: all 0.2s ease;
-}
-
-.group:focus-within {
-  border-color: var(--ring);
-}
-
-.text {
-    border: none;
-    background-color: var(--input);
-    outline: none;
-    width: 100%;
-    font-size: 1rem;
-}
-
-.text:focus {
-    outline: none;
 }

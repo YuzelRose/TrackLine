@@ -1,4 +1,4 @@
-import HourglassSVG from "@/app/media/hourGlassSVG";
+import HourglassSVG from "@/app/media/HourGlassSVG";
 import { useEffect, useState } from "react";
 import styles from './css/ui.module.css'
 

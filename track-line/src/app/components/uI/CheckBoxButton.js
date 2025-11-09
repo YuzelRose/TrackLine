@@ -1,34 +1,32 @@
 'use client'
 
-import BoxChekedSVG from "@/app/media/boxChekedSVG"
-import BoxSVG from "@/app/media/boxSVG"
+import BoxChekedSVG from "@/app/media/BoxChekedSVG"
+import BoxSVG from "@/app/media/BoxSVG"
 import { useState } from "react"
 import styles from './css/ui.module.css'
 
 export default function CheckBoxButton({ 
-    text, 
+    text = "Te falta la etiqueta text.", 
     onclick = () => {}, 
     state = false, 
-    onlychange = false 
+    onlyChange = false,
+    notChange = false
 }){
     const [check, setCheck] = useState(state)
 
     const handleClick = () => {
-        // Primero ejecuta la lógica interna del checkbox
-        setCheck(!state)
-        if(!onlychange) {
-            setCheck(!check)
-            state = !state
-        }
-        
-        // Luego ejecuta la función onclick que se pasa por props
-        if (onclick) {
-            onclick(); // Ejecuta la función adicional
+        if(!notChange) {
+            setCheck(!state)
+            if(!onlyChange) {
+                setCheck(!check)
+                state = !state
+            }
+            if (onclick) onclick(); 
         }
     }
 
     return(
-        <div id={styles.keep} onClick={handleClick}>
+        <div id={styles.keep} className={notChange ? styles.brightless : styles.bright} onClick={handleClick} >
             { check ? 
                 <BoxChekedSVG /> 
             : 

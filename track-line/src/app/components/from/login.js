@@ -3,21 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation';
 import axios from 'axios'
 import styles from './css/login-register.module.css'
-import User from '@/app/media/userSVG'
-import ClosedEye from '@/app/media/closedEyeSVG'
-import Eye from '@/app/media/eyeSVG'
-import LoginSVG from '@/app/media/loginSVG'
+import User from '@/app/media/UserSVG'
+import LoginSVG from '@/app/media/LoginSVG'
 import { useState } from 'react'
-import HgWait from '../uI/hgWait'
+import HgWait from '../uI/HgWait'
 import { keepSession } from '@/app/utils/JsonManage'
 import CheckBoxButton from '../uI/CheckBoxButton';
+import PassInput from '../uI/inputs/PassInput';
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/login-attempt`;
 
 export default function Login({ onWaitingChange }){
     const navigate = useRouter();
-    const [show, setShow] = useState(false)
     const [check, setCheck] = useState(false)
     const [watingStatus, setWatingStatus] = useState(true)
     const [error, setError] = useState({
@@ -80,19 +78,11 @@ export default function Login({ onWaitingChange }){
                 transition={{ duration: 0.3 }}
             >
                 <form onSubmit={handleSubmit} id={styles.form}>
-                    <span className={styles.group}>
-                        <input type="email" name='user' placeholder='correo@proveedor.com' required className={styles.text} />
+                    <div className='group'>
+                        <input type='email' name='user' placeholder='correo@proveedor.com' required className='grup-text' />
                         <User/>
-                    </span>
-                    <span className={styles.group}>
-                        { show ? <>
-                            <input type="text" name='pass' placeholder='Contraseña' required className={styles.text} />
-                            <Eye onClick={() => setShow(!show)}/> 
-                        </> : <>
-                            <input type="password" name='pass' placeholder='Contraseña' required className={styles.text} />
-                            <ClosedEye onClick={() => setShow(!show)}/>
-                        </> }
-                    </span>
+                    </div>
+                    <PassInput />
                     <CheckBoxButton text="Mantener sesión" onclick={() => setCheck(!check)}/>
                     <button type='submit' className='button'>Ingresar <LoginSVG/></button>
                 </form>

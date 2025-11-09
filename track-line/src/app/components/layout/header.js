@@ -1,12 +1,10 @@
 'use client'
-import Icon from '../uI/icon.js'
-import Profile from '../uI/profile.js'
+import Profile from '../uI/Profile.js'
+import TrackLine from '../../media/Track-lineSVG.js'
 import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import styles from './css/header.module.css'
 export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const pathname = usePathname()
     const [lastScrollTop, setLastScrollTop] = useState(0);
     const [headerVisible, setHeaderVisible] = useState(true);
 
@@ -34,7 +32,7 @@ export default function Header() {
 
     return (
         <header id={`${headerVisible ? styles.visible : styles.hidden}`}>
-            <div id={styles.icon}> <Icon /> </div>
+            <div id={styles.icon}> <TrackLine dim="10em" style="pointer" /> </div>
             <div id={styles.space}/>
             <div id={styles.user}> {isLoggedIn ? <Profile /> : <></> } </div>
         </header>

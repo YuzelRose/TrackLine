@@ -11,19 +11,39 @@ export const keepSession = ({ AuthUserEmail, AuthTok }) => {
     saveData({data: sessionData, key: LOCAL_STORAGE_KEY_KEEP})
 };
 
-export const registerData = ({ AuthPass, AuthTok }) => {
-    const sessionData = {
+export const registerData = ({ AuthEmail, AuthPass, AuthTok }) => {
+    deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
+    const preRegisterData = {
+        Email: AuthEmail,
         Pass: AuthPass,
-        AuthUser: AuthTok
+        Token: AuthTok,
+        ExDate: Date.now() + (60*60*1000) 
     };
-    saveData({data: sessionData, key: LOCAL_STORAGE_KEY_REGISTER})
+    saveData({data: preRegisterData, key: LOCAL_STORAGE_KEY_REGISTER})
 };
+
+export const doRegister = () => {
+    const data = getData(LOCAL_STORAGE_KEY_REGISTER);
+    if (!data) return null;
+    if (data.ExDate && data.ExDate > Date.now()) {
+        const reg = {
+            Email: data.Email,
+            Pass: data.Pass,
+            Token: data.Token
+        }
+        return reg
+    } else {
+        deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
+        return null
+    }
+}
+
+export const EndRegister = () => {deleteJSON(LOCAL_STORAGE_KEY_REGISTER)}
 
 export const isSessionValid = () => {
     const data = getData(LOCAL_STORAGE_KEY_KEEP);
     
     if (!data || !data.date || data.token) {
-        alert("Su sesion a caducado")
         deleteJSON(LOCAL_STORAGE_KEY_KEEP);
         return false;
     }
@@ -43,7 +63,7 @@ const saveData = ({data,key}) => {
     localStorage.setItem(key, JSON.stringify(data));
 };
 // Funcion para borrar datos
-export const deleteJSON = (key) => {
+const deleteJSON = (key) => {
     localStorage.removeItem(key); 
 };
 

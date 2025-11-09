@@ -1,9 +1,5 @@
 // src/email-utils.js
 import mjml2html from 'mjml';
-import fs from 'fs/promises';
-import path from 'path';
-
-
 
 export const compileEmailTemplate = async (templateData) => {
     const MJML_TEMPLATE =
@@ -128,18 +124,15 @@ export const compileEmailTemplate = async (templateData) => {
         </mj-body>
     </mjml>`
     try {        
-        // Reemplazar variables
         const compiledMjml = MJML_TEMPLATE
             .replace(/{{email}}/g, templateData.email || 'trackline.edu@gmail.com')
             .replace(/{{fecha}}/g, new Date().toLocaleDateString())
-        
-        // Convertir MJML a HTML
+            .replace(/{{urlPlataforma}}/g, `${templateData.origin}/confirmar-registro?token=${templateData.token ?? 'error'}`
+        )
         const { html, errors } = mjml2html(compiledMjml);
-        
         if (errors?.length > 0) {
             console.warn('MJML errors:', errors);
         }
-        
         return html;
     } catch (error) {
         console.error('Error compiling email template:', error);
