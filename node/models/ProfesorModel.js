@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
-
-import User from './UserModel';
+import User from './UserModel.js';
 
 const profesorSchema = new mongoose.Schema({
     RFC: {

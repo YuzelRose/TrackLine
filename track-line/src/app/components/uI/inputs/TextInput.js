@@ -8,13 +8,22 @@ export default function TextForm({content}) {
                     <p>
                         {inp.text? inp.text : inp.placeholder}
                     </p>
-                    <span className={`group ${styles.in}`}>
+                    <span 
+                        className={`group ${styles.in}`}
+                        {...(inp.read && {
+                            style: { 
+                                filter: 'brightness(0.8)',
+                                WebkitFilter: 'brightness(0.8)',
+                                cursor: 'not-allowed'
+                            }
+                        })}
+                    >
                         <input  
                             type={inp.type? inp.type : "text"}
                             name={inp.name} 
                             placeholder={inp.placeholder} 
                             {...(inp.req && { required: true })}
-                            {...(inp.red && {
+                            {...(inp.read && {
                                 readOnly: true, 
                                 style: { 
                                     filter: 'brightness(0.8)',

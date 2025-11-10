@@ -9,12 +9,21 @@ export default function PassInput({
     value = null, 
     placeholder = 'Contraseña', 
     onlyPass = false,
-    red = false
+    read = false
 }) {
     const [show, setShow] = useState(false)
 
     return(
-        <span className='group'>
+        <span 
+            className='group'
+            {...(read && {
+                style: { 
+                    filter: 'brightness(0.8)',
+                    WebkitFilter: 'brightness(0.8)',
+                    cursor: 'not-allowed'
+                }
+            })}
+        >
             { show && !onlyPass ? <>
                 <input 
                     type="text" 
@@ -22,7 +31,7 @@ export default function PassInput({
                     placeholder={placeholder} 
                     className='group-text' 
                     defaultValue={value} 
-                    {...(red && { 
+                    {...(read && { 
                         readOnly: true, 
                         style: { 
                             filter: 'brightness(0.8)',
@@ -40,7 +49,7 @@ export default function PassInput({
                     placeholder={placeholder} 
                     className='group-text' 
                     defaultValue={value} 
-                    {...(red && {
+                    {...(read && {
                         readOnly: true, 
                         style: { 
                             filter: 'brightness(0.8)',

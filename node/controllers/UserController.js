@@ -1,4 +1,5 @@
 import User from '../models/UserModel.js';
+import Student from '../models/StudentModel.js'
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
@@ -58,15 +59,12 @@ export const postLogIn = async (req, res) => {
         const { email, pass } = req.body;
         const user = await User.findOne({ Email: email });
         console.log(`Login Attempt: ${email}`);
-        if (!user) {
+        if (!user) 
             return res.status(404).json({ message: 'Correo no válido' });
-        }
         const contrasenaValida = await comparePasswords(pass, user.Pass);
-        if (!contrasenaValida) {
+        if (!contrasenaValida) 
             return res.status(401).json({ message: 'Error al iniciar sesión' });
-        }
         const tok = genTok();
-        
         const { Pass, ...userData } = user.toObject();
         userData.token = tok;
         res.json(userData);
@@ -74,6 +72,45 @@ export const postLogIn = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const registerTutor = async (req, res) => {
+    try {
+        const { data } = req.body;
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const registerStudent = async (req, res) => {
+    try {
+        const { data } = req.body;
+        if (!data) 
+            return res.status(404).json({ message: 'Error en el formulario.' })
+        console.log(`registro del correo: ${data.email}`)
+        if(data.pass === data.passConfirm) {
+        const salt = await bcrypt.genSalt(10);
+        const registerData = {
+            Name: data.name,
+            Email: data.email,
+            Pass: await bcrypt.hash(data.pass, salt),
+            CURP: data.curp,
+            Birth: data.birth,
+            userType: "student",  // Discriminador
+            Pays: [
+                { NRef: "REF123456" },
+                { NRef: "REF789012" }
+            ],
+            kardex: `KARDEX${data.email}`
+        }
+        await Student.create(registerData);
+        } else 
+            return res.status(404).json({ message: 'Error en la contraseña' })
+        res.json(userData);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 /*
 export const getUserById = async (req, res) => {

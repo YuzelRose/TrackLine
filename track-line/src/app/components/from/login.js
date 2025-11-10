@@ -1,15 +1,15 @@
 'use client'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation';
 import axios from 'axios'
 import styles from './css/login-register.module.css'
 import User from '@/app/media/UserSVG'
 import LoginSVG from '@/app/media/LoginSVG'
-import { useState } from 'react'
 import HgWait from '../uI/HgWait'
+import PassInput from '../uI/inputs/PassInput'
+import CheckBoxButton from '../uI/CheckBoxButton'
+import { useState } from 'react'
 import { keepSession } from '@/app/utils/JsonManage'
-import CheckBoxButton from '../uI/CheckBoxButton';
-import PassInput from '../uI/inputs/PassInput';
+import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/login-attempt`;
@@ -19,8 +19,8 @@ export default function Login({ onWaitingChange }){
     const [check, setCheck] = useState(false)
     const [watingStatus, setWatingStatus] = useState(true)
     const [error, setError] = useState({
-        message:'',
-        state:false
+        message: '',
+        state: false
     })
 
     const handleSubmit = async (e) => { 

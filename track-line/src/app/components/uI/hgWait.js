@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import styles from './css/ui.module.css'
 
 export default function HgWait(){
-    const [wait, setWait] = useState('cargando')
+    const [wait, setWait] = useState('Cargando')
     const [dotCount, setDotCount] = useState(0)
 
     useEffect(() => {

@@ -39,12 +39,10 @@ export default function Reguister({ onWaitingChange }){
             const res = response.data;
             if(response.status === 200){
                 setMessage({ message: res.message, state: true })
-                alert(data.email)
                 registerData({ AuthEmail:  data.email, AuthPass: data.pass, AuthTok: res.token })
                 setRet(false)
             }
         } catch (exError) {
-            console.error("Error al iniciar sesión:", exError);
             if (exError.response) {
                 if (exError.response.status === 404 || exError.response.status === 401) {
                     setMessage({

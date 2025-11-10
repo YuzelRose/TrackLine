@@ -5,7 +5,6 @@ import './database/MongoConex.js';
 import ContentRoutes from './routes/ContentRoutes.js';
 import PayRoutes from './routes/PayRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
-import TutorRoutes from './routes/TutorRoutes.js';
 import ProfesorRoutes from './routes/ProfesorRoutes.js';
 import TabloidRoutes from './routes/TabloidRoutes.js';
 
@@ -27,7 +26,6 @@ app.use(express.json());
 
 app.use(`${REQUEST_URL}/pay`, PayRoutes)
 app.use(`${REQUEST_URL}/user`, UserRoutes);
-app.use(`${REQUEST_URL}/tutor`, TutorRoutes);
 app.use(`${REQUEST_URL}/profesor`, ProfesorRoutes);
 app.use(`${REQUEST_URL}/tabloid`, TabloidRoutes);
 app.use(`${REQUEST_URL}/content`, ContentRoutes)
