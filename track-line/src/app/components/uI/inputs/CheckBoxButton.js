@@ -1,9 +1,8 @@
 'use client'
-
 import BoxChekedSVG from "@/app/media/BoxChekedSVG"
 import BoxSVG from "@/app/media/BoxSVG"
 import { useState } from "react"
-import styles from './css/ui.module.css'
+import styles from './css/inputs.module.css'
 
 export default function CheckBoxButton({ 
     text = "Te falta la etiqueta text.", 

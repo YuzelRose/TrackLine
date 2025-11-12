@@ -234,6 +234,9 @@ footer { background-color: var(--muted); }
     h5 { font-size: 1rem; }
     h6 { font-size: 0.875rem; }
     p { font-size: 0.875rem; }
+    .button{
+      width: 8em;
+    }
 }
 
 .error-text {

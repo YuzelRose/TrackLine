@@ -11,6 +11,18 @@ export const comparePasswords = async (plainPassword, hashedPassword) => {
 };
 const genTok = () => crypto.randomBytes(32).toString('hex');
 
+const isUserAvailable = async (email) => { // true si está disponible, false si existe
+    try {
+        const existingUser = await User.findOne({ Email: email });
+        return !existingUser; 
+    } catch (error) {
+        console.error('Error en isUserAvailable:', error);
+        return false; 
+    }
+}
+
+
+
 export const postSupRegister = async (req, res) => {
     try {
         const { email } = req.body;
@@ -59,11 +71,10 @@ export const postLogIn = async (req, res) => {
         const { email, pass } = req.body;
         const user = await User.findOne({ Email: email });
         console.log(`Login Attempt: ${email}`);
-        if (!user) 
-            return res.status(404).json({ message: 'Correo no válido' });
+        if (!user) return res.status(404).json({ message: 'Correo no válido' });
+        
         const contrasenaValida = await comparePasswords(pass, user.Pass);
-        if (!contrasenaValida) 
-            return res.status(401).json({ message: 'Error al iniciar sesión' });
+        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
         const tok = genTok();
         const { Pass, ...userData } = user.toObject();
         userData.token = tok;
@@ -85,30 +96,31 @@ export const registerTutor = async (req, res) => {
 export const registerStudent = async (req, res) => {
     try {
         const { data } = req.body;
-        if (!data) 
-            return res.status(404).json({ message: 'Error en el formulario.' })
-        console.log(`registro del correo: ${data.email}`)
+        if(!data)
+            return res.status(404).json({ message: 'Sin infromacion' })
+        if(!isUserAvailable(data.email)) return res.status(404).json({ message: 'usuario existente' })
         if(data.pass === data.passConfirm) {
-        const salt = await bcrypt.genSalt(10);
-        const registerData = {
-            Name: data.name,
-            Email: data.email,
-            Pass: await bcrypt.hash(data.pass, salt),
-            CURP: data.curp,
-            Birth: data.birth,
-            userType: "student",  // Discriminador
-            Pays: [
-                { NRef: "REF123456" },
-                { NRef: "REF789012" }
-            ],
-            kardex: `KARDEX${data.email}`
+            const salt = await bcrypt.genSalt(10);
+            const registerData = {
+                Name: data.name,
+                Email: data.email,
+                Pass: await bcrypt.hash(data.pass, salt),
+                CURP: data.curp,
+                Birth: data.birth,
+                userType: "student",  // ← Esto activa el discriminador
+                Pays: [
+                    { NRef: "REF123456" },
+                    { NRef: "REF789012" }
+                ],
+                kardex: `KARDEX${data.email}`
+            }
+            const userData = await Student.create(registerData)
+            res.json(userData)
+        } else {
+            return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
         }
-        await Student.create(registerData);
-        } else 
-            return res.status(404).json({ message: 'Error en la contraseña' })
-        res.json(userData);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message, place: "Try-catch" })
     }
 }
 

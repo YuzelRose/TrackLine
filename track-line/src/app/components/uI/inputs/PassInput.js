@@ -33,11 +33,6 @@ export default function PassInput({
                     defaultValue={value} 
                     {...(read && { 
                         readOnly: true, 
-                        style: { 
-                            filter: 'brightness(0.8)',
-                            WebkitFilter: 'brightness(0.8)',
-                            cursor: 'not-allowed'
-                        }
                     })}
                     required 
                 />
@@ -52,10 +47,8 @@ export default function PassInput({
                     {...(read && {
                         readOnly: true, 
                         style: { 
-                            filter: 'brightness(0.8)',
-                            WebkitFilter: 'brightness(0.8)',
                             cursor: 'not-allowed'
-                        }
+                        } 
                     })}
                     required 
                 />

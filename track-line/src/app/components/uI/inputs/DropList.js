@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react"
-import styles from './css/ui.module.css'
+import styles from './css/inputs.module.css'
 
 export default function DropList({ info, text, onclick }) {
     const [change, setChange] = useState(false)

@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import PayPalLogoSVG from '../../media/PaypalSVG.js'
 import TrackLineSVG from '../../media/Track-lineSVG.js'
-import EmailButton from '../from/mailconsult.js'
+import EmailButton from '../from/Mailconsult.js'
 import styles from './css/footer.module.css'
 export default function Footer(){
     const router = useRouter()

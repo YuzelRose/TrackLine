@@ -1,11 +1,11 @@
 'use client'
 import axios from 'axios'
 import styles from './css/login-register.module.css'
-import User from '@/app/media/UserSVG'
 import LoginSVG from '@/app/media/LoginSVG'
 import HgWait from '../uI/HgWait'
 import PassInput from '../uI/inputs/PassInput'
-import CheckBoxButton from '../uI/CheckBoxButton'
+import TextInput from '../uI/inputs/TextInput'
+import CheckBoxButton from '../uI/inputs/CheckBoxButton'
 import { useState } from 'react'
 import { keepSession } from '@/app/utils/JsonManage'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -22,7 +22,9 @@ export default function Login({ onWaitingChange }){
         message: '',
         state: false
     })
-
+    const BASE = [
+        {id: 1, name: "user", placeholder: "Correo", req: true, type: "email"}
+    ]
     const handleSubmit = async (e) => { 
         e.preventDefault()
         try {
@@ -78,10 +80,7 @@ export default function Login({ onWaitingChange }){
                 transition={{ duration: 0.3 }}
             >
                 <form onSubmit={handleSubmit} id={styles.form}>
-                    <div className='group'>
-                        <input type='email' name='user' placeholder='correo@proveedor.com' required className='grup-text' />
-                        <User/>
-                    </div>
+                    <TextInput content={BASE} width={"100%"}/>
                     <PassInput />
                     <CheckBoxButton text="Mantener sesión" onclick={() => setCheck(!check)}/>
                     <button type='submit' className='button'>Ingresar <LoginSVG/></button>

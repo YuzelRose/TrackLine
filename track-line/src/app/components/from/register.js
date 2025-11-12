@@ -2,13 +2,13 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import styles from './css/login-register.module.css'
-import User from '@/app/media/UserSVG'
 import SendSVG from '@/app/media/SendSVG'
 import { useState } from 'react'
 import HgWait from '../uI/HgWait'
-import CheckBoxButton from '../uI/CheckBoxButton'
+import CheckBoxButton from '../uI/inputs/CheckBoxButton'
 import { registerData } from '@/app/utils/JsonManage'
 import PassInput from '../uI/inputs/PassInput'
+import TextInput from '../uI/inputs/TextInput'
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/frst-register`;
@@ -22,7 +22,9 @@ export default function Reguister({ onWaitingChange }){
         message:'',
         state: false
     })
-
+    const BASE = [
+        {id: 1, name: "user", placeholder: "Correo", req: true, type: "email"}
+    ]
     const handleRegister = async (e) => { 
         e.preventDefault()
         try {
@@ -89,10 +91,7 @@ export default function Reguister({ onWaitingChange }){
                     transition={{ duration: 0.3 }}
                 >
                     <form onSubmit={handleRegister} id={styles.form}>
-                        <div className='group'>
-                            <input type="email" name='user' placeholder='correo@proveedor.com' required className='grup-text'/>
-                            <User/>
-                        </div>
+                        <TextInput content={BASE} width={"100%"}/>
                         <PassInput />
                         <CheckBoxButton 
                             text="Leer los terminos y condiciones" 

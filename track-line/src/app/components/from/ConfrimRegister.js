@@ -2,18 +2,15 @@
 import axios from 'axios'
 import styles from './css/confrim-register.module.css'
 import PassInput from '../uI/inputs/PassInput'
-import DropList from '../uI/DropList'
+import DropList from '../uI/inputs/DropList'
 import TextInput from '../uI/inputs/TextInput'
 import HgWait from '../uI/HgWait'
 import { doRegister, EndRegister } from '../../utils/JsonManage'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
-import { minDate18YO } from '@/app/utils/Funtions'
-
-
-const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
-const URI = `${URI_START}/trckln/user/register-`;
+import { minDate18YO, peticion } from '@/app/utils/Funtions'
+import { STUDENTS, TUTORFILDS, DROPUSERS } from '../uI/inputs/jasonContentemts'
 
 export default function ConfrimRegister({funtion = () => {}}) {
     const router  = useRouter();
@@ -29,23 +26,9 @@ export default function ConfrimRegister({funtion = () => {}}) {
         json: null,
         state: false
     })
-    const opc = [ 
-        { id: 1, text: "Estudiante", type: "student" },
-        { id: 2, text: "Tutor", type: "tutor" },
-    ]
-    const base = [
-        {id: 1, name: "Name", placeholder: "Nombre", req: true},
-        {id: 2, name: "Email", placeholder: "Correo", req: true, type: "email"},
-        {id: 3, name: "CURP", placeholder: "CURP", req: true},
-        {id: 4, name: "Birth", placeholder: "YYYY-MM-DD", req: true, text: "Fecha de nacimiento", type: "date"},
-    ]
-    const tutor = [
-        {id: 1, name: "Phone", placeholder: "Telefono", req: true, type: "tel"},
-        {id: 2, name: "RelatedEmail", placeholder: "Correo del estudiante", req: true, type: "email"},
-    ]
-    const [typeBase, setTypeBase] = useState([...base])
+    const [typeBase, setTypeBase] = useState(null)
     
-    useEffect(() => {
+    useEffect(() => { // Validacion de los datos
         const urlToken = searchParams.get('token')
         const json = doRegister()
         const isValid = !!urlToken && !!json && json.Token === urlToken
@@ -54,92 +37,40 @@ export default function ConfrimRegister({funtion = () => {}}) {
             json: json,
             state: isValid
         })
-        if (!isValid) {
-            router.push('/')
-        } else {
-            setTypeBase(prevBase => 
-                prevBase.map(item => 
-                    item.name === "Email" 
-                        ? { ...item, value: json.Email, read: true }
-                        : item
-                )
-            )
-        }
+        if (!isValid) router.push('/')
     }, [searchParams, router])
 
     const handleSelect = (selection) => {
         if(selection) {
             setType({
-                text: selection.text,
+                message: selection.text,
                 type: selection.type,
                 state: true
             })
-            
-            if(selection.type === "tutor") {
-                setTypeBase(prevBase => 
-                    prevBase.map(item => ({
-                        ...item,
-                        name: `tutor-${item.name}`
-                    }))
-                )
-            } else {
-                setTypeBase(prevBase => 
-                    prevBase.map(item => ({
-                        ...item,
-                        name: item.name.replace('tutor-', '')
-                    }))
-                )
-            }
+            const baseConfig = selection.type === "student" ? [...STUDENTS] : [...TUTORFILDS];
+            const updatedBase = baseConfig.map(item => 
+                item.name === (selection.type === "tutor" ? "Tutor-Email" : "Email")
+                    ? { ...item, value: data.json.Email, read: true }
+                    : item
+            );
+            setTypeBase(updatedBase);
         }
     }
 
-    const endRegister = async (e) => {
-    e.preventDefault()
-    const formData = new FormData(e.target);
-    
-    try {
-        let response;
-        let data;
-        
-        funtion({
-            text: "Recabando tu información",
-            status: null,
-            wait: true
-        })
-
-        const pass = formData.get('Pass');
-        const passConfirm = formData.get('passConfirm');
-        
-        if (pass !== passConfirm) {
-            funtion({
-                text: "Las contraseñas no coinciden",
-                status: null,
-                wait: false
-            })
-            return; 
-        }
-
-        if(type.type === "tutor") {
-            const birth = formData.get('tutor-Birth');
-            if (!minDate18YO(birth)) {
-                funtion({
-                    text: "Debe ser mayor de edad para ser tutor",
-                    status: null,
-                    wait: false
-                })
-                return; 
-            }
-
-            data = {
+    const getData = (formData, type) => { // Recepcion de informacion
+        funtion({message: "Recabando tu información",status: true,})
+        let retMessage = null
+        if(type === "tutor") {
+            const requestData = {
                 tutor: {
-                    name: formData.get('tutor-Name'),
-                    email: formData.get('tutor-Email'),
-                    pass: pass,
-                    pass2: passConfirm, 
-                    curp: formData.get('tutor-CURP'),
-                    birth: birth,
-                    phone: formData.get('Phone'), 
-                    relatedEmail: formData.get('RelatedEmail'), 
+                    name: formData.get('Tutor-Name'),
+                    email: formData.get('Tutor-Email'),
+                    pass: formData.get('Pass'),
+                    passConfirm: formData.get('PassConfirm'), 
+                    curp: formData.get('Tutor-CURP'),
+                    birth: formData.get('Tutor-Birth'),
+                    phone: formData.get('Tutor-Phone'), 
+                    relatedEmail: formData.get('Tutor-RelatedEmail'), 
                 },
                 student: {
                     name: formData.get('Name'),
@@ -148,74 +79,61 @@ export default function ConfrimRegister({funtion = () => {}}) {
                     birth: formData.get('Birth')
                 }
             }
-            
-            funtion({
-                text: "Registrando sus datos",
-                status: null,
-                wait: true
-            })
-            
-            response = await axios.post(`${URI}tutor`, data);
-            
+            retMessage = checkData(data, data.tutor.pass, data.tutor.passConfirm, data.tutor.birth, type)
+            if(!retMessage) return requestData
         } else {
-            const birth = formData.get('Birth');
-            if (!minDate18YO(birth)) {
-                funtion({
-                    text: "Debe ser mayor de edad para registrarse sin un tutor",
-                    status: null,
-                    wait: false
-                })
-                return; 
+            const requestData = {
+                data: {
+                    name: formData.get('Name'),
+                    email: formData.get('Email'),
+                    pass: formData.get('Pass'),
+                    passConfirm: formData.get('PassConfirm'),
+                    curp: formData.get('CURP'),
+                    birth: formData.get('Birth')
+                }
             }
-
-            data = {
-                name: formData.get('Name'),
-                email: formData.get('Email'),
-                pass: pass,
-                pass2: passConfirm,
-                curp: formData.get('CURP'),
-                birth: birth
-            }
-            
-            funtion({
-                text: "Registrando sus datos",
-                status: null,
-                wait: true
-            })
-            
-            response = await axios.post(`${URI}student`, data);
+            retMessage = checkData(data, data.pass, data.passConfirm, data.birth, type)
+            if(!retMessage) return requestData
         }
+        if(retMessage) funtion({ message: retMessage, status: true })
+        return null
+    }
 
-        funtion({
-            text: response.data.message,
-            status: response.data.status,
-            wait: false
-        })
-        
-    } catch(exError) {
-        if (exError.response) {
-            if (exError.response.status === 404 || exError.response.status === 401) {
-                funtion({
-                    text: 'Correo o contraseña incorrectos.',
-                    status: exError.response.status,
-                    wait: false                        
-                })
-            } else {
-                funtion({
-                    text: 'Ocurrió un error. Inténtelo más tarde.',
-                    status: null,
-                    wait: false
-                })
+    const checkData = (data, pass, passConfirm, birth, type) => { // Revisar la informacion
+        if(!data) return "Error en la informacion"
+        if(pass !== passConfirm) return "Las contraseñas no coinciden"
+        if (!minDate18YO(birth))
+            return type === "tutor"
+                ? "Debe ser mayor de edad para ser tutor"
+                : "Debe ser mayor de edad para registrarse sin un tutor"
+        return null
+    }
+
+    const endRegister = async (e) => {
+        e.preventDefault()
+        try {
+            setWait(true)
+            funtion({ message: "Registrando sus datos", status: true })
+            const requestData  = getData(new FormData(e.target), type.type)
+            if(!requestData) {
+                setWait(false)
+                return
             }
-        } else {
-            funtion({
-                text: 'Ocurrió un error. Inténtelo más tarde.',
-                status: null,
-                wait: false
-            })
+            let response
+            if(type.type === "tutor") { 
+                response = await peticion('user/register-tutor', requestData)
+            } else {
+                response = await peticion('user/register-student', requestData)
+            }
+            if(response.status === 201) EndRegister()
+            funtion({ message: response.message, status: response.status})
+        } catch(exError) {
+            console.error('Error en registro:', exError)
+            funtion({ message: 'Ocurrió un error. Inténtelo más tarde.', status: false })
+        } finally {
+            setWait(false)
         }
     }
-}
     return(
         <>
             { wait ? 
@@ -233,22 +151,19 @@ export default function ConfrimRegister({funtion = () => {}}) {
                     </div>
                     
                     <div className={`group ${styles.bg}`}>
-                        <p>Yo soy un:</p> <DropList info={opc} text={"Tipo de cuenta"} onclick={handleSelect}/>
+                        <p>Yo soy un:</p> <DropList info={DROPUSERS} text={"Tipo de cuenta"} onclick={handleSelect}/>
                     </div>
 
                     {type.state ?
                         <>
                             <div className={`group ${styles.bg} ${styles.fromContent}`}>
                                 <h4>Sus datos:</h4>
-                                <TextInput content={typeBase}/>
-                                {type.type === "tutor" ? 
-                                    <TextInput content={tutor}/> 
-                                : null }
+                                <TextInput content={typeBase} width={"50%"}/> 
                             </div>
                             {type.type === "tutor" ? 
                             <div className={`group ${styles.bg} ${styles.fromContent}`}>
                                 <h4>Datos del alumno:</h4>
-                                <TextInput content={base}/>                            
+                                <TextInput content={STUDENTS} width={"50%"}/>                            
                             </div>
                             : null }
                             <button type='submit' className='button'>Terminar</button>

@@ -10,7 +10,7 @@ export default function HgWait(){
         const interval = setInterval(() => {
             setDotCount(prev => {
                 const nextCount = (prev + 1) % 4 
-                setWait('cargando' + '.'.repeat(nextCount))
+                setWait('Cargando' + '.'.repeat(nextCount))
                 return nextCount
             })
         }, 600) 
