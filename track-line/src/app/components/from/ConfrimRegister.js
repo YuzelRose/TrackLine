@@ -1,5 +1,4 @@
 'use client'
-import axios from 'axios'
 import styles from './css/confrim-register.module.css'
 import PassInput from '../uI/inputs/PassInput'
 import DropList from '../uI/inputs/DropList'
@@ -102,7 +101,7 @@ export default function ConfrimRegister({funtion = () => {}}) {
     const checkData = (data, pass, passConfirm, birth, type) => { // Revisar la informacion
         if(!data) return "Error en la informacion"
         if(pass !== passConfirm) return "Las contraseñas no coinciden"
-        if (!minDate18YO(birth))
+        if (minDate18YO(birth))
             return type === "tutor"
                 ? "Debe ser mayor de edad para ser tutor"
                 : "Debe ser mayor de edad para registrarse sin un tutor"
@@ -125,14 +124,18 @@ export default function ConfrimRegister({funtion = () => {}}) {
             } else {
                 response = await peticion('user/register-student', requestData)
             }
-            if(response.status === 201) EndRegister()
-            funtion({ message: response.message, status: response.status})
+            if(response.httpStatus === 201) {
+                EndRegister()
+                funtion({ message: "Pulse para regresar a la pagina principal", status: true, completed: true})
+            } else {
+                setWait(false)
+                funtion({ message: `Error inespertado :${response.status}`, status: true, completed: null})
+            }
         } catch(exError) {
             console.error('Error en registro:', exError)
-            funtion({ message: 'Ocurrió un error. Inténtelo más tarde.', status: false })
-        } finally {
+            funtion({ message: 'Ocurrió un error. Inténtelo más tarde.', status: true })
             setWait(false)
-        }
+        } 
     }
     return(
         <>

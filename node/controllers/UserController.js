@@ -21,50 +21,52 @@ const isUserAvailable = async (email) => { // true si está disponible, false si
     }
 }
 
-
-
 export const postSupRegister = async (req, res) => {
     try {
         const { email } = req.body;
         const tok = genTok();
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            service: 'gmail',
-            port: 465,
-            secure: true, 
-            auth: {
-                user: 'trackline.edu@gmail.com',       
-                pass: GMAIL_PASS    
-            }
-        });
+        if(!(await isUserAvailable(email))) {
+            console.log(`Correo ya usado`)
+            return  res.status(409).json({ message: 'Usuario ya registrado' });
+        } else {
+            const transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                service: 'gmail',
+                port: 465,
+                secure: true, 
+                auth: {
+                    user: 'trackline.edu@gmail.com',       
+                    pass: GMAIL_PASS    
+                }
+            });
 
-        const htmlContent = await compileEmailTemplate({
-            token: tok,
-            email: email,
-            origin: TRACT_ORIGIN
-        });
+            const htmlContent = await compileEmailTemplate({
+                token: tok,
+                email: email,
+                origin: TRACT_ORIGIN
+            });
 
-        const mailOptions = {
-            from: {
-                name: 'Track-Line',
-                address: 'trackline.edu@gmail.com',
-            },
-            to: email,
-            subject: 'Confirma tu registro en Track-Line',
-            html: htmlContent
-        };
+            const mailOptions = {
+                from: {
+                    name: 'Track-Line',
+                    address: 'trackline.edu@gmail.com',
+                },
+                to: email,
+                subject: 'Confirma tu registro en Track-Line',
+                html: htmlContent
+            };
 
-        await transporter.sendMail(mailOptions);
-        console.log('Correo enviado exitosamente');
-        res.status(200).json({ 
-            message: 'Revise su correo', 
-            token: tok
-        });
+            await transporter.sendMail(mailOptions);
+            console.log('Correo enviado exitosamente');
+            res.status(200).json({ 
+                message: 'Revise su correo', 
+                token: tok
+            });
+        }
     } catch (error) {
         console.log(`Error al enviar el correo: ${error}`);
     }
-
-};
+}
 
 export const postLogIn = async (req, res) => {
     try {
@@ -97,7 +99,7 @@ export const registerStudent = async (req, res) => {
     try {
         const { data } = req.body;
         if(!data)
-            return res.status(404).json({ message: 'Sin infromacion' })
+            return res.status(204).json({ message: 'Sin infromacion' })
         if(!isUserAvailable(data.email)) return res.status(404).json({ message: 'usuario existente' })
         if(data.pass === data.passConfirm) {
             const salt = await bcrypt.genSalt(10);
@@ -115,7 +117,9 @@ export const registerStudent = async (req, res) => {
                 kardex: `KARDEX${data.email}`
             }
             const userData = await Student.create(registerData)
-            res.json(userData)
+            if(userData)
+                console.log("Usuario creado correctamente")
+                res.status(201).json({message: "Usuario creado correctamente", status: 201})
         } else {
             return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
         }

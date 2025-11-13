@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { keepSession } from '@/app/utils/JsonManage'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { peticion } from '@/app/utils/Funtions'
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
 const URI = `${URI_START}/trckln/user/login-attempt`;
@@ -35,14 +36,13 @@ export default function Login({ onWaitingChange }){
             const formData = new FormData(e.target)
             const data = {
                 email: formData.get('user'),
-                Pass: formData.get('pass')
+                pass: formData.get('pass')
             }
-            const response = await axios.post(URI, { email: data.email, pass: data.Pass });
-            const user = response.data;
+            const response = await peticion('user/login-attempt', { email: data.email, pass: data.pass })
             if (check) {
-                keepSession({AuthUserEmail: user.Email, Token: user.token})
+                keepSession({AuthUserEmail: data.Email, Token: response.data.token})
             }
-            navigate.push('/tabloid/main');
+            navigate.push('/tabloid');
         } catch (exError) {
             console.error("Error al iniciar sesión:", exError);
             if (exError.response) {

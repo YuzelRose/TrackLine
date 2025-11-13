@@ -151,6 +151,19 @@ p { font-size: 1.125rem; }
   cursor: pointer;
 }
 
+.interactuable-text {
+  color: var(--ring);
+  cursor: pointer;
+}
+
+.interactuable-text:hover {
+  text-decoration: underline;
+}
+
+.interactuable-text:active {
+  color: var(--foreground);
+}
+
 .button:active {
   text-decoration: none;
   border: solid 0.25em var(--muted-foreground);

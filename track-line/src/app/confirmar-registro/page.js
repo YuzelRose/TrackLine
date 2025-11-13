@@ -1,28 +1,37 @@
 'use client'
-import ConfrimRegister from '../components/from/ConfrimRegister';
 import styles from './css/confrim-register.module.css'
+import ConfrimRegister from '../components/from/ConfrimRegister'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function RegisterConfirm(){
-    const [message, setMessage] = useState({ message: null, status: null });
-
-    const handleRegisterResult = (resp) => {
-        setMessage({ message: resp.message, status: resp.status });
+    const router  = useRouter();
+    const [mensage, setMensage] = useState({
+        message: null,
+        status: null,
+        completed: false
+    })
+    const changeState = (res) => {
+        if(res) {
+            setMensage({
+                message: res.message,
+                status: res.status,
+                completed: res.completed
+            })
+        }
     }
 
     return(
         <main id={styles.main}>
-            <h2 id={styles.h2}>
-                {message.status === 201 ? "¡Registro Completado!" : "Terminemos tu registro"}
-            </h2>
-            
-            <ConfrimRegister onResult={handleRegisterResult} />
-            
-            {message.message && (
-                <div className={`${styles.message} ${message.status === 201 ? styles.success : styles.error}`}>
-                    {message.message}
-                </div>
-            )}
+            <h2 id={styles.h2}>{mensage.wait? "Terminando" : "Terminemos"} tu registro</h2>
+            {!mensage.completed?<ConfrimRegister funtion={changeState} />: null}
+            {mensage.status ? 
+                (mensage.message === "Pulse para regresar a la pagina principal"?  
+                    <p onClick={() => router.push('/')} className='interactuable-text'>{mensage.message}</p> 
+                    : <p>{mensage.message}</p>
+                )
+                : null
+            }
         </main>
     )
 }

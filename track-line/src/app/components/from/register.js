@@ -1,6 +1,5 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
-import axios from 'axios'
 import styles from './css/login-register.module.css'
 import SendSVG from '@/app/media/SendSVG'
 import { useState } from 'react'
@@ -9,11 +8,10 @@ import CheckBoxButton from '../uI/inputs/CheckBoxButton'
 import { registerData } from '@/app/utils/JsonManage'
 import PassInput from '../uI/inputs/PassInput'
 import TextInput from '../uI/inputs/TextInput'
-
-const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
-const URI = `${URI_START}/trckln/user/frst-register`;
+import { peticion } from '@/app/utils/Funtions'
 
 export default function Reguister({ onWaitingChange }){
+    const [memory, setMemory] = useState(false)
     const [button, setButton] = useState(false)
     const [conditios, setConditios] = useState(false)
     const [watingStatus, setWatingStatus] = useState(true)
@@ -37,12 +35,14 @@ export default function Reguister({ onWaitingChange }){
                 email: formData.get('user'),
                 pass: formData.get('pass')
             }
-            const response = await axios.post(URI, { email: data.email })
-            const res = response.data;
-            if(response.status === 200){
-                setMessage({ message: res.message, state: true })
-                registerData({ AuthEmail:  data.email, AuthPass: data.pass, AuthTok: res.token })
+            const response = await peticion('user/frst-register', { email: data.email })
+            if(response.httpStatus === 200){
+                setMessage({ message: response.message, state: true })
+                registerData({ AuthEmail:  data.email, AuthPass: data.pass, AuthTok: response.data.token })
                 setRet(false)
+            } else {
+                setMemory(true)
+                alert(response.message)
             }
         } catch (exError) {
             if (exError.response) {
@@ -74,13 +74,15 @@ export default function Reguister({ onWaitingChange }){
         if(conditios === false) {
             setConditios(true)
             window.open('/documents/Términos_y_Condiciones _de_Uso_Track_Line_04-11-2025.pdf', '_blank');
+        } else {
+            window.open('/documents/Términos_y_Condiciones _de_Uso_Track_Line_04-11-2025.pdf', '_blank');
         }
     }
 
     return(
         
         <AnimatePresence mode="wait">
-            {ret ? 
+            { ret ? 
             <>
             {watingStatus ? (
                 <motion.div
@@ -97,16 +99,19 @@ export default function Reguister({ onWaitingChange }){
                             text="Leer los terminos y condiciones" 
                             onclick={handleDownload}
                             onlyChange={true}
+                            state={memory}
                         />
-                        {conditios ? 
+                        { !conditios ? 
                             <CheckBoxButton
                                 text="he leido y acepto los terminos y condiciones" 
-                                onclick={() => setButton(!button)} 
+                                notChange={true}
+                                state={memory}
                             />
                             :
                             <CheckBoxButton
                                 text="he leido y acepto los terminos y condiciones" 
-                                notChange={true}
+                                onclick={() => setButton(!button)} 
+                                state={memory}
                             />
                         }
                         <AnimatePresence>
@@ -125,7 +130,6 @@ export default function Reguister({ onWaitingChange }){
                             )}
                         </AnimatePresence>
                     </form>
-                    
                 </motion.div>
             ) : (
                 <motion.div
