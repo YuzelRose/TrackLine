@@ -1,0 +1,124 @@
+#conteiner {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    padding: 0.5em;
+    height: fit-content;
+    margin-bottom: 2em;
+    background-color: var(--card);
+    border: solid 0.25em var(--border);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -ms-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+}
+
+#conteiner:focus-within {
+    border: solid 0.25em var(--ring);
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.15),
+        0 0 0 2px color-mix(in srgb, var(--ring) 20%, transparent);
+}
+
+#conteiner:focus-within #h3 {
+    border-bottom-color: var(--ring);
+}
+
+.highlight {
+    color: var(--ring);
+}
+
+#h3 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 2vh;
+    border-bottom: solid 0.15em var(--border);
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -ms-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+}
+
+#h3:hover {
+    color: var(--ring);
+}
+
+#parent {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: min-content;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+    margin-bottom: 1em;
+}
+
+#txt1 { grid-area: 2 / 1 / 3 / 2; }
+#log  { 
+    grid-area: 1 / 2 / 3 / 3; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#img  { 
+    grid-area: 3 / 1 / 5 / 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+}
+#txt2 { 
+    grid-area: 3 / 2 / 5 / 3; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.text { 
+    text-align: justify; 
+    padding: 0 1em 0 1em;
+}
+.text > p {
+    padding-top: 1em;
+}
+
+#image {
+    max-width: 482.500px;
+    width: 100%;
+    height: auto;
+    padding: 0.5em;
+    margin: 1em 0;
+    border: solid 0.25em var(--border);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+@media (max-width: 630px) {
+    #parent {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    #img  { 
+        width: 95%;
+        margin: 0em;
+    }
+    #image {
+        margin: 0;
+    }
+}
+@media (min-width: 1024px) {
+    
+}

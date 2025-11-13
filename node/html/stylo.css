@@ -1,0 +1,112 @@
+*{
+    box-sizing: border-box;
+    font-family: "Poppins" , sans-serif;
+}
+body{
+    background: #cfd6e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.container{
+    background: #1e1f26;
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 3);
+    width: 320px;
+}
+.form-group{
+    position: relative;
+    margin-bottom: 25px;
+}
+.form-group input{
+    width: 100%;
+    padding: 12px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #485460;
+    border-bottom: 1px solid #2ecc71;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+}
+.form-group label{
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    color: #ccc;
+    font-size: 16px;
+    pointer-events: none;
+    transition: 0.3s ease;
+}
+.form-group input:focus ~ label,
+.form-group input:valid ~ label{
+    top: -10px;
+    left: 8px;
+    font-size: 12px;
+    color: #2ecc71;
+    background-color: #1e1f26;
+    padding: 0 5px;
+}
+.btn{
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background: #2ecc71;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn:hover{
+    background: #27ea60;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+label {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    font-size: 13px;
+    color: #666;
+    padding: 0 5px;
+}
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+}
+
+.btn {
+    width: 100%;
+    background: #007BFF;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #0056b3;
+}
