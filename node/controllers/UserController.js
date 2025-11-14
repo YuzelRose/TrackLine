@@ -1,10 +1,9 @@
 import User from '../models/UserModel.js';
 import Student from '../models/StudentModel.js'
-import nodemailer from 'nodemailer';
+import Tutor from '../models/TutorModel.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { GMAIL_PASS, TRACT_ORIGIN } from '../config.js';
-import { compileEmailTemplate } from '../email-teplates/utils.js';
+import { sendRegMail, sendTutorToStudentRegMail } from '../utils/email.js';
 
 export const comparePasswords = async (plainPassword, hashedPassword) => {
     return await bcrypt.compare(plainPassword, hashedPassword);
@@ -16,81 +15,64 @@ const isUserAvailable = async (email) => { // true si está disponible, false si
         const existingUser = await User.findOne({ Email: email });
         return !existingUser; 
     } catch (error) {
-        console.error('Error en isUserAvailable:', error);
+        console.error(`Error al enviar el correo: ${error.message}`);
         return false; 
     }
 }
 
-export const postSupRegister = async (req, res) => {
+export const MailRegister = async (req, res) => {
     try {
-        const { email } = req.body;
-        const tok = genTok();
+        const { email } = req.body
         if(!(await isUserAvailable(email))) {
             console.log(`Correo ya usado`)
             return  res.status(409).json({ message: 'Usuario ya registrado' });
         } else {
-            const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                service: 'gmail',
-                port: 465,
-                secure: true, 
-                auth: {
-                    user: 'trackline.edu@gmail.com',       
-                    pass: GMAIL_PASS    
-                }
-            });
-
-            const htmlContent = await compileEmailTemplate({
-                token: tok,
-                email: email,
-                origin: TRACT_ORIGIN
-            });
-
-            const mailOptions = {
-                from: {
-                    name: 'Track-Line',
-                    address: 'trackline.edu@gmail.com',
-                },
-                to: email,
-                subject: 'Confirma tu registro en Track-Line',
-                html: htmlContent
-            };
-
-            await transporter.sendMail(mailOptions);
-            console.log('Correo enviado exitosamente');
-            res.status(200).json({ 
-                message: 'Revise su correo', 
-                token: tok
-            });
+            const mail = await sendRegMail(email)
+            if(mail.status === 200) {
+                res.status(200).json({ 
+                    message: 'Revise su correo', 
+                    token: mail.token
+                })
+            }
         }
     } catch (error) {
-        console.log(`Error al enviar el correo: ${error}`);
-    }
-}
-
-export const postLogIn = async (req, res) => {
-    try {
-        const { email, pass } = req.body;
-        const user = await User.findOne({ Email: email });
-        console.log(`Login Attempt: ${email}`);
-        if (!user) return res.status(404).json({ message: 'Correo no válido' });
-        
-        const contrasenaValida = await comparePasswords(pass, user.Pass);
-        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
-        const tok = genTok();
-        const { Pass, ...userData } = user.toObject();
-        userData.token = tok;
-        res.json(userData);
-    } catch (error) {
+        console.error(`Error al enviar el correo: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
-};
+}
 
 export const registerTutor = async (req, res) => {
     try {
         const { data } = req.body;
-
+        if(!data)
+            return res.status(204).json({ message: 'Sin infromacion' })
+        if(!isUserAvailable(data.email)) return res.status(404).json({ message: 'usuario existente' })
+        if(data.pass === data.passConfirm) {
+            const salt = await bcrypt.genSalt(10);
+            const registerData = {
+                Name: data.name,
+                Email: data.email,
+                Pass: await bcrypt.hash(data.pass, salt),
+                CURP: data.curp,
+                Birth: data.birth,
+                UserType: "tutor",  // Discriminador
+                Phone: data.phone,
+                RelatedEmail: data.relatedEmail
+            }
+            const userData = await Tutor.create(registerData)
+            if(userData) {
+                console.log("Usuario creado correctamente")
+                const mail = await sendTutorToStudentRegMail(data.relatedEmail)
+                if(mail.status === 200)
+                    res.status(201).json({
+                        message: "Tutor registrado, revise el correo del estudiante", 
+                        status: 201,
+                        token: mail.token
+                    })
+            }
+        } else return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
     } catch (error) {
+        console.error(`Error al enviar el correo: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
 }
@@ -109,7 +91,7 @@ export const registerStudent = async (req, res) => {
                 Pass: await bcrypt.hash(data.pass, salt),
                 CURP: data.curp,
                 Birth: data.birth,
-                userType: "student",  // ← Esto activa el discriminador
+                UserType: "student",  // Discriminador
                 Pays: [
                     { NRef: "REF123456" },
                     { NRef: "REF789012" }
@@ -120,11 +102,28 @@ export const registerStudent = async (req, res) => {
             if(userData)
                 console.log("Usuario creado correctamente")
                 res.status(201).json({message: "Usuario creado correctamente", status: 201})
-        } else {
-            return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
-        }
+        } else return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
     } catch (error) {
         res.status(500).json({ message: error.message, place: "Try-catch" })
+    }
+}
+
+export const postLogIn = async (req, res) => {
+    try {
+        const { email, pass } = req.body;
+        const user = await User.findOne({ Email: email });
+        console.log(`Login Attempt: ${email}`);
+        if (!user) return res.status(404).json({ message: 'Correo no válido' });
+        
+        const contrasenaValida = await comparePasswords(pass, user.Pass);
+        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
+        const tok = genTok();
+        const { Pass, ...userData } = user.toObject();
+        userData.token = tok;
+        res.json(userData);
+    } catch (error) {
+        console.error(`Error al enviar el correo: ${error.message}`);
+        res.status(500).json({ message: error.message });
     }
 }
 

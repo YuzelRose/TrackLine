@@ -4,7 +4,7 @@ import PassInput from '../uI/inputs/PassInput'
 import DropList from '../uI/inputs/DropList'
 import TextInput from '../uI/inputs/TextInput'
 import HgWait from '../uI/HgWait'
-import { doRegister, EndRegister } from '../../utils/JsonManage'
+import { doRegister, EndRegister, registerStudentData } from '../../utils/JsonManage'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
@@ -61,7 +61,7 @@ export default function ConfrimRegister({funtion = () => {}}) {
         let retMessage = null
         if(type === "tutor") {
             const requestData = {
-                tutor: {
+                data: {
                     name: formData.get('Tutor-Name'),
                     email: formData.get('Tutor-Email'),
                     pass: formData.get('Pass'),
@@ -70,15 +70,10 @@ export default function ConfrimRegister({funtion = () => {}}) {
                     birth: formData.get('Tutor-Birth'),
                     phone: formData.get('Tutor-Phone'), 
                     relatedEmail: formData.get('Tutor-RelatedEmail'), 
-                },
-                student: {
-                    name: formData.get('Name'),
-                    email: formData.get('Email'),
-                    curp: formData.get('CURP'),
-                    birth: formData.get('Birth')
                 }
             }
-            retMessage = checkData(data, data.tutor.pass, data.tutor.passConfirm, data.tutor.birth, type)
+
+            retMessage = checkData(data, data.pass, data.passConfirm, data.birth, type)
             if(!retMessage) return requestData
         } else {
             const requestData = {
@@ -126,7 +121,12 @@ export default function ConfrimRegister({funtion = () => {}}) {
             }
             if(response.httpStatus === 201) {
                 EndRegister()
-                funtion({ message: "Pulse para regresar a la pagina principal", status: true, completed: true})
+                if(type.type === "tutor")
+                    registerStudentData({
+                        AuthEmail: requestData.data.relatedEmail, 
+                        AuthTok: response.data.token
+                    })
+                funtion({ message: "Pulse para regresar a la pagina principal", status: true, completed: true, type: type.type})
             } else {
                 setWait(false)
                 funtion({ message: `Error inespertado :${response.status}`, status: true, completed: null})
@@ -163,12 +163,6 @@ export default function ConfrimRegister({funtion = () => {}}) {
                                 <h4>Sus datos:</h4>
                                 <TextInput content={typeBase} width={"50%"}/> 
                             </div>
-                            {type.type === "tutor" ? 
-                            <div className={`group ${styles.bg} ${styles.fromContent}`}>
-                                <h4>Datos del alumno:</h4>
-                                <TextInput content={STUDENTS} width={"50%"}/>                            
-                            </div>
-                            : null }
                             <button type='submit' className='button'>Terminar</button>
                         </>
                     : null }

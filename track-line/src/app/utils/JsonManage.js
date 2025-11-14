@@ -22,6 +22,16 @@ export const registerData = ({ AuthEmail, AuthPass, AuthTok }) => {
     saveData({data: preRegisterData, key: LOCAL_STORAGE_KEY_REGISTER})
 };
 
+export const registerStudentData = ({ AuthEmail, AuthTok }) => {
+    deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
+    const preRegisterData = {
+        Email: AuthEmail,
+        Token: AuthTok,
+        ExDate: Date.now() + (60*60*1000) 
+    };
+    saveData({data: preRegisterData, key: LOCAL_STORAGE_KEY_REGISTER})
+};
+
 export const doRegister = () => {
     const data = getData(LOCAL_STORAGE_KEY_REGISTER);
     if (!data) return null;

@@ -9,14 +9,16 @@ export default function RegisterConfirm(){
     const [mensage, setMensage] = useState({
         message: null,
         status: null,
-        completed: false
+        completed: false,
+        type: null
     })
     const changeState = (res) => {
         if(res) {
             setMensage({
                 message: res.message,
                 status: res.status,
-                completed: res.completed
+                completed: res.completed, 
+                type: res.type
             })
         }
     }
@@ -26,12 +28,13 @@ export default function RegisterConfirm(){
             <h2 id={styles.h2}>{mensage.wait? "Terminando" : "Terminemos"} tu registro</h2>
             {!mensage.completed?<ConfrimRegister funtion={changeState} />: null}
             {mensage.status ? 
-                (mensage.message === "Pulse para regresar a la pagina principal"?  
+                (mensage.message === "Pulse para regresar a la pagina principal" ?  
                     <p onClick={() => router.push('/')} className='interactuable-text'>{mensage.message}</p> 
                     : <p>{mensage.message}</p>
                 )
                 : null
             }
+            {mensage.type === "tutor" ?<p>Revise el correo del alumno</p> : null}
         </main>
     )
 }
