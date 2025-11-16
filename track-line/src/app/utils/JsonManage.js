@@ -7,9 +7,9 @@ export const keepSession = ({ AuthUserEmail, AuthTok }) => {
         Email: AuthUserEmail,
         Token: AuthTok,
         date: Date.now()
-    };
+    }
     saveData({data: sessionData, key: LOCAL_STORAGE_KEY_KEEP})
-};
+}
 
 export const registerData = ({ AuthEmail, AuthPass, AuthTok }) => {
     deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
@@ -17,20 +17,20 @@ export const registerData = ({ AuthEmail, AuthPass, AuthTok }) => {
         Email: AuthEmail,
         Pass: AuthPass,
         Token: AuthTok,
-        ExDate: Date.now() + (60*60*1000) 
-    };
+        ExDate: Date.now() + (24*60*60*1000) 
+    }
     saveData({data: preRegisterData, key: LOCAL_STORAGE_KEY_REGISTER})
-};
+}
 
 export const registerStudentData = ({ AuthEmail, AuthTok }) => {
     deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
     const preRegisterData = {
         Email: AuthEmail,
         Token: AuthTok,
-        ExDate: Date.now() + (60*60*1000) 
-    };
+        ExDate: Date.now() + (24*60*60*1000) 
+    }
     saveData({data: preRegisterData, key: LOCAL_STORAGE_KEY_REGISTER})
-};
+}
 
 export const doRegister = () => {
     const data = getData(LOCAL_STORAGE_KEY_REGISTER);
@@ -39,6 +39,21 @@ export const doRegister = () => {
         const reg = {
             Email: data.Email,
             Pass: data.Pass,
+            Token: data.Token
+        }
+        return reg
+    } else {
+        deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
+        return null
+    }
+}
+
+export const doRegisterNoPass = () => {
+    const data = getData(LOCAL_STORAGE_KEY_REGISTER);
+    if (!data) return null;
+    if (data.ExDate && data.ExDate > Date.now()) {
+        const reg = {
+            Email: data.Email,
             Token: data.Token
         }
         return reg
@@ -66,21 +81,21 @@ export const isSessionValid = () => {
     data.date = Date.now();
     saveData({data: data, key: LOCAL_STORAGE_KEY_KEEP})
     return true;
-};
+}
 
 // Función para guardar datos en el Local Storage
 const saveData = ({data,key}) => {
     localStorage.setItem(key, JSON.stringify(data));
-};
+}
 // Funcion para borrar datos
 const deleteJSON = (key) => {
     localStorage.removeItem(key); 
-};
+}
 
 const getData = (key) => {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
-};
+}
 
 /*
 

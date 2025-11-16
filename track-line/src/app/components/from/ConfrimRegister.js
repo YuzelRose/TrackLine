@@ -12,7 +12,7 @@ import { minDate18YO, peticion } from '@/app/utils/Funtions'
 import { STUDENTS, TUTORFILDS, DROPUSERS } from '../uI/inputs/jasonContentemts'
 
 export default function ConfrimRegister({funtion = () => {}}) {
-    const router  = useRouter();
+    const router  = useRouter()
     const searchParams = useSearchParams()
     const [wait, setWait] = useState(false)
     const [type, setType] = useState({
@@ -51,16 +51,16 @@ export default function ConfrimRegister({funtion = () => {}}) {
                 item.name === (selection.type === "tutor" ? "Tutor-Email" : "Email")
                     ? { ...item, value: data.json.Email, read: true }
                     : item
-            );
+            )
             setTypeBase(updatedBase);
         }
     }
 
     const getData = (formData, type) => { // Recepcion de informacion
         funtion({message: "Recabando tu información",status: true,})
-        let retMessage = null
+        let requestData = null
         if(type === "tutor") {
-            const requestData = {
+            requestData = {
                 data: {
                     name: formData.get('Tutor-Name'),
                     email: formData.get('Tutor-Email'),
@@ -72,11 +72,12 @@ export default function ConfrimRegister({funtion = () => {}}) {
                     relatedEmail: formData.get('Tutor-RelatedEmail'), 
                 }
             }
-
-            retMessage = checkData(data, data.pass, data.passConfirm, data.birth, type)
-            if(!retMessage) return requestData
+            if(requestData.data.email === requestData.data.relatedEmail) {
+                funtion({ message: 'Los correos no pueden ser idénticos', status: true })
+                return null
+            }
         } else {
-            const requestData = {
+            requestData = {
                 data: {
                     name: formData.get('Name'),
                     email: formData.get('Email'),
@@ -85,22 +86,30 @@ export default function ConfrimRegister({funtion = () => {}}) {
                     curp: formData.get('CURP'),
                     birth: formData.get('Birth')
                 }
+
             }
-            retMessage = checkData(data, data.pass, data.passConfirm, data.birth, type)
-            if(!retMessage) return requestData
         }
-        if(retMessage) funtion({ message: retMessage, status: true })
-        return null
+        const retMessage = checkData({
+            data: requestData.data, 
+            pass: requestData.data.pass, 
+            passConfirm: requestData.data.passConfirm, 
+            birth: requestData.data.birth, 
+            type: type
+        })
+        if(retMessage) {
+            funtion({ message: retMessage, status: true })
+            return null
+        } else return requestData
     }
 
-    const checkData = (data, pass, passConfirm, birth, type) => { // Revisar la informacion
-        if(!data) return "Error en la informacion"
-        if(pass !== passConfirm) return "Las contraseñas no coinciden"
-        if (minDate18YO(birth))
-            return type === "tutor"
+    const checkData = (data) => { // Revisar la informacion
+        if(!data.data) return "Error en la informacion"
+        if(data.pass !== data.passConfirm) return "Las contraseñas no coinciden"
+        if (minDate18YO(data.birth))
+            return data.type === "tutor"
                 ? "Debe ser mayor de edad para ser tutor"
                 : "Debe ser mayor de edad para registrarse sin un tutor"
-        return null
+        return false
     }
 
     const endRegister = async (e) => {
@@ -129,7 +138,7 @@ export default function ConfrimRegister({funtion = () => {}}) {
                 funtion({ message: "Pulse para regresar a la pagina principal", status: true, completed: true, type: type.type})
             } else {
                 setWait(false)
-                funtion({ message: `Error inespertado :${response.status}`, status: true, completed: null})
+                funtion({ message: `Error inespertado: ${response.message}`, status: true, completed: null})
             }
         } catch(exError) {
             console.error('Error en registro:', exError)

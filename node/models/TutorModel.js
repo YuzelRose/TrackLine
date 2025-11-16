@@ -8,7 +8,6 @@ const tutorSchema = new mongoose.Schema({
     },
     RelatedEmail: {
         type: String,
-        required: true,
     }
 });
 

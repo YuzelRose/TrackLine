@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { RegsiterTemplate, TutorToStudentRegsiterTemplate } from './email-teplates.js';
+import { RegsiterTemplate, studentConfirmTemplate, tutorConfirmTemplate, TutorToStudentRegsiterTemplate } from './email-teplates.js';
 import { GMAIL_PASS } from '../config.js';
 
 const genTok = () => crypto.randomBytes(32).toString('hex');
@@ -49,17 +49,18 @@ export const sendRegMail = async (email) => {
     return {status: 200, token: tok }
 }
 
-export const sendTutorToStudentRegMail = async (email) => {
+export const sendTutorToStudentRegMail = async ({studentMail, tutorMail}) => {
     const tok = genTok()
     const transporter = retTransporter()
 
     const htmlContent = await TutorToStudentRegsiterTemplate({
         token: tok,
-        email: email,
+        email: studentMail,
+        tutorEmail: tutorMail
     })
 
     const options = retMailOptions({
-        email: email, 
+        email: studentMail, 
         subject: 'Confirma tu registro en Track-Line', 
         content: htmlContent
     })
@@ -67,4 +68,34 @@ export const sendTutorToStudentRegMail = async (email) => {
     await transporter.sendMail(options);
     console.log('Correo enviado exitosamente');
     return {status: 200, token: tok }
+}
+
+export const sendConfStudentMail = async (email) => {
+    const transporter = retTransporter()  
+    const htmlContent = await studentConfirmTemplate()
+
+    const options = retMailOptions({
+        email: email, 
+        subject: 'Confirmación del registro en Track-Line', 
+        content: htmlContent
+    })
+
+    await transporter.sendMail(options);
+    console.log('Correo enviado exitosamente');
+    return {status: 200 }
+}
+
+export const sendConfTutorMail = async (email) => {
+    const transporter = retTransporter()  
+    const htmlContent = await tutorConfirmTemplate()
+
+    const options = retMailOptions({
+        email: email, 
+        subject: 'Confirmación del registro en Track-Line', 
+        content: htmlContent
+    })
+
+    await transporter.sendMail(options);
+    console.log('Correo enviado exitosamente');
+    return {status: 200 }
 }

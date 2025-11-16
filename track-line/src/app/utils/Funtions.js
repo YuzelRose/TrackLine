@@ -8,7 +8,7 @@ export const minDate18YO = (birthDate) =>{
         today.getMonth(),
         today.getDate()
     );
-    return birth <= min
+    return birth > min
 }
 
 const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
