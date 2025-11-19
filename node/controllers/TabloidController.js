@@ -1,10 +1,109 @@
-import NewUser from '../models/PayModel.js'
-import Usuario from '../models/UserModel.js'
-import bcrypt from 'bcrypt';
-import nodemailer from 'nodemailer';
+import User from '../models/UserModel.js'
+import Student from '../models/StudentModel.js'
+import Tabloid from '../models/TabloidModel.js'
+
+const getUserCourses = async (email) => {
+    try {
+        const user = await Student.findOne({ Email: email })
+            .populate('Tabloids.refId'); 
+        if (user && user.Tabloids) return user.Tabloids;
+        return null;
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        return null;
+    }
+};
+
+export const getCourses = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) 
+            return res.status(400).json({ message: 'Email es requerido', status: 400 });
+        const courses = await getUserCourses(email);
+        // Usuario no encontrado
+        if (!courses) 
+            return res.status(404).json({ message: 'Usuario no encontrado', status: 404 });
+        // Usuario encontrado, verificar cursos
+        const validCourses = courses.filter(course => 
+            course && course.refId
+        );
+        if (validCourses.length > 0) {
+            return res.status(200).json({ 
+                validCourses, 
+                status: 200 
+            });
+        } else {
+            return res.status(204).json({ 
+                courses: [],
+                status: 204
+            });
+        }
+    } catch (error) {
+        console.error(`Error al recuperar cursos: ${error.message}`);
+        return res.status(500).json({ 
+            success: false,
+            message: 'Error interno del servidor',
+            status: 500 
+        });
+    }
+};
+
+export const addCoursesToUser = async (req, res) => {
+    try {
+        const { data } = req.body;
+        const tabloid = await Tabloid.findById(data.course).select('_id Name');
+        if (!tabloid) 
+            return res.status(400).json({message: "No se encontró el curso"});
+        await Student.updateOne(
+            { Email: data.email },
+            { $pull: { Tabloids: null } }
+        );
+        const result = await Student.updateOne(
+            { Email: data.email },
+            { 
+                $addToSet: { 
+                    Tabloids: { 
+                        refId: tabloid._id 
+                    } 
+                } 
+            }
+        );
+        if (result.matchedCount === 0) {
+            return res.status(404).json({message: "Usuario no encontrado"});
+        }
+        if (result.modifiedCount === 0) {
+            return res.status(200).json({
+                status: 200,
+                message: `El usuario ya está registrado en el curso "${tabloid.Name}"`
+            });
+        }
+        res.status(201).json({
+            status: 201,
+            message: `${tabloid.Name} se agregó correctamente al usuario`,
+        });
+    } catch (error) {
+        console.error(`Error al cargar cursos al usuario: ${error.message}`);
+        res.status(500).json({ message: error.message, place: "Try-catch" });
+    }
+}
+
+export const getData = async (req, res) => {
+    try {
+        const { urlId } = req.body;
+        if(!urlId)
+            return res.status(400).json({ message: `Informacion: ${urlId}` })
+        const consultData = await Tabloid.findById(urlId)
+        if(!consultData)
+            return res.status(404).json({ message: `Curso: ${urlId} no encontrado` })
+        res.status(200).json({ ...consultData.toObject(), status: "200"})
+    } catch (error) {
+        console.error(`Error al cargar el cursos ${error.message}`);
+        res.status(500).json({ message: error.message, place: "Try-catch" });
+    }
+}
 
 // generar registro temporal:
-export const postNewUser = async (req, res) => {
+/*export const postNewUser = async (req, res) => {
     try {
         const { Nombre, Correo, Contrasena } = req.body;
         const newUser = new NewUser({Nombre,Correo,Contrasena});
@@ -122,4 +221,4 @@ const postCreateUser = async ({ Name, Mail, Pass }) => {
     } catch (error) {
         throw error;
     }
-};
+};*/

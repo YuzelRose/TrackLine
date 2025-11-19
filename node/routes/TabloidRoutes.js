@@ -1,9 +1,14 @@
 import express from 'express';
-//import { getBookByName, getAllBooks, getBestSellerBooks, getBookById, getDescountBooks, getSearchBooks, getAutorBooks, DropBook, ChangeBook, UpdateDesc } from '../controllers/BookController.js';
+import { 
+    addCoursesToUser,
+    getCourses, 
+    getData
+} from '../controllers/TabloidController.js';
 
 const router = express.Router();
 
-//router.get('/', getAllBooks);
-
+router.post('/get-courses', getCourses);
+router.post('/add-user', addCoursesToUser)
+router.post('/get-data', getData)
 
 export default router;

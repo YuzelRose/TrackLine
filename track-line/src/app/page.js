@@ -7,18 +7,19 @@ import Image from "next/image"
 import backgroundImage from '@/app/media/pexels-august-de-richelieu-4260475.jpg'
 import ArrowSVG from "./media/ArrowSVG.js"
 import styles from './page.module.css'
-import { isSessionValid } from "./utils/JsonManage.js"
+import { GetKeep, NUKE } from "./utils/JsonManage.js"
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router  = useRouter();
   const [login,setLogin] = useState(true)
-  const [isAnimating, setIsAnimating] = useState(false)
   const [wait, setWait] = useState(false)
 
   useEffect(() => {
-      if (isSessionValid()) {
+      if (GetKeep()) {
         router.push('/tabloid');
+      } else {
+        NUKE()
       }
   }, [router]);
 
@@ -70,8 +71,6 @@ export default function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                onAnimationStart={() => setIsAnimating(true)}
-                onAnimationComplete={() => setIsAnimating(false)}
               >
                 {login ? 
                   <Login onWaitingChange={setWaitingStatus}/> 

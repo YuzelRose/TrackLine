@@ -1,19 +1,16 @@
 'use client'
-import axios from 'axios'
 import styles from './css/login-register.module.css'
 import LoginSVG from '@/app/media/LoginSVG'
 import HgWait from '../uI/HgWait'
 import PassInput from '../uI/inputs/PassInput'
 import TextInput from '../uI/inputs/TextInput'
 import CheckBoxButton from '../uI/inputs/CheckBoxButton'
-import { useState } from 'react'
-import { keepSession } from '@/app/utils/JsonManage'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { MAIN } from '../uI/inputs/jasonContentemts'
 import { peticion } from '@/app/utils/Funtions'
-
-const URI_START = process.env.NEXT_PUBLIC_BACK_URL || 'https://track-line.com'
-const URI = `${URI_START}/trckln/user/login-attempt`;
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { keepSession, session } from '@/app/utils/JsonManage'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Login({ onWaitingChange }){
     const navigate = useRouter();
@@ -23,9 +20,6 @@ export default function Login({ onWaitingChange }){
         message: '',
         state: false
     })
-    const BASE = [
-        {id: 1, name: "user", placeholder: "Correo", req: true, type: "email"}
-    ]
     const handleSubmit = async (e) => { 
         e.preventDefault()
         try {
@@ -34,15 +28,19 @@ export default function Login({ onWaitingChange }){
             setError({ message: '', state: false })
             
             const formData = new FormData(e.target)
-            const data = {
-                email: formData.get('user'),
-                pass: formData.get('pass')
+            const requestData= {
+                data: {
+                    email: formData.get('user'),
+                    pass: formData.get('pass')
+                }
             }
-            const response = await peticion('user/login-attempt', { email: data.email, pass: data.pass })
+            const response = await peticion('user/login', requestData )
             if (check) {
-                keepSession({AuthUserEmail: data.Email, Token: response.data.token})
+                keepSession({AuthUserEmail: response.data.Email, Token: response.data.Token})
+            } else {
+                session({AuthUserEmail: response.data.Email, Token: response.data.Token})
             }
-            navigate.push('/tabloid');
+            navigate.push('/main');
         } catch (exError) {
             console.error("Error al iniciar sesión:", exError);
             if (exError.response) {
@@ -80,7 +78,7 @@ export default function Login({ onWaitingChange }){
                 transition={{ duration: 0.3 }}
             >
                 <form onSubmit={handleSubmit} id={styles.form}>
-                    <TextInput content={BASE} width={"100%"}/>
+                    <TextInput content={MAIN} width={"100%"}/>
                     <PassInput />
                     <CheckBoxButton text="Mantener sesión" onclick={() => setCheck(!check)}/>
                     <button type='submit' className='button'>Ingresar <LoginSVG/></button>

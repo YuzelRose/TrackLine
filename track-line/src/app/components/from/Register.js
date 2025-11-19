@@ -1,14 +1,16 @@
 'use client'
-import { motion, AnimatePresence } from 'framer-motion'
 import styles from './css/login-register.module.css'
 import SendSVG from '@/app/media/SendSVG'
-import { useState } from 'react'
 import HgWait from '../uI/HgWait'
 import CheckBoxButton from '../uI/inputs/CheckBoxButton'
-import { registerData } from '@/app/utils/JsonManage'
 import PassInput from '../uI/inputs/PassInput'
 import TextInput from '../uI/inputs/TextInput'
+import { MAIN } from '../uI/inputs/jasonContentemts'
 import { peticion } from '@/app/utils/Funtions'
+import { useState } from 'react'
+import { registerData } from '@/app/utils/JsonManage'
+import { motion, AnimatePresence } from 'framer-motion'
+
 
 export default function Reguister({ onWaitingChange }){
     const [memory, setMemory] = useState(false)
@@ -20,9 +22,6 @@ export default function Reguister({ onWaitingChange }){
         message:'',
         state: false
     })
-    const BASE = [
-        {id: 1, name: "user", placeholder: "Correo", req: true, type: "email"}
-    ]
     const handleRegister = async (e) => { 
         e.preventDefault()
         try {
@@ -93,7 +92,7 @@ export default function Reguister({ onWaitingChange }){
                     transition={{ duration: 0.3 }}
                 >
                     <form onSubmit={handleRegister} id={styles.form}>
-                        <TextInput content={BASE} width={"100%"}/>
+                        <TextInput content={MAIN} width={"100%"}/>
                         <PassInput />
                         <CheckBoxButton 
                             text="Leer los terminos y condiciones" 

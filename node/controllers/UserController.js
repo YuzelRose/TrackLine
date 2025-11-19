@@ -111,7 +111,8 @@ export const registerTutorStudent = async (req, res) => {
                     { NRef: "REF789012" }
                 ],
                 kardex: `KARDEX${data.email}`,
-                RelatedEmail: data.relatedEmail
+                RelatedEmail: data.relatedEmail,
+                Tabloids: []
             }
             const userData = await Student.create(registerData)
             tutor.RelatedEmail = data.email
@@ -148,7 +149,10 @@ export const registerStudent = async (req, res) => {
                     { NRef: "REF789012" }
                 ],
                 kardex: `KARDEX${data.email}`,
-                RelatedEmail: null
+                RelatedEmail: null,
+                Tabloids: [
+                    null
+                ]
             }
             const userData = await Student.create(registerData)
             if(userData)
@@ -161,19 +165,20 @@ export const registerStudent = async (req, res) => {
     }
 }
 
-export const postLogIn = async (req, res) => {
+export const login = async (req, res) => {
     try {
-        const { email, pass } = req.body;
-        const user = await User.findOne({ Email: email });
-        console.log(`Login Attempt: ${email}`);
+        const { data } = req.body;
+        const user = await User.findOne({ Email: data.email });
+        console.log(`Login Attempt: ${data.email}`);
         if (!user) return res.status(404).json({ message: 'Correo no válido' });
         
-        const contrasenaValida = await comparePasswords(pass, user.Pass);
+        const contrasenaValida = await comparePasswords(data.pass, user.Pass);
         if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
-        const tok = genTok();
-        const { Pass, ...userData } = user.toObject();
-        userData.token = tok;
-        res.json(userData);
+        const { Pass, ...userData} = user.toObject();
+        res.json({ 
+            ...userData,
+            Token: genTok()
+        });
     } catch (error) {
         console.error(`Error al enviar el correo: ${error.message}`);
         res.status(500).json({ message: error.message });

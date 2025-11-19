@@ -16,7 +16,14 @@ const studentSchema = new mongoose.Schema({
     },
     RelatedEmail: {
         type: String,
-    }
+    },
+    Tabloids: [{
+        refId: {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Tabloid', 
+            required: true
+        }
+    }],
 });
 
 const Student = User.discriminator('student', studentSchema);

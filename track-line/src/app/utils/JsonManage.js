@@ -11,6 +11,37 @@ export const keepSession = ({ AuthUserEmail, AuthTok }) => {
     saveData({data: sessionData, key: LOCAL_STORAGE_KEY_KEEP})
 }
 
+export const session = ({ AuthUserEmail, AuthTok }) => {
+    const sessionData = {
+        Email: AuthUserEmail,
+        Token: AuthTok,
+        date: Date.now()
+    }
+    saveData({data: sessionData, key: LOCAL_STORAGE_KEY})
+}
+
+export const getSession = () => {
+    let data = null;
+    
+    data = getData(LOCAL_STORAGE_KEY_KEEP);
+    if (data && isSessionValid(LOCAL_STORAGE_KEY_KEEP)) {
+        return {
+            Email: data.Email,  
+            Token: data.Token
+        };
+    }
+    
+    data = getData(LOCAL_STORAGE_KEY);
+    if (data && isSessionValid(LOCAL_STORAGE_KEY)) {
+        return {
+            Email: data.Email,  
+            Token: data.Token
+        };
+    }
+    
+    return null;
+}
+
 export const registerData = ({ AuthEmail, AuthPass, AuthTok }) => {
     deleteJSON(LOCAL_STORAGE_KEY_REGISTER)
     const preRegisterData = {
@@ -65,22 +96,11 @@ export const doRegisterNoPass = () => {
 
 export const EndRegister = () => {deleteJSON(LOCAL_STORAGE_KEY_REGISTER)}
 
-export const isSessionValid = () => {
-    const data = getData(LOCAL_STORAGE_KEY_KEEP);
-    
-    if (!data || !data.date || data.token) {
-        deleteJSON(LOCAL_STORAGE_KEY_KEEP);
-        return false;
-    }
-    if ((Date.now() - data.date) > (4 * 60 * 60 * 1000)) {
-        alert(`Sesion caduca ${data.date}`)
-        deleteJSON(LOCAL_STORAGE_KEY_KEEP);
-        alert("Su sesion a caducado")
-        return false;
-    }
-    data.date = Date.now();
-    saveData({data: data, key: LOCAL_STORAGE_KEY_KEEP})
-    return true;
+export const GetKeep = () => {return isSessionValid(LOCAL_STORAGE_KEY_KEEP)}
+
+export const NUKE = () => {
+    deleteJSON(LOCAL_STORAGE_KEY)
+    deleteJSON(LOCAL_STORAGE_KEY_KEEP)
 }
 
 // Función para guardar datos en el Local Storage
@@ -95,6 +115,24 @@ const deleteJSON = (key) => {
 const getData = (key) => {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
+}
+
+const isSessionValid = (key) => {
+    const data = getData(key);
+    
+    if (!data || !data.date || data.token) {
+        deleteJSON(key);
+        return false;
+    }
+    if ((Date.now() - data.date) > (4 * 60 * 60 * 1000)) {
+        alert(`Sesion caduca ${data.date}`)
+        deleteJSON(key);
+        alert("Su sesion a caducado")
+        return false;
+    }
+    data.date = Date.now();
+    saveData({data: data, key: key})
+    return true;
 }
 
 /*

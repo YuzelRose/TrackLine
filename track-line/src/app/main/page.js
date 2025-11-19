@@ -1,0 +1,30 @@
+import styles from './css/tabloid.module.css'
+import TabloidCourses from "../components/uI/object/TabloidCourses"
+import Calendar from '../components/uI/object/Calendar'
+
+export default function Main() { 
+    // solo falta agregar en la parte inferior un buscador de cursos
+    return(
+        <main id={styles.main}>
+            <article id={styles.mainContent}>
+                <section id={styles.mainSection}>
+                    <div className={styles.title}>
+                        <h3>Cursos:</h3>
+                    </div>
+                    <div className={styles.conteiner}>
+                        <TabloidCourses />
+                    </div>
+                </section>
+                <aside id={styles.aside}>
+                    <div className={styles.title}>
+                        <h3>Calendario:</h3>
+                    </div>
+                    <div className={styles.conteiner}>
+                        <Calendar/>
+                    </div>
+                </aside>
+            </article>
+            {/* Aqui */}
+        </main>
+    )
+}
