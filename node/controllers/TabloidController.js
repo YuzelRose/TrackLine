@@ -1,12 +1,28 @@
-import User from '../models/UserModel.js'
-import Student from '../models/StudentModel.js'
-import Tabloid from '../models/TabloidModel.js'
+import User from '../models/user/UserModel.js'
+import Student from '../models/user/StudentModel.js'
+import Tabloid from '../models/tabloid/TabloidModel.js'
+import Notice from '../models/tabloid/NoticeModel.js';
+import Assigment from '../models/tabloid/AssigmentModel.js';
 
 const getUserCourses = async (email) => {
     try {
         const user = await Student.findOne({ Email: email })
-            .populate('Tabloids.refId'); 
-        if (user && user.Tabloids) return user.Tabloids;
+            .populate({
+                path: 'Tabloids.refId',
+                populate: [
+                    {
+                        path: 'HomeWork.notice',
+                        model: 'Notice'
+                    },
+                    {
+                        path: 'HomeWork.assigment',
+                        model: 'Assigment'
+                    }
+                ]
+            }); 
+        if (user && user.Tabloids) {
+            return user.Tabloids;
+        }
         return null;
     } catch (error) {
         console.error(`Error: ${error.message}`);
@@ -20,10 +36,8 @@ export const getCourses = async (req, res) => {
         if (!email) 
             return res.status(400).json({ message: 'Email es requerido', status: 400 });
         const courses = await getUserCourses(email);
-        // Usuario no encontrado
         if (!courses) 
             return res.status(404).json({ message: 'Usuario no encontrado', status: 404 });
-        // Usuario encontrado, verificar cursos
         const validCourses = courses.filter(course => 
             course && course.refId
         );

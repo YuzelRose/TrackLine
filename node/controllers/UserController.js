@@ -1,6 +1,6 @@
-import User from '../models/UserModel.js';
-import Student from '../models/StudentModel.js'
-import Tutor from '../models/TutorModel.js';
+import User from '../models/user/UserModel.js';
+import Student from '../models/user/StudentModel.js'
+import Tutor from '../models/user/TutorModel.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendConfStudentMail, sendConfTutorMail, sendRegMail, sendTutorToStudentRegMail } from '../utils/email.js';

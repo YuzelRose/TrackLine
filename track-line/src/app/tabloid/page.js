@@ -27,6 +27,7 @@ export default function Tabloid() {
                         if(!!result && result.httpStatus === 200) {
                             setSession(session)
                             setData(result.data)
+                            
                         }
                     } else navigate.push('/main');
                 } else navigate.push('/')
@@ -40,7 +41,7 @@ export default function Tabloid() {
         getData() 
     }, [searchParams, navigate])
 
-    if(loading){
+    if(loading) {
         return(
             <main id={styles.main}>
                 <div id={styles.hg}>
@@ -48,11 +49,23 @@ export default function Tabloid() {
                 </div>
             </main>
         )
+    } else {
+        return(
+            <main id={styles.main}>
+                {data?
+                    <Notice data={data.HomeWork}/>
+                :
+                    <>
+                        <p>Sin novedades, te avisaremos cuando el camino empiece.</p>
+                        <p 
+                            className='link'
+                            onClick={() => navigate.push('/main')}
+                        >
+                            Regresar a la pagina principal.
+                        </p>
+                    </>
+                }
+            </main>
+        )
     }
-
-    return(
-        <main id={styles.main}>
-
-        </main>
-    )
 }
