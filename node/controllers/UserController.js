@@ -31,7 +31,8 @@ export const MailRegister = async (req, res) => {
             if(mail.status === 200) {
                 res.status(200).json({ 
                     message: 'Revise su correo', 
-                    token: mail.token
+                    token: mail.token,
+                    status: 200
                 })
             }
         }
