@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation"
 import { useRouter } from 'next/navigation'
 import { getSession } from "../utils/JsonManage"
 import styles from './css/tabloid.module.css'
-import Notice from "../components/uI/object/Notice"
+import Notice from "../components/uI/object/TabloidContent"
 import HgWait from "../components/uI/HgWait"
+import DotsSVG from "../media/DotsSVG"
 
 
 export default function Tabloid() {
@@ -52,8 +53,23 @@ export default function Tabloid() {
     } else {
         return(
             <main id={styles.main}>
+                <div id={styles.header}>
+                    <h3>{data.Name}  <DotsSVG url={data._id} height="0.75em"/></h3>
+                </div>
+                <div id={styles.data}>
+                    <h5>NDM: {data._id} {data.Owner? data.Owner : null}</h5>
+                    <p>{data.description}</p>
+                </div>
                 {data?
-                    <Notice data={data.HomeWork}/>
+                    <section id={styles.conteiner}>
+                        {data.HomeWork.map(notice => (
+                            <Notice 
+                                key={notice._id} 
+                                data={notice.notice || notice.assigment}
+                                type={notice.notice? 'Aviso' : 'Tarea'}
+                            />
+                        ))}
+                    </section>
                 :
                     <>
                         <p>Sin novedades, te avisaremos cuando el camino empiece.</p>

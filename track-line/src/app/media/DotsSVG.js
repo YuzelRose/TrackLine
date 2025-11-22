@@ -1,17 +1,18 @@
 'use client'
 import { useRouter } from 'next/navigation'
 
-export default function DotsSVG (url) {
+export default function DotsSVG ({url, height="1em"}) {
     const navigate = useRouter();
 
-    const handleClick = () => { 
+    const handleClick = (e) => { 
+        e.stopPropagation()
         navigate.push(`/tabloid/opc?id=${url}`); 
     }
     return(
         <svg
             id="injected-svg"
-            width="24"
-            height="24"
+            className='dot-container'
+            height={height}
             fill="currentColor"
             viewBox="0 0 24 24"
             onClick={handleClick}

@@ -1,0 +1,58 @@
+.conteiner {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    padding: 0.5em;
+    background: var(--card);
+    border: 0.125em solid var(--border);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+    gap: 0.5em;
+}
+.hw:hover {
+    border: solid 0.125em var(--ring);
+}
+.hw:hover > .header > h4 {
+    text-decoration: underline;
+}
+.header {
+    width: 100%;
+    padding: 0.5em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.arrowWrapper {
+    width: 5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: solid 0.125em var(--border);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.arrowWrapper:hover {
+    border: solid 0.125em var(--ring);
+}
+.arrowWrapper:hover > svg {
+    color: var(--ring);
+}
+.dropContent {
+    width: 100%;
+    text-align: start;
+    margin: 1em 0;
+    padding: 0 1em;
+}

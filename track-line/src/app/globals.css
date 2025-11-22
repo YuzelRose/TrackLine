@@ -347,3 +347,19 @@ footer { background-color: var(--muted); }
 .group-text:focus {
   outline: none;
 }
+
+.dot-container {
+  cursor: pointer;
+  width: auto;
+  color: var(--foreground);
+  border: solid 0.125em var(--foreground);
+  border-radius: 1em;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  -ms-border-radius: 1em;
+  -o-border-radius: 1em;
+}
+.dot-container:hover {
+  color: var(--ring);
+  border: solid 0.125em var(--ring);
+}

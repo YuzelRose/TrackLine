@@ -1,5 +1,5 @@
 'use client'
-import styles from './css/object.module.css'
+import styles from './css/tabloid.module.css'
 import HgWait from '../HgWait';
 import DotsSVG from '@/app/media/DotsSVG';
 import { peticion } from '@/app/utils/Funtions';
@@ -63,28 +63,30 @@ export default function TabloidCourses() {
                             {course.refId.Name || 'Sin nombre'} 
                             <span 
                                 className={styles.dotConteiner} 
-                                onClick={(e) => e.stopPropagation()}
                             >
                                 <DotsSVG url={course.refId._id}/>
                             </span>
                         </h6>
-                        <p className={styles.description}>{course.refId.description}</p>
+                        <p className={styles.description}>Dueño: {course.refId.Owner || 'ND'}</p>
                     </div>
                     {course.refId.HomeWork ?
                         <ul className={styles.hwUl}>
 
-                            {course.refId.HomeWork.map(hw => (
+                            {course.refId.HomeWork
+                                .filter(hw => hw.assigment)
+                                .map(hw => (
                                 <li 
-                                    key={hw._id} 
+                                    key={hw.assigment._id} 
                                     className={styles.hwLi}
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <p
-                                        onClick={() => navigate.push(`/tabloid/assigment?id=${course.refId._id}&hw-id=${hw._id}`)}
+                                        onClick={() => navigate.push(`/tabloid/assigment?id=${course.refId._id}&hw-id=${hw.assigment._id}`)}
                                     >
-                                        {hw.Name}: {hw.Date}
+                                            • {hw.assigment.Name}:
                                     </p>
                                 </li>
+                                
                             ))} 
                         </ul>
                     : null}

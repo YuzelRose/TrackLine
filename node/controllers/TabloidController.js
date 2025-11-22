@@ -106,7 +106,16 @@ export const getData = async (req, res) => {
         const { urlId } = req.body;
         if(!urlId)
             return res.status(400).json({ message: `Informacion: ${urlId}` })
-        const consultData = await Tabloid.findById(urlId)
+        const consultData = await Tabloid.findById(urlId).populate([
+            {
+                path: 'HomeWork.notice',
+                model: 'Notice'
+            },
+            {
+                path: 'HomeWork.assigment', 
+                model: 'Assigment'
+            }
+        ]);
         if(!consultData)
             return res.status(404).json({ message: `Curso: ${urlId} no encontrado` })
         res.status(200).json({ ...consultData.toObject(), status: "200"})
