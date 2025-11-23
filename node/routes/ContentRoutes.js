@@ -1,8 +1,13 @@
 import express from 'express';
-//import { helpMail } from '../controllers/MailController.js';
+import { 
+    downloadFile, 
+    getFile 
+} from '../controllers/ContentController.js';
 
 const router = express.Router();
 
-//router.post('/Help', helpMail);
+router.post('/get', getFile);
+router.get('/download/:contentId', downloadFile);
+
 
 export default router;

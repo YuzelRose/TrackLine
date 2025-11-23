@@ -1,14 +1,20 @@
-import express from 'express';
+import express from 'express'
+import multer from 'multer';
+const upload = multer({ storage: multer.memoryStorage() });
 import { 
     addCoursesToUser,
     getCourses, 
-    getData
-} from '../controllers/TabloidController.js';
+    getData, 
+    getHw,
+    sendHw
+} from '../controllers/TabloidController.js'
 
-const router = express.Router();
+const router = express.Router()
 
-router.post('/get-courses', getCourses);
+router.post('/get-courses', getCourses)
 router.post('/add-user', addCoursesToUser)
 router.post('/get-data', getData)
+router.post('/get-hw', getHw)
+router.post('/send-hw', upload.array('workFiles'), sendHw);
 
-export default router;
+export default router

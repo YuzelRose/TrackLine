@@ -1,0 +1,50 @@
+.file {
+    cursor: pointer;
+    max-width: 20em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+    border: solid 0.125em var(--background);
+    background-color: var(--background);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.f:hover {
+    border: solid 0.125em var(--ring);
+    color: var(--ring);
+}
+.f:hover .Name {
+    border-top: solid 0.125em var(--ring);
+}
+.file2 {
+    cursor: pointer;
+    width: 14em;
+    height: 7em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+    border: solid 0.125em var(--foreground);
+    background-color: var(--card);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.Name {
+    border-top: solid 0.125em var(--foreground);
+    
+}

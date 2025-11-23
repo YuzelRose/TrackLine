@@ -1,0 +1,40 @@
+.bg {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 1em;
+    gap: 0.5em;
+    background-color: var(--card);
+    border: solid 0.125em var(--foreground);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+#submitions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    width: 30em;
+}
+#feedback > h4 {
+    border-bottom: 0.125em solid var(--foreground);
+}
+#form {
+    display: flex;
+    justify-content: center;
+
+}
+#form > input {
+    background-color: var(--input);
+}
+
+#filesWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}

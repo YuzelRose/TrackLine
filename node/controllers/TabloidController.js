@@ -3,6 +3,8 @@ import Student from '../models/user/StudentModel.js'
 import Tabloid from '../models/tabloid/TabloidModel.js'
 import Notice from '../models/tabloid/NoticeModel.js';
 import Assigment from '../models/tabloid/AssigmentModel.js';
+import Content from '../models/tabloid/ContentModel.js'
+import mongoose from 'mongoose';
 
 const getUserCourses = async (email) => {
     try {
@@ -96,8 +98,8 @@ export const addCoursesToUser = async (req, res) => {
             message: `${tabloid.Name} se agregó correctamente al usuario`,
         });
     } catch (error) {
-        console.error(`Error al cargar cursos al usuario: ${error.message}`);
-        res.status(500).json({ message: error.message, place: "Try-catch" });
+        console.error(`Error al cargar cursos al usuario: ${error.message}`)
+        res.status(500).json({ message: error.message, place: "Try-catch" })
     }
 }
 
@@ -118,10 +120,90 @@ export const getData = async (req, res) => {
         ]);
         if(!consultData)
             return res.status(404).json({ message: `Curso: ${urlId} no encontrado` })
-        res.status(200).json({ ...consultData.toObject(), status: "200"})
+        res.status(200).json({ ...consultData.toObject(), status: 200})
     } catch (error) {
-        console.error(`Error al cargar el cursos ${error.message}`);
-        res.status(500).json({ message: error.message, place: "Try-catch" });
+        console.error(`Error al cargar el cursos ${error.message}`)
+        res.status(500).json({ message: error.message, place: "Try-catch" })
+    }
+}
+
+export const getHw = async (req, res) => {
+    try {
+        const { data } = req.body
+        if (!data) 
+            return res.status(400).json({ message: `Informacion: ${data}` })
+        const user = await Student.findOne({ Email: data.email })
+        if (!user) 
+            return res.status(404).json({ message: `Usuario: ${data.email} no encontrado` })
+        const consultData = await Assigment.findById(data.urlId).populate([
+            {
+                path: 'Content.file',
+                model: 'Content'
+            },
+            {
+                path: 'Submissions.SubmittedWork.file', 
+                model: 'Content'
+            }
+        ]);
+        if (!consultData) 
+            return res.status(404).json({ message: "Tarea no encontrada", status: 404 });
+        const filteredSubmissions = consultData.Submissions.filter(
+            submission => submission.Student.toString() === user._id.toString()
+        );
+        const result = {
+            ...consultData.toObject(),
+            Submissions: filteredSubmissions,
+            status: "200"
+        };
+        res.status(200).json(result)
+    } catch (error) { 
+        console.error(`Error al cargar la tarea: ${error.message}`)
+        res.status(500).json({ message: error.message, place: "Try-catch" })
+    }
+}
+
+export const sendHw = async (req, res) => {
+    try {
+        const { hwID, StudentID } = req.body
+        const workFiles = req.files
+        if (!hwID || !StudentID) 
+            return res.status(400).json({ message: "Faltan datos requeridos" })
+        if (!workFiles || workFiles.length === 0)  
+            return res.status(400).json({ message: "No se enviaron archivos" })
+        const consultData = await Assigment.findById(hwID)
+        if (!consultData) 
+            return res.status(404).json({ message: "Tarea no encontrada" })
+        let studentSubmission = consultData.Submissions.find(
+            submission => submission.Student.toString() === StudentID
+        )
+        if (!studentSubmission) 
+            return res.status(404).json({ message: "No se encontró la submission del estudiante" })
+        const submittedWorkIds = []
+        for (const file of workFiles) {
+            const contentData = await Content.create({
+                Name: file.originalname,     
+                size: file.size,             
+                data: file.buffer,           
+                contentType: file.mimetype,  
+                uploadDate: new Date()
+            });
+
+            submittedWorkIds.push({ file: contentData._id })
+        }
+        studentSubmission.SubmittedWork = submittedWorkIds
+        const currentDate = new Date()
+        const dueDate = new Date(consultData.DueDate)
+        studentSubmission.Status = currentDate <= dueDate ? "Entregado" : "Tarde"
+        studentSubmission.SubmittedAt = currentDate
+        await consultData.save()
+        res.status(200).json({ 
+            message: "Tarea enviada correctamente",
+            filesReceived: workFiles.length,
+            status: 200 
+        });
+    } catch (error) {
+        console.error(`Error al subir la tarea: ${error.message}`)
+        res.status(500).json({ message: error.message, place: "Try-catch" })
     }
 }
 

@@ -13,7 +13,6 @@ import DotsSVG from "../media/DotsSVG"
 export default function Tabloid() {
     const searchParams = useSearchParams() 
     const navigate = useRouter();
-    const [session, setSession] = useState(false)
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
         
@@ -26,9 +25,7 @@ export default function Tabloid() {
                     if(!!urlId){
                         const result = await peticion('tabloid/get-data',{ urlId })
                         if(!!result && result.httpStatus === 200) {
-                            setSession(session)
                             setData(result.data)
-                            
                         }
                     } else navigate.push('/main');
                 } else navigate.push('/')

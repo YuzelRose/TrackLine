@@ -6,10 +6,9 @@ const AssigmentModel = new mongoose.Schema({
         required: true,
         unique: true
     },
-    Content: {
-        contentType: { type: String, enum: ['text', 'file', 'link'] }, 
-        value: String,
-        filename: String
+    Text: {
+        type: String,
+        required: true
     },
     DueDate: { 
         type: Date, 
@@ -19,6 +18,12 @@ const AssigmentModel = new mongoose.Schema({
         type: Date, 
         default: Date.now
     },
+    Content: [{
+        file: {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'content' 
+        },
+    }],
     Submissions: [{
         Student: {
             type: mongoose.Schema.Types.ObjectId, 
@@ -27,15 +32,15 @@ const AssigmentModel = new mongoose.Schema({
         },
         Status: {
             type: String, 
-            enum: ['pending', 'submitted', 'graded', 'late'], 
-            default: 'pending' 
+            enum: ['Pendiente', 'Entregado', 'Tarde'], 
+            default: 'Pendiente' 
         },
-        SubmittedWork: {
-            contentType: { type: String, enum: ['text', 'file', 'link'] }, 
-            value: String,
-            filename: String,
-            submittedAt: { type: Date, default: Date.now }
-        },
+        SubmittedWork: [{
+            file: {
+                type: mongoose.Schema.Types.ObjectId, 
+                ref: 'content' 
+            },
+        }],
         Grade: {
             type: Number,
             min: 0,

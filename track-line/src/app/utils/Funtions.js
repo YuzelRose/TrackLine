@@ -66,3 +66,32 @@ export const peticion = async (endpoint, data = null, method = 'POST') => {
         }
     }
 }
+
+export const fetchData = async (endpoint, fileName) => {
+    const URI = `${URI_START}/trckln/${endpoint}`
+    try {
+        const response = await fetch(URI);
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            alert(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const blob = await response.blob();
+        
+        // Crear y disparar la descarga
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        return { success: true, message: 'Descarga completada' };
+        
+    } catch(exError) {
+        console.error('Error en petición:', exError);
+        throw new Error(exError.message || 'Error al descargar el archivo');
+    }
+}

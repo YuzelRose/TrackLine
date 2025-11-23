@@ -1,0 +1,75 @@
+.wrapperDropZone {
+    width: 25em;
+}
+
+.dropArea {
+    border: 0.125em dashed var(--foreground);
+    padding: 2em 1em;
+    text-align: center;
+    transition: all 0.3s ease;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+.dropArea.dragging {
+    border-color: var(--ring);
+    background-color: var(--background);
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.uploadLabel {
+    color: var(--accent-foreground);
+    cursor: pointer;
+    text-decoration: underline;
+}
+.uploadLabel:hover {
+    color: var(--ring);
+}
+.uploadLabel:active{
+    color: var(--accent);
+}
+.selectedFiles {
+    margin-top: 1em;
+}
+.selectedFiles > ul {
+    list-style-type: none;
+}
+.file {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5em; 
+    margin-top: 1em;
+    padding: 1em;
+    background-color: var(--background);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.fileSVG {
+    border-right: solid 0.125em var(--muted-foreground);
+}
+.fileName {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0; 
+}
+.x {
+    border-left: solid 0.125em var(--muted-foreground);
+}
+.x:hover{
+    color: var(--ring);
+}

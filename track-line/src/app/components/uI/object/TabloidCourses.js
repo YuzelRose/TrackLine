@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from "react"
 
 export default function TabloidCourses() {
-    const navigate = useRouter();
+    const navigate = useRouter()
     const [courses, setCourses] = useState(null)
     const [loading, setLoading] = useState(true)
 
@@ -81,7 +81,7 @@ export default function TabloidCourses() {
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <p
-                                        onClick={() => navigate.push(`/tabloid/assigment?id=${course.refId._id}&hw-id=${hw.assigment._id}`)}
+                                        onClick={() => navigate.push(`/tabloid/assigment?id=${hw.assigment._id}`)}
                                     >
                                             • {hw.assigment.Name}:
                                     </p>
