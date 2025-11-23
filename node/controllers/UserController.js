@@ -54,7 +54,7 @@ export const registerTutor = async (req, res) => {
                 Name: data.name,
                 Email: data.email,
                 Pass: await bcrypt.hash(data.pass, salt),
-                CURP: data.curp,
+                CURP: await bcrypt.hash(data.curp, salt),
                 Birth: data.birth,
                 UserType: "tutor",  // Discriminador
                 Phone: data.phone,
@@ -104,7 +104,7 @@ export const registerTutorStudent = async (req, res) => {
                 Name: data.name,
                 Email: data.email,
                 Pass: await bcrypt.hash(data.pass, salt),
-                CURP: data.curp,
+                CURP: await bcrypt.hash(data.curp, salt),
                 Birth: data.birth,
                 UserType: "student",  // Discriminador
                 Pays: [
@@ -142,7 +142,7 @@ export const registerStudent = async (req, res) => {
                 Name: data.name,
                 Email: data.email,
                 Pass: await bcrypt.hash(data.pass, salt),
-                CURP: data.curp,
+                CURP: await bcrypt.hash(data.curp, salt),
                 Birth: data.birth,
                 UserType: "student",  // Discriminador
                 Pays: [

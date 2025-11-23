@@ -83,7 +83,7 @@ export default function TabloidCourses() {
                                     <p
                                         onClick={() => navigate.push(`/tabloid/assigment?id=${hw.assigment._id}`)}
                                     >
-                                            • {hw.assigment.Name}:
+                                        • {hw.assigment.Name}:
                                     </p>
                                 </li>
                                 
