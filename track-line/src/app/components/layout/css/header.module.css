@@ -27,4 +27,24 @@
     grid-area: 1 / 2 / 2 / 3;
     width: 100%;
 }
-#user { grid-area: 1 / 3 / 2 / 4; }
+#user { 
+    grid-area: 1 / 3 / 2 / 4; 
+    display: flex;
+    justify-content: end;
+    padding-right: 1em;
+}
+#profile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+#profile:hover {
+    color: var(--ring);
+    text-decoration: underline;
+}
+.userIcon {
+    height: 2em;
+    width: auto;
+}

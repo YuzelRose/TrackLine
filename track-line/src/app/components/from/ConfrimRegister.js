@@ -26,6 +26,7 @@ export default function ConfrimRegister({funtion = () => {}}) {
         state: false
     })
     const [typeBase, setTypeBase] = useState(null)
+    const [mmry, setMemory] = useState(null)
     
     useEffect(() => { // Validacion de los datos
         const urlToken = searchParams.get('token')
@@ -46,6 +47,7 @@ export default function ConfrimRegister({funtion = () => {}}) {
                 type: selection.type,
                 state: true
             })
+            setMemory(selection.text)
             const baseConfig = selection.type === "student" ? [...STUDENTS] : [...TUTORFILDS];
             const updatedBase = baseConfig.map(item => 
                 item.name === (selection.type === "tutor" ? "Tutor-Email" : "Email")
@@ -146,37 +148,43 @@ export default function ConfrimRegister({funtion = () => {}}) {
             setWait(false)
         } 
     }
-    return(
-        <>
-            { wait ? 
-                <div id={styles.wait} className='group'>
-                    <HgWait/>
-                </div>
-            :
-                <form onSubmit={endRegister} id={styles.form}>
-                    <div id={styles.passConfirm} className={`group ${styles.bg}`}>
-                        <p>Confirme su contraseña:</p>
-                        <div>
-                            <PassInput name="Pass" value={data.json?.Pass || ''} onlyPass={true} read={true}/>
-                            <PassInput name='PassConfirm' placeholder='Confirme su contraseña'/>
-                        </div>
-                    </div>
-                    
-                    <div className={`group ${styles.bg}`}>
-                        <p>Yo soy un:</p> <DropList info={DROPUSERS} text={"Tipo de cuenta"} onclick={handleSelect}/>
-                    </div>
 
-                    {type.state ?
-                        <>
-                            <div className={`group ${styles.bg} ${styles.fromContent}`}>
-                                <h4>Sus datos:</h4>
-                                <TextInput content={typeBase} width={"50%"}/> 
-                            </div>
-                            <button type='submit' className='button'>Terminar</button>
-                        </>
-                    : null }
-                </form>
-            }
-        </>
-    )
+    if(wait){
+        return(
+            <div id={styles.wait} className='group'>
+                <HgWait/>
+            </div>
+        )
+    } else {
+        return(
+            <form onSubmit={endRegister} id={styles.form}>
+                <div id={styles.passConfirm} className={`group ${styles.bg}`}>
+                    <p>Confirme su contraseña:</p>
+                    <div>
+                        <PassInput name="Pass" value={data.json?.Pass || ''} onlyPass={true} read={true}/>
+                        <PassInput name='PassConfirm' placeholder='Confirme su contraseña'/>
+                    </div>
+                </div>
+                
+                <div className={`group ${styles.bg}`}>
+                    <p>Yo soy un:</p> 
+                    <DropList 
+                        info={DROPUSERS} 
+                        text={mmry || "Tipo de cuenta"} 
+                        onclick={handleSelect}
+                    />
+                </div>
+
+                {type.state ?
+                    <>
+                        <div className={`group ${styles.bg} ${styles.fromContent}`}>
+                            <h4>Sus datos:</h4>
+                            <TextInput content={typeBase} width={"50%"}/> 
+                        </div>
+                        <button type='submit' className='button'>Terminar</button>
+                    </>
+                : null }
+            </form>
+        )
+    }
 }

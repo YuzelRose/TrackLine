@@ -1,0 +1,51 @@
+#BadgeOBJ {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    padding: 1em;
+    margin-top: 1em;
+    gap: 0.5em;
+    border: solid 0.125em var(--foreground);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+#dropBadges {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.drop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 0.5em;
+    border-top: solid var(--border) 0.125em;
+    border-bottom: var(--background) solid 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.drop:hover {
+    color: var(--ring);
+    border-top: var(--ring) solid 0.125em;
+    border-bottom: var(--border) solid 0.125em;
+}
+.drop:active {
+    color: var(--accent);
+    border-top: var(--accent) solid 0.125em;
+    border-bottom: var(--border) solid 0.125em;
+}
+.p {
+    text-align: center;
+    width: 100%;
+    border-bottom: solid var(--foreground) 0.125em; 
+}

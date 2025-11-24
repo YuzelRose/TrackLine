@@ -103,6 +103,10 @@ export const NUKE = () => {
     deleteJSON(LOCAL_STORAGE_KEY_KEEP)
 }
 
+export const miniNUKE = () => {
+    deleteJSON(LOCAL_STORAGE_KEY)
+}
+
 // Función para guardar datos en el Local Storage
 const saveData = ({data,key}) => {
     localStorage.setItem(key, JSON.stringify(data));

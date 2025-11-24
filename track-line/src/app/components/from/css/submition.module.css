@@ -18,7 +18,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 1em;
-    width: 30em;
+    max-width: 30em;
 }
 #feedback > h4 {
     border-bottom: 0.125em solid var(--foreground);
@@ -26,7 +26,6 @@
 #form {
     display: flex;
     justify-content: center;
-
 }
 #form > input {
     background-color: var(--input);
@@ -37,4 +36,13 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+}
+
+@media (max-width: 768px) {
+    #submitions {
+        width: 100%;
+        margin-top: 1em;
+        display: flex;
+        justify-content: center;
+    }
 }

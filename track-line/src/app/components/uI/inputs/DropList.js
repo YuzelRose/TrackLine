@@ -1,10 +1,11 @@
 'use client'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import styles from './css/inputs.module.css'
 
-export default function DropList({ info, text, onclick }) {
+export default function DropList({ info, text, onclick}) {
     const [change, setChange] = useState(false)
     const [selectedText, setSelectedText] = useState(text)
+    
     const handleItemClick  = ({itemText,type}) => {
         setSelectedText(itemText)
         setChange(false)

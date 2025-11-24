@@ -79,7 +79,6 @@ export default function Reguister({ onWaitingChange }){
     }
 
     return(
-        
         <AnimatePresence mode="wait">
             { ret ? 
             <>

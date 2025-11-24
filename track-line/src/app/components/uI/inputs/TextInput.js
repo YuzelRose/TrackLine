@@ -1,6 +1,6 @@
 'use client'
+import LoginUserSVG from '@/app/media/LoginUserSVG'
 import styles from './css/inputs.module.css'
-import User from '@/app/media/UserSVG'
 export default function TextForm({content, width}) {
     return(
         <>
@@ -40,7 +40,7 @@ export default function TextForm({content, width}) {
                                 }
                             })}
                         />
-                        {inp.type  === "email"? <User/> : null}
+                        {inp.type  === "email"? <LoginUserSVG/> : null}
                     </span>
                 </div>
             ))}

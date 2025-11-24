@@ -16,9 +16,18 @@ const UserSchema = new mongoose.Schema({
         required: true,
     },
     CURP: {
-        type: String,
-        required: true,
-        unique: true,
+        iv: {
+            type: String,
+            required: true
+        },
+        content: {
+            type: String,
+            required: true
+        },
+        authTag: {
+            type: String,
+            required: true
+        }
     },
     Birth: {
         type: String,

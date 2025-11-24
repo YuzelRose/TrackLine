@@ -77,11 +77,13 @@ export default function HomeWorkPage() {
                             </>
                         : null }
                     </div>
-                    <Submition 
-                        data={data.Submissions[0]} 
-                        DueDate={data.DueDate} 
-                        hwID={data._id}
-                    />
+                    <div id={styles.submitionWrapper}>
+                        <Submition 
+                            data={data.Submissions[0]} 
+                            DueDate={data.DueDate} 
+                            hwID={data._id}
+                        />
+                    </div>
                 </section>
             </main>
         )
