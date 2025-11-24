@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
     }
 }, { 
     collection: 'users',
-    discriminatorKey: 'userType'  // ← Clave que discrimina el tipo
+    discriminatorKey: 'UserType'  // ← Clave que discrimina el tipo
 });
 
 const User = mongoose.model('User', UserSchema);

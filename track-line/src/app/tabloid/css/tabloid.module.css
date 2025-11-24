@@ -3,6 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    
 }
 #conteiner {
     width: 100%;
@@ -65,3 +66,9 @@
 #data > h5 {
     margin-bottom: 1em;
 }
+.dashboardBtn {
+    background-color: aqua;
+    border-bottom: 90%;
+    position: relative;
+}
+

@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import '../css/userCss.css';
 import { peticion } from '@/app/utils/Funtions';
 
-export default function StudentsPage() {
-  const [students, setStudents] = useState([]);
+export default function TutorsPage() {
+  const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({
     message: '',
@@ -16,30 +16,30 @@ export default function StudentsPage() {
     Pass: '',
     CURP: '',
     Birth: '',
-    UserType: 'student',
-    kardex: '',
+    UserType: 'tutor',
+    Phone: '',
     RelatedEmail: ''
   });
 
-  // Obtener todos los estudiantes
-  const fetchStudents = async () => {
+  // Obtener todos los tutores
+  const fetchTutors = async () => {
     setLoading(true);
     try {
-      const response = await peticion('crud/students', null, 'GET');
+      const response = await peticion('crudTutor/tutors', null, 'GET');
       
       if (response.status) {
-        setStudents(response.data.data || []);
+        setTutors(response.data.data || []);
         setMessage({ message: '', state: false });
       } else {
         setMessage({ 
-          message: response.message || 'Error al cargar estudiantes', 
+          message: response.message || 'Error al cargar tutores', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al cargar estudiantes', 
+        message: 'Error de conexión al cargar tutores', 
         state: true 
       });
     } finally {
@@ -47,17 +47,17 @@ export default function StudentsPage() {
     }
   };
 
-  // Crear estudiante
-  const createStudent = async (e) => {
+  // Crear tutor
+  const createTutor = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      const response = await peticion('crud/students', { data: formData }, 'POST');
+      const response = await peticion('crudTutor/tutors', { data: formData }, 'POST');
       
       if (response.status) {
         setMessage({ 
-          message: response.message || 'Estudiante creado exitosamente', 
+          message: response.message || 'Tutor creado exitosamente', 
           state: true 
         });
         // Resetear formulario
@@ -67,21 +67,21 @@ export default function StudentsPage() {
           Pass: '',
           CURP: '',
           Birth: '',
-          UserType: 'student',
-          kardex: '',
+          UserType: 'tutor',
+          Phone: '',
           RelatedEmail: ''
         });
-        fetchStudents();
+        fetchTutors();
       } else {
         setMessage({ 
-          message: response.message || 'Error al crear estudiante', 
+          message: response.message || 'Error al crear tutor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al crear estudiante', 
+        message: 'Error de conexión al crear tutor', 
         state: true 
       });
     } finally {
@@ -89,29 +89,29 @@ export default function StudentsPage() {
     }
   };
 
-  // Eliminar estudiante
-  const deleteStudent = async (id) => {
-    if (confirm('¿Estás seguro de eliminar este estudiante?')) {
+  // Eliminar tutor
+  const deleteTutor = async (id) => {
+    if (confirm('¿Estás seguro de eliminar este tutor?')) {
       setLoading(true);
       try {
-        const response = await peticion(`crud/students/${id}`, null, 'DELETE');
+        const response = await peticion(`crudTutor/tutors/${id}`, null, 'DELETE');
         
         if (response.status) {
           setMessage({ 
-            message: response.message || 'Estudiante eliminado exitosamente', 
+            message: response.message || 'Tutor eliminado exitosamente', 
             state: true 
           });
-          fetchStudents();
+          fetchTutors();
         } else {
           setMessage({ 
-            message: response.message || 'Error al eliminar estudiante', 
+            message: response.message || 'Error al eliminar tutor', 
             state: true 
           });
         }
       } catch (error) {
         console.error('Error:', error);
         setMessage({ 
-          message: 'Error de conexión al eliminar estudiante', 
+          message: 'Error de conexión al eliminar tutor', 
           state: true 
         });
       } finally {
@@ -120,28 +120,28 @@ export default function StudentsPage() {
     }
   };
 
-  // Actualizar estudiante
-  const updateStudent = async (id, updatedData) => {
+  // Actualizar tutor
+  const updateTutor = async (id, updatedData) => {
     setLoading(true);
     try {
-      const response = await peticion(`crud/students/${id}`, { data: updatedData }, 'PUT');
+      const response = await peticion(`crudTutor/tutors/${id}`, { data: updatedData }, 'PUT');
       
       if (response.status) {
         setMessage({ 
-          message: response.message || 'Estudiante actualizado exitosamente', 
+          message: response.message || 'Tutor actualizado exitosamente', 
           state: true 
         });
-        fetchStudents();
+        fetchTutors();
       } else {
         setMessage({ 
-          message: response.message || 'Error al actualizar estudiante', 
+          message: response.message || 'Error al actualizar tutor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al actualizar estudiante', 
+        message: 'Error de conexión al actualizar tutor', 
         state: true 
       });
     } finally {
@@ -149,32 +149,32 @@ export default function StudentsPage() {
     }
   };
 
-  // Buscar estudiante por email
+  // Buscar tutor por email
   const searchByEmail = async (email) => {
     setLoading(true);
     try {
-      const response = await peticion(`crud/students/email/${email}`, null, 'GET');
+      const response = await peticion(`crudTutor/tutors/email/${email}`, null, 'GET');
       
       if (response.status) {
         if (response.data.data) {
-          setStudents([response.data.data]);
+          setTutors([response.data.data]);
         } else {
-          setStudents([]);
+          setTutors([]);
         }
         setMessage({ 
-          message: response.data.data ? 'Estudiante encontrado' : 'No se encontró el estudiante', 
+          message: response.data.data ? 'Tutor encontrado' : 'No se encontró el tutor', 
           state: true 
         });
       } else {
         setMessage({ 
-          message: response.message || 'Error al buscar estudiante', 
+          message: response.message || 'Error al buscar tutor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al buscar estudiante', 
+        message: 'Error de conexión al buscar tutor', 
         state: true 
       });
     } finally {
@@ -182,32 +182,65 @@ export default function StudentsPage() {
     }
   };
 
-  // Buscar estudiante por kardex
-  const searchByKardex = async (kardex) => {
+  // Buscar tutor por teléfono
+  const searchByPhone = async (phone) => {
     setLoading(true);
     try {
-      const response = await peticion(`crud/students/kardex/${kardex}`, null, 'GET');
+      const response = await peticion(`crudTutor/tutors/phone/${phone}`, null, 'GET');
       
       if (response.status) {
         if (response.data.data) {
-          setStudents([response.data.data]);
+          setTutors([response.data.data]);
         } else {
-          setStudents([]);
+          setTutors([]);
         }
         setMessage({ 
-          message: response.data.data ? 'Estudiante encontrado' : 'No se encontró el estudiante', 
+          message: response.data.data ? 'Tutor encontrado' : 'No se encontró el tutor', 
           state: true 
         });
       } else {
         setMessage({ 
-          message: response.message || 'Error al buscar estudiante', 
+          message: response.message || 'Error al buscar tutor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al buscar estudiante', 
+        message: 'Error de conexión al buscar tutor', 
+        state: true 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Buscar tutor por email relacionado
+  const searchByRelatedEmail = async (relatedEmail) => {
+    setLoading(true);
+    try {
+      const response = await peticion(`crudTutor/tutors/related-email/${relatedEmail}`, null, 'GET');
+      
+      if (response.status) {
+        if (response.data.data) {
+          setTutors([response.data.data]);
+        } else {
+          setTutors([]);
+        }
+        setMessage({ 
+          message: response.data.data ? 'Tutor encontrado' : 'No se encontró el tutor', 
+          state: true 
+        });
+      } else {
+        setMessage({ 
+          message: response.message || 'Error al buscar tutor', 
+          state: true 
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage({ 
+        message: 'Error de conexión al buscar tutor', 
         state: true 
       });
     } finally {
@@ -217,26 +250,27 @@ export default function StudentsPage() {
 
   // Resetear búsqueda y cargar todos
   const resetSearch = () => {
-    fetchStudents();
+    fetchTutors();
   };
 
   useEffect(() => {
-    fetchStudents();
+    fetchTutors();
   }, []);
 
   return (
-    <div className="crud-container">
-      <h1>Gestión de Estudiantes</h1>
+    <div className="crud-container ">
+      <h1>Gestión de Tutores</h1>
+      
       {/* Mensajes de estado */}
       {message.state && (
         <div className={`message ${message.message.includes('Error') ? 'error' : 'success'}`}>
           {message.message}
         </div>
       )}
-        
-      {/* Formulario para crear estudiante */}
-      <form onSubmit={createStudent} className="crud-form">
-        <h2>Agregar Nuevo Estudiante</h2>
+
+      {/* Formulario para crear tutor */}
+      <form onSubmit={createTutor} className="crud-form">
+        <h2>Agregar Nuevo Tutor</h2>
         <div className="form-grid">
           <div className="input-group">
             <input
@@ -291,10 +325,10 @@ export default function StudentsPage() {
 
           <div className="input-group">
             <input
-              type="text"
-              placeholder="Kardex"
-              value={formData.kardex}
-              onChange={(e) => setFormData({...formData, kardex: e.target.value})}
+              type="tel"
+              placeholder="Teléfono"
+              value={formData.Phone}
+              onChange={(e) => setFormData({...formData, Phone: e.target.value})}
               required
             />
           </div>
@@ -302,7 +336,7 @@ export default function StudentsPage() {
           <div className="input-group">
             <input
               type="email"
-              placeholder="Email del tutor"
+              placeholder="Email relacionado (estudiante)"
               value={formData.RelatedEmail}
               onChange={(e) => setFormData({...formData, RelatedEmail: e.target.value})}
             />
@@ -314,13 +348,13 @@ export default function StudentsPage() {
           className="btn btn-primary"
           disabled={loading}
         >
-          {loading ? 'Creando...' : 'Crear Estudiante'}
+          {loading ? 'Creando...' : 'Crear Tutor'}
         </button>
       </form>
 
-      {/* Búsqueda de estudiantes */}
+      {/* Búsqueda de tutores */}
       <div className="search-section">
-        <h3>Buscar Estudiantes</h3>
+        <h3>Buscar Tutores</h3>
         <div className="search-options">
           <div className="input-group">
             <input
@@ -346,23 +380,45 @@ export default function StudentsPage() {
           
           <div className="input-group">
             <input
-              type="text"
-              placeholder="Buscar por kardex"
+              type="tel"
+              placeholder="Buscar por teléfono"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
-                  searchByKardex(e.target.value);
+                  searchByPhone(e.target.value);
                 }
               }}
             />
             <button 
               type="button"
               onClick={() => {
-                const kardex = document.querySelector('input[placeholder="Buscar por kardex"]').value;
-                if (kardex) searchByKardex(kardex);
+                const phone = document.querySelector('input[placeholder="Buscar por teléfono"]').value;
+                if (phone) searchByPhone(phone);
               }}
               className="btn btn-secondary"
             >
-              Buscar por Kardex
+              Buscar por Teléfono
+            </button>
+          </div>
+
+          <div className="input-group">
+            <input
+              type="email"
+              placeholder="Buscar por email relacionado"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  searchByRelatedEmail(e.target.value);
+                }
+              }}
+            />
+            <button 
+              type="button"
+              onClick={() => {
+                const relatedEmail = document.querySelector('input[placeholder="Buscar por email relacionado"]').value;
+                if (relatedEmail) searchByRelatedEmail(relatedEmail);
+              }}
+              className="btn btn-secondary"
+            >
+              Buscar por Email Relacionado
             </button>
           </div>
           
@@ -376,20 +432,20 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      {/* Lista de estudiantes */}
+      {/* Lista de tutores */}
       <div className="crud-list">
         <div className="list-header">
-          <h2>Lista de Estudiantes</h2>
-          <span className="count-badge">{students.length} estudiantes</span>
+          <h2>Lista de Tutores</h2>
+          <span className="count-badge">{tutors.length} tutores</span>
         </div>
         
         {loading ? (
-          <div className="loading">Cargando estudiantes...</div>
+          <div className="loading">Cargando tutores...</div>
         ) : (
           <div className="table-container">
-            {students.length === 0 ? (
+            {tutors.length === 0 ? (
               <div className="empty-state">
-                No hay estudiantes registrados
+                No hay tutores registrados
               </div>
             ) : (
               <table className="students-table">
@@ -398,26 +454,26 @@ export default function StudentsPage() {
                     <th>Nombre</th>
                     <th>Email</th>
                     <th>CURP</th>
-                    <th>Kardex</th>
+                    <th>Teléfono</th>
+                    <th>Email Relacionado</th>
                     <th>Fecha Nac.</th>
-                    <th>Email Tutor</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {students.map((student) => (
-                    <tr key={student._id}>
-                      <td>{student.Name}</td>
-                      <td>{student.Email}</td>
-                      <td className="curp-cell">{student.CURP}</td>
-                      <td>{student.kardex}</td>
-                      <td>{student.Birth ? new Date(student.Birth).toLocaleDateString() : 'N/A'}</td>
-                      <td>{student.RelatedEmail || 'N/A'}</td>
+                  {tutors.map((tutor) => (
+                    <tr key={tutor._id}>
+                      <td>{tutor.Name}</td>
+                      <td>{tutor.Email}</td>
+                      <td className="curp-cell">{tutor.CURP}</td>
+                      <td>{tutor.Phone}</td>
+                      <td>{tutor.RelatedEmail || 'N/A'}</td>
+                      <td>{tutor.Birth ? new Date(tutor.Birth).toLocaleDateString() : 'N/A'}</td>
                       <td>
                         <div className="action-buttons">
                           <button 
                             className="btn btn-danger btn-sm"
-                            onClick={() => deleteStudent(student._id)}
+                            onClick={() => deleteTutor(tutor._id)}
                             disabled={loading}
                           >
                             Eliminar

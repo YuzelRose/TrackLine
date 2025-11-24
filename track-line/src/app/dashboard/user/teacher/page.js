@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import '../css/userCss.css';
 import { peticion } from '@/app/utils/Funtions';
 
-export default function StudentsPage() {
-  const [students, setStudents] = useState([]);
+export default function TeachersPage() {
+  const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({
     message: '',
@@ -16,30 +16,32 @@ export default function StudentsPage() {
     Pass: '',
     CURP: '',
     Birth: '',
-    UserType: 'student',
-    kardex: '',
-    RelatedEmail: ''
+    UserType: 'profesor',
+    RFC: '',
+    NCount: '',
+    Cedula: '',
+    Tabloid: []
   });
 
-  // Obtener todos los estudiantes
-  const fetchStudents = async () => {
+  // Obtener todos los profesores
+  const fetchTeachers = async () => {
     setLoading(true);
     try {
-      const response = await peticion('crud/students', null, 'GET');
+      const response = await peticion('crudProfe/profesors', null, 'GET');
       
       if (response.status) {
-        setStudents(response.data.data || []);
+        setTeachers(response.data.data || []);
         setMessage({ message: '', state: false });
       } else {
         setMessage({ 
-          message: response.message || 'Error al cargar estudiantes', 
+          message: response.message || 'Error al cargar profesores', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al cargar estudiantes', 
+        message: 'Error de conexión al cargar profesores', 
         state: true 
       });
     } finally {
@@ -47,17 +49,17 @@ export default function StudentsPage() {
     }
   };
 
-  // Crear estudiante
-  const createStudent = async (e) => {
+  // Crear profesor
+  const createTeacher = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      const response = await peticion('crud/students', { data: formData }, 'POST');
+      const response = await peticion('crudProfe/profesors', { data: formData }, 'POST');
       
       if (response.status) {
         setMessage({ 
-          message: response.message || 'Estudiante creado exitosamente', 
+          message: response.message || 'Profesor creado exitosamente', 
           state: true 
         });
         // Resetear formulario
@@ -67,21 +69,23 @@ export default function StudentsPage() {
           Pass: '',
           CURP: '',
           Birth: '',
-          UserType: 'student',
-          kardex: '',
-          RelatedEmail: ''
+          UserType: 'profesor',
+          RFC: '',
+          NCount: '',
+          Cedula: '',
+          Tabloid: []
         });
-        fetchStudents();
+        fetchTeachers();
       } else {
         setMessage({ 
-          message: response.message || 'Error al crear estudiante', 
+          message: response.message || 'Error al crear profesor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al crear estudiante', 
+        message: 'Error de conexión al crear profesor', 
         state: true 
       });
     } finally {
@@ -89,29 +93,29 @@ export default function StudentsPage() {
     }
   };
 
-  // Eliminar estudiante
-  const deleteStudent = async (id) => {
-    if (confirm('¿Estás seguro de eliminar este estudiante?')) {
+  // Eliminar profesor
+  const deleteTeacher = async (id) => {
+    if (confirm('¿Estás seguro de eliminar este profesor?')) {
       setLoading(true);
       try {
-        const response = await peticion(`crud/students/${id}`, null, 'DELETE');
+        const response = await peticion(`crudProfe/profesor/${id}`, null, 'DELETE');
         
         if (response.status) {
           setMessage({ 
-            message: response.message || 'Estudiante eliminado exitosamente', 
+            message: response.message || 'Profesor eliminado exitosamente', 
             state: true 
           });
-          fetchStudents();
+          fetchTeachers();
         } else {
           setMessage({ 
-            message: response.message || 'Error al eliminar estudiante', 
+            message: response.message || 'Error al eliminar profesor', 
             state: true 
           });
         }
       } catch (error) {
         console.error('Error:', error);
         setMessage({ 
-          message: 'Error de conexión al eliminar estudiante', 
+          message: 'Error de conexión al eliminar profesor', 
           state: true 
         });
       } finally {
@@ -120,28 +124,28 @@ export default function StudentsPage() {
     }
   };
 
-  // Actualizar estudiante
-  const updateStudent = async (id, updatedData) => {
+  // Actualizar profesor
+  const updateTeacher = async (id, updatedData) => {
     setLoading(true);
     try {
-      const response = await peticion(`crud/students/${id}`, { data: updatedData }, 'PUT');
+      const response = await peticion(`crudProfe/profesor/${id}`, { data: updatedData }, 'PUT');
       
       if (response.status) {
         setMessage({ 
-          message: response.message || 'Estudiante actualizado exitosamente', 
+          message: response.message || 'Profesor actualizado exitosamente', 
           state: true 
         });
-        fetchStudents();
+        fetchTeachers();
       } else {
         setMessage({ 
-          message: response.message || 'Error al actualizar estudiante', 
+          message: response.message || 'Error al actualizar profesor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al actualizar estudiante', 
+        message: 'Error de conexión al actualizar profesor', 
         state: true 
       });
     } finally {
@@ -149,32 +153,32 @@ export default function StudentsPage() {
     }
   };
 
-  // Buscar estudiante por email
+  // Buscar profesor por email
   const searchByEmail = async (email) => {
     setLoading(true);
     try {
-      const response = await peticion(`crud/students/email/${email}`, null, 'GET');
+      const response = await peticion(`crudProfe/profesors/email/${email}`, null, 'GET');
       
       if (response.status) {
         if (response.data.data) {
-          setStudents([response.data.data]);
+          setTeachers([response.data.data]);
         } else {
-          setStudents([]);
+          setTeachers([]);
         }
         setMessage({ 
-          message: response.data.data ? 'Estudiante encontrado' : 'No se encontró el estudiante', 
+          message: response.data.data ? 'Profesor encontrado' : 'No se encontró el profesor', 
           state: true 
         });
       } else {
         setMessage({ 
-          message: response.message || 'Error al buscar estudiante', 
+          message: response.message || 'Error al buscar profesor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al buscar estudiante', 
+        message: 'Error de conexión al buscar profesor', 
         state: true 
       });
     } finally {
@@ -182,32 +186,32 @@ export default function StudentsPage() {
     }
   };
 
-  // Buscar estudiante por kardex
-  const searchByKardex = async (kardex) => {
+  // Buscar profesor por RFC
+  const searchByRFC = async (rfc) => {
     setLoading(true);
     try {
-      const response = await peticion(`crud/students/kardex/${kardex}`, null, 'GET');
+      const response = await peticion(`crudProfe/profesors/rfc/${rfc}`, null, 'GET');
       
       if (response.status) {
         if (response.data.data) {
-          setStudents([response.data.data]);
+          setTeachers([response.data.data]);
         } else {
-          setStudents([]);
+          setTeachers([]);
         }
         setMessage({ 
-          message: response.data.data ? 'Estudiante encontrado' : 'No se encontró el estudiante', 
+          message: response.data.data ? 'Profesor encontrado' : 'No se encontró el profesor', 
           state: true 
         });
       } else {
         setMessage({ 
-          message: response.message || 'Error al buscar estudiante', 
+          message: response.message || 'Error al buscar profesor', 
           state: true 
         });
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage({ 
-        message: 'Error de conexión al buscar estudiante', 
+        message: 'Error de conexión al buscar profesor', 
         state: true 
       });
     } finally {
@@ -217,26 +221,27 @@ export default function StudentsPage() {
 
   // Resetear búsqueda y cargar todos
   const resetSearch = () => {
-    fetchStudents();
+    fetchTeachers();
   };
 
   useEffect(() => {
-    fetchStudents();
+    fetchTeachers();
   }, []);
 
   return (
     <div className="crud-container">
-      <h1>Gestión de Estudiantes</h1>
+      <h1>Gestión de Profesores</h1>
+      
       {/* Mensajes de estado */}
       {message.state && (
         <div className={`message ${message.message.includes('Error') ? 'error' : 'success'}`}>
           {message.message}
         </div>
       )}
-        
-      {/* Formulario para crear estudiante */}
-      <form onSubmit={createStudent} className="crud-form">
-        <h2>Agregar Nuevo Estudiante</h2>
+
+      {/* Formulario para crear profesor */}
+      <form onSubmit={createTeacher} className="crud-form">
+        <h2>Agregar Nuevo Profesor</h2>
         <div className="form-grid">
           <div className="input-group">
             <input
@@ -292,19 +297,31 @@ export default function StudentsPage() {
           <div className="input-group">
             <input
               type="text"
-              placeholder="Kardex"
-              value={formData.kardex}
-              onChange={(e) => setFormData({...formData, kardex: e.target.value})}
+              placeholder="RFC"
+              value={formData.RFC}
+              onChange={(e) => setFormData({...formData, RFC: e.target.value})}
+              required
+              maxLength={13}
+            />
+          </div>
+
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Número de Cuenta"
+              value={formData.NCount}
+              onChange={(e) => setFormData({...formData, NCount: e.target.value})}
               required
             />
           </div>
 
           <div className="input-group">
             <input
-              type="email"
-              placeholder="Email del tutor"
-              value={formData.RelatedEmail}
-              onChange={(e) => setFormData({...formData, RelatedEmail: e.target.value})}
+              type="text"
+              placeholder="Cédula Profesional"
+              value={formData.Cedula}
+              onChange={(e) => setFormData({...formData, Cedula: e.target.value})}
+              required
             />
           </div>
         </div>
@@ -314,13 +331,13 @@ export default function StudentsPage() {
           className="btn btn-primary"
           disabled={loading}
         >
-          {loading ? 'Creando...' : 'Crear Estudiante'}
+          {loading ? 'Creando...' : 'Crear Profesor'}
         </button>
       </form>
 
-      {/* Búsqueda de estudiantes */}
+      {/* Búsqueda de profesores */}
       <div className="search-section">
-        <h3>Buscar Estudiantes</h3>
+        <h3>Buscar Profesores</h3>
         <div className="search-options">
           <div className="input-group">
             <input
@@ -347,22 +364,22 @@ export default function StudentsPage() {
           <div className="input-group">
             <input
               type="text"
-              placeholder="Buscar por kardex"
+              placeholder="Buscar por RFC"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
-                  searchByKardex(e.target.value);
+                  searchByRFC(e.target.value);
                 }
               }}
             />
             <button 
               type="button"
               onClick={() => {
-                const kardex = document.querySelector('input[placeholder="Buscar por kardex"]').value;
-                if (kardex) searchByKardex(kardex);
+                const rfc = document.querySelector('input[placeholder="Buscar por RFC"]').value;
+                if (rfc) searchByRFC(rfc);
               }}
               className="btn btn-secondary"
             >
-              Buscar por Kardex
+              Buscar por RFC
             </button>
           </div>
           
@@ -376,20 +393,20 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      {/* Lista de estudiantes */}
+      {/* Lista de profesores */}
       <div className="crud-list">
         <div className="list-header">
-          <h2>Lista de Estudiantes</h2>
-          <span className="count-badge">{students.length} estudiantes</span>
+          <h2>Lista de Profesores</h2>
+          <span className="count-badge">{teachers.length} profesores</span>
         </div>
         
         {loading ? (
-          <div className="loading">Cargando estudiantes...</div>
+          <div className="loading">Cargando profesores...</div>
         ) : (
           <div className="table-container">
-            {students.length === 0 ? (
+            {teachers.length === 0 ? (
               <div className="empty-state">
-                No hay estudiantes registrados
+                No hay profesores registrados
               </div>
             ) : (
               <table className="students-table">
@@ -398,26 +415,28 @@ export default function StudentsPage() {
                     <th>Nombre</th>
                     <th>Email</th>
                     <th>CURP</th>
-                    <th>Kardex</th>
+                    <th>RFC</th>
+                    <th>N° Cuenta</th>
+                    <th>Cédula</th>
                     <th>Fecha Nac.</th>
-                    <th>Email Tutor</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {students.map((student) => (
-                    <tr key={student._id}>
-                      <td>{student.Name}</td>
-                      <td>{student.Email}</td>
-                      <td className="curp-cell">{student.CURP}</td>
-                      <td>{student.kardex}</td>
-                      <td>{student.Birth ? new Date(student.Birth).toLocaleDateString() : 'N/A'}</td>
-                      <td>{student.RelatedEmail || 'N/A'}</td>
+                  {teachers.map((teacher) => (
+                    <tr key={teacher._id}>
+                      <td>{teacher.Name}</td>
+                      <td>{teacher.Email}</td>
+                      <td className="curp-cell">{teacher.CURP}</td>
+                      <td className="curp-cell">{teacher.RFC}</td>
+                      <td>{teacher.NCount}</td>
+                      <td>{teacher.Cedula}</td>
+                      <td>{teacher.Birth ? new Date(teacher.Birth).toLocaleDateString() : 'N/A'}</td>
                       <td>
                         <div className="action-buttons">
                           <button 
                             className="btn btn-danger btn-sm"
-                            onClick={() => deleteStudent(student._id)}
+                            onClick={() => deleteTeacher(teacher._id)}
                             disabled={loading}
                           >
                             Eliminar
