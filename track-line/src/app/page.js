@@ -16,12 +16,8 @@ export default function Home() {
   const [wait, setWait] = useState(false)
 
   useEffect(() => {
-      /*if (GetKeep()) {
-        router.push('/tabloid');
-      } else {
-        
-      }*/
-      NUKE()
+      if(GetKeep()) router.push('/tabloid');
+      else NUKE()
   }, [router]);
 
   const setWaitingStatus = (waiting) => {

@@ -1,0 +1,79 @@
+#danger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 1em 0;
+    padding: 0.5em 1em  0 1em;
+    border: solid 0.125em var(--secondary);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.in {
+    display: flex;
+    width: 100%;
+    padding: 0.5em 0;
+    flex-direction: row;
+    align-items: center;
+}
+.in2 {
+    justify-content: space-between;
+}
+#Drop {
+    border-top: solid 0.125em var(--accent);
+    justify-content: center;
+}
+.button {
+    min-width: 15em;
+    font-size: 1.125rem;
+    cursor: pointer;
+    padding: 0.5em 1em;
+    background-color: var(--input);
+    border: solid 0.125em var(--accent);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+.button:hover {
+    border: solid 0.125em var(--ring);
+    color: var(--ring);
+    background-color: var(--primary-foreground);
+}
+
+#changeData {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1em;
+    border: solid 0.125em var(--accent);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+#changeData > div {
+    margin-bottom: 0.5em;
+}
+
+@media (max-width: 425px) {
+    .button {
+        font-size: 0.875rem;
+    }
+    .in2 {
+        flex-direction: column;
+    }
+    .inbtn {
+        margin-top: 0.5em;
+    }
+}

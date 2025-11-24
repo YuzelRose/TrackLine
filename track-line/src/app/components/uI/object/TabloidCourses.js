@@ -17,8 +17,8 @@ export default function TabloidCourses() {
             try {
                 const data = getSession()
                 if(!data) {
-                    navigate.push('/');
-                    return;
+                    navigate.push('/')
+                    return
                 }
                 const coursesData = await peticion('tabloid/get-courses', { email: data.Email })
                 setCourses(coursesData.data.validCourses)

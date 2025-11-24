@@ -12,12 +12,6 @@ export default function Main() {
     // solo falta agregar en la parte inferior un buscador de cursos
     return(
         <main id={styles.main}>
-             <button 
-                className={styles.dashboardBtn}
-                onClick={() => router.push('/dashboard')} 
-            >
-                Ir al Dashboard
-            </button>
             <article id={styles.mainContent}>
                 <section id={styles.mainSection}>
                     <div className={styles.title}>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function RegisterConfirm(){
-    const router  = useRouter();
+    const router  = useRouter()
     const [mensage, setMensage] = useState({
         message: null,
         status: null,
@@ -26,7 +26,9 @@ export default function RegisterConfirm(){
     return(
         <main id={styles.main}>
             <h2 id={styles.h2}>{mensage.wait? "Terminando" : "Terminemos"} tu registro</h2>
-            {!mensage.completed?<ConfrimRegister funtion={changeState} />: null}
+            {!mensage.completed?
+                <ConfrimRegister funtion={changeState} />
+            : null}
             {mensage.status ? 
                 (mensage.message === "Pulse para regresar a la pagina principal" ?  
                     <p onClick={() => router.push('/')} className='interactuable-text'>{mensage.message}</p> 

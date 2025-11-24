@@ -131,6 +131,19 @@ p { font-size: 1.125rem; }
   color: var(--muted-foreground);
 }
 
+.interactuable-text {
+  color: var(--ring);
+  cursor: pointer;
+}
+
+.interactuable-text:hover {
+  text-decoration: underline;
+}
+
+.interactuable-text:active {
+  color: var(--foreground);
+}
+
 .button{
   align-self: center;
   width: 15em;
@@ -157,29 +170,10 @@ p { font-size: 1.125rem; }
   background-color: var(--background);
 }
 
-.interactuable-text {
-  color: var(--ring);
-  cursor: pointer;
-}
-
-.interactuable-text:hover {
-  text-decoration: underline;
-}
-
-.interactuable-text:active {
-  color: var(--foreground);
-}
-
 .button:active {
   text-decoration: none;
   border: solid 0.25em var(--muted-foreground);
   color: var(--card-foreground);
-}
-
-@media (max-width: 425px) {
-  .button {
-    font-size: 0.875rem;
-  }
 }
 
 .pointer:hover {
@@ -257,6 +251,7 @@ footer { background-color: var(--muted); }
     p { font-size: 0.875rem; }
     .button{
       width: 8em;
+      font-size: 0.875rem;
     }
 }
 

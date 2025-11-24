@@ -19,3 +19,17 @@ export const TUTORFILDS = [
 export const MAIN = [ 
     {id: 1, name: "user", placeholder: "Correo", req: true, type: "email"}
 ]
+export const CHGMAIL =[
+    {id: 1, name: "user", placeholder: "Correo", req: true, type: "email"}
+]
+export const CHGSTUDENTS = [
+    {id: 1, name: "Name", placeholder: "Nombre", req: true, textBool: true},
+    {id: 2, name: "CURP", placeholder: "CURP", req: true, textBool: true},
+    {id: 3, name: "Birth", req: true, text: "Fecha nac.", type: "date", textBool: true, title: "Ingrese su fecha de nacimiento en formato AAAA-MM-DD"},
+]
+export const CHGTUTORFILDS = [
+    {id: 1, name: "Name", placeholder: "Nombre", req: true, textBool: true},
+    {id: 2, name: "CURP", placeholder: "CURP", req: true, textBool: true},
+    {id: 3, name: "Birth", req: true, text: "Fecha nac.", type: "date", textBool: true, title: "Ingrese su fecha de nacimiento en formato AAAA-MM-DD"},
+    {id: 4, name: "Phone", placeholder: "Telefono", req: true, type: "tel", textBool: true},
+]

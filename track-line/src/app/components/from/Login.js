@@ -26,15 +26,13 @@ export default function Login({ onWaitingChange }){
             onWaitingChange(true)
             setWatingStatus(false)
             setError({ message: '', state: false })
-            
             const formData = new FormData(e.target)
-            const requestData= {
+            const response = await peticion('user/login', {
                 data: {
                     email: formData.get('user'),
                     pass: formData.get('pass')
                 }
-            }
-            const response = await peticion('user/login', requestData )
+            })
             if (check) {
                 keepSession({AuthUserEmail: response.data.Email, Token: response.data.Token})
             } else {
