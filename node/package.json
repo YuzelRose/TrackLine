@@ -18,7 +18,8 @@
     "mjml": "^4.16.1",
     "mongoose": "^8.7.0",
     "multer": "^2.0.2",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

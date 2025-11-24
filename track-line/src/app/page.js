@@ -7,7 +7,7 @@ import Image from "next/image"
 import backgroundImage from '@/app/media/pexels-august-de-richelieu-4260475.jpg'
 import ArrowSVG from "./media/ArrowSVG.js"
 import styles from './page.module.css'
-import { GetKeep, miniNUKE, NUKE } from "./utils/JsonManage.js"
+import { GetKeep, NUKE } from "./utils/JsonManage.js"
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
@@ -16,12 +16,12 @@ export default function Home() {
   const [wait, setWait] = useState(false)
 
   useEffect(() => {
-      miniNUKE()
-      if (GetKeep()) {
+      /*if (GetKeep()) {
         router.push('/tabloid');
       } else {
-        NUKE()
-      }
+        
+      }*/
+      NUKE()
   }, [router]);
 
   const setWaitingStatus = (waiting) => {
