@@ -7,7 +7,7 @@ import { sendConfStudentMail, sendConfTutorMail, sendRegMail, sendTutorToStudent
 
 export const comparePasswords = async (plainPassword, hashedPassword) => {
     return await bcrypt.compare(plainPassword, hashedPassword);
-};
+}
 const genTok = () => crypto.randomBytes(32).toString('hex');
 
 const isUserAvailable = async (email) => { // true si está disponible, false si existe
@@ -15,16 +15,61 @@ const isUserAvailable = async (email) => { // true si está disponible, false si
         const existingUser = await User.findOne({ Email: email });
         return !existingUser; 
     } catch (error) {
-        console.error(`Error al enviar el correo: ${error.message}`);
         return false; 
     }
 }
+
+const hashData = async ({curp, pass}) => {
+    try {
+        const salt = await bcrypt.genSalt(10)
+        const hashPass = await bcrypt.hash(pass, salt)
+        const iv = crypto.randomBytes(16)
+        const cipher = crypto.createCipheriv(
+            process.env.ALGORITHM, 
+            Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), 
+            iv 
+        )
+        let encrypted = cipher.update(curp, 'utf8', 'hex')
+        encrypted += cipher.final('hex')
+        const authTag = cipher.getAuthTag()
+        return {
+            pass: hashPass,
+            CURP: {
+                iv: iv.toString('hex'),        
+                content: encrypted,
+                authTag: authTag.toString('hex')
+            }
+        }
+    } catch(error) {
+        console.error('Error en hashData:', error)
+        return null
+    }
+}
+
+const decryptCurp = (encryptedData) => {
+    try {
+        const decipher = crypto.createDecipheriv(
+            process.env.ALGORITHM,
+            Buffer.from(process.env.ENCRYPTION_KEY, 'hex'),
+            Buffer.from(encryptedData.iv, 'hex') 
+        )
+        if (encryptedData.authTag) 
+            decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
+        let decrypted = decipher.update(encryptedData.content, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+    } catch(error) {
+        console.error('Error al desencriptar CURP:', error);
+        return null;
+    }
+}
+
+
 
 export const MailRegister = async (req, res) => {
     try {
         const { email } = req.body
         if(!(await isUserAvailable(email))) {
-            console.log(`Correo ya usado`)
             return  res.status(409).json({ message: 'Usuario ya registrado' });
         } else {
             const mail = await sendRegMail(email)
@@ -37,7 +82,6 @@ export const MailRegister = async (req, res) => {
             }
         }
     } catch (error) {
-        console.error(`Error al enviar el correo: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
 }
@@ -45,124 +89,134 @@ export const MailRegister = async (req, res) => {
 export const registerTutor = async (req, res) => {
     try {
         const { data } = req.body;
-        if(!data)
-            return res.status(204).json({ message: 'Sin infromacion' })
-        if(!isUserAvailable(data.email)) return res.status(404).json({ message: 'usuario existente' })
-        if(data.pass === data.passConfirm) {
-            const salt = await bcrypt.genSalt(10);
+        if(!data) return res.status(400).json({ message: 'Sin información' });
+        const available = await isUserAvailable(data.email);
+        if(!available) return res.status(409).json({ message: 'Usuario existente' });
+        const hash = await hashData({
+            curp: data.curp,
+            pass: data.pass
+        })
+        if(data.pass === data.passConfirm && !!hash) {
             const registerData = {
                 Name: data.name,
                 Email: data.email,
-                Pass: await bcrypt.hash(data.pass, salt),
-                CURP: await bcrypt.hash(data.curp, salt),
+                Pass: hash.pass,
+                CURP: hash.CURP,
                 Birth: data.birth,
-                UserType: "tutor",  // Discriminador
+                UserType: "tutor",
                 Phone: data.phone,
                 RelatedEmail: null
             }
-            const userData = await Tutor.create(registerData)
+            const userData = await Tutor.create(registerData);
             if(userData) {
-                console.log("Usuario creado correctamente")
-                const mail = await sendTutorToStudentRegMail({
-                    studentMail: data.relatedEmail,
-                    tutorMail: data.email
-                }) 
-                if(mail.status === 200)
-                    res.status(201).json({
-                        message: "Tutor registrado, revise el correo del estudiante", 
-                        status: 201,
-                        token: mail.token
+                if(data.relatedEmail) {
+                    const mail = await sendTutorToStudentRegMail({
+                        studentMail: data.relatedEmail,
+                        tutorMail: data.email
                     })
+                    if(mail.status === 200) {
+                        return res.status(201).json({
+                            message: "Tutor registrado, revise el correo del estudiante", 
+                            status: 201,
+                            token: mail.token
+                        })
+                    }
+                }
+                return res.status(201).json({
+                    message: "Tutor registrado correctamente", 
+                    status: 201
+                })
             }
-        } else return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
+        } else return res.status(400).json({ message: 'Las contraseñas no coinciden' });
     } catch (error) {
-        console.error(`Error: ${error.message}`);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
 export const registerTutorStudent = async (req, res) => {
     try {
         const { data } = req.body;
-        if(!data) {
-            console.error('Sin infromacion')
-            return res.status(204).json({ message: 'Sin infromacion' })
-        }
-        if(!isUserAvailable(data.email)) {
-            console.error('Usuario existente')
-            return res.status(404).json({ message: 'usuario existente' })
-        }
-        const tutor = await User.findOne({ Email: data.relatedEmail });
-        if(!tutor) {
-            console.error(`El tutor no existe: ${data.relatedEmail}`)
-            return res.status(204).json({ message: 'La cuenta del tutor no existe' })
-        }
-        if(data.pass === data.passConfirm) {
-            console.log("Creando usuario")
-            const salt = await bcrypt.genSalt(10);
+        if(!data) return res.status(400).json({ message: 'Sin información' })
+        const available = await isUserAvailable(data.email)
+        if(!available) return res.status(409).json({ message: 'Usuario existente' })
+        const tutor = await User.findOne({ Email: data.relatedEmail })
+        if(!tutor) return res.status(404).json({ message: 'La cuenta del tutor no existe' })
+        const hash = await hashData({
+            curp: data.curp,
+            pass: data.pass
+        })
+        if(data.pass === data.passConfirm && !!hash) {
             const registerData = {
                 Name: data.name,
                 Email: data.email,
-                Pass: await bcrypt.hash(data.pass, salt),
-                CURP: await bcrypt.hash(data.curp, salt),
+                Pass: hash.pass,
+                CURP: hash.CURP,
                 Birth: data.birth,
-                UserType: "student",  // Discriminador
+                UserType: "student",
                 Pays: [
                     { NRef: "REF123456" },
                     { NRef: "REF789012" }
                 ],
                 kardex: `KARDEX${data.email}`,
                 RelatedEmail: data.relatedEmail,
-                Tabloids: []
+                Tabloids: [],
+                Badges: []
             }
-            const userData = await Student.create(registerData)
-            tutor.RelatedEmail = data.email
-            await tutor.save();
-            if(userData)
-                console.log("Usuario creado y actualizado correctamente")
-                await sendConfTutorMail(data.relatedEmail)
-                await sendConfStudentMail(data.email)
-                res.status(201).json({message: "Usuario creado correctamente", status: 201})
-        } else return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
+            const userData = await Student.create(registerData);
+            tutor.RelatedEmail = data.email;
+            await tutor.save()
+            if(userData) {
+                await sendConfTutorMail(data.relatedEmail);
+                await sendConfStudentMail(data.email);
+                return res.status(201).json({
+                    message: "Usuario creado correctamente", 
+                    status: 201
+                })
+            }
+        } else  return res.status(400).json({ message: 'Las contraseñas no coinciden' });
     } catch (error) {
-        console.error(`Error: ${error.message}`)
-        res.status(500).json({ message: error.message, place: "Try-catch" })
+        return res.status(500).json({ message: error.message })
     }
 }
 
 export const registerStudent = async (req, res) => {
     try {
         const { data } = req.body;
-        if(!data)
-            return res.status(204).json({ message: 'Sin infromacion' })
-        if(!isUserAvailable(data.email)) return res.status(404).json({ message: 'usuario existente' })
-        if(data.pass === data.passConfirm) {
-            const salt = await bcrypt.genSalt(10);
+        if(!data) return res.status(400).json({ message: 'Sin información' });
+        const available = await isUserAvailable(data.email);
+        if(!available) return res.status(409).json({ message: 'Usuario existente' });
+        const hash = await hashData({
+            curp: data.curp,
+            pass: data.pass
+        })
+        if(data.pass === data.passConfirm && !!hash) {
             const registerData = {
                 Name: data.name,
                 Email: data.email,
-                Pass: await bcrypt.hash(data.pass, salt),
-                CURP: await bcrypt.hash(data.curp, salt),
+                Pass: hash.pass,
+                CURP: hash.CURP,
                 Birth: data.birth,
-                UserType: "student",  // Discriminador
+                UserType: "student",
                 Pays: [
                     { NRef: "REF123456" },
                     { NRef: "REF789012" }
                 ],
                 kardex: `KARDEX${data.email}`,
                 RelatedEmail: null,
-                Tabloids: [
-                    null
-                ]
+                Tabloids: [],
+                Badges: []
+            };
+            const userData = await Student.create(registerData);
+            if(userData) {
+                await sendConfStudentMail(data.email);
+                return res.status(201).json({
+                    message: "Usuario creado correctamente", 
+                    status: 201
+                });
             }
-            const userData = await Student.create(registerData)
-            if(userData)
-                console.log("Usuario creado correctamente")
-                await sendConfStudentMail(data.email)
-                res.status(201).json({message: "Usuario creado correctamente", status: 201})
-        } else return res.status(404).json({ message: 'Las contraseñas no coinsiden' })
+        } else return res.status(400).json({ message: 'Las contraseñas no coinciden' });
     } catch (error) {
-        res.status(500).json({ message: error.message, place: "Try-catch" })
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -170,9 +224,7 @@ export const login = async (req, res) => {
     try {
         const { data } = req.body;
         const user = await User.findOne({ Email: data.email });
-        console.log(`Login Attempt: ${data.email}`);
         if (!user) return res.status(404).json({ message: 'Correo no válido' });
-        
         const contrasenaValida = await comparePasswords(data.pass, user.Pass);
         if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
         const { Pass, ...userData} = user.toObject();
@@ -181,153 +233,31 @@ export const login = async (req, res) => {
             Token: genTok()
         });
     } catch (error) {
-        console.error(`Error al enviar el correo: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
 }
 
-/*
-export const getUserById = async (req, res) => {
+export const getUser = async (req, res) => {
     try {
-        const user = await Usuario.findById(req.params.id);
-        if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-        const { Contrasena, ...userData } = user.toObject();
-        res.json(userData);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const getUserByMail = async (req, res) => {
-    const { mail } = req.params;
-    try {
-        const user = await Usuario.findOne({ Correo: mail });
-        if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-        const { Contrasena, ...userData } = user.toObject();
-        res.json(userData);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const updatePass = async ({correo, contrasena}) => {
-    try {
-        const usuario = await Usuario.findOne({ Correo: correo });
-        if (!usuario) return console.log('Usuario no encontrado');
-        const salt = await bcrypt.genSalt(10);
-        usuario.Contrasena = await bcrypt.hash(contrasena, salt);
-        await usuario.save();
-        console.log('Contraseña actualizada con éxito');
-    } catch (error) {
-        console.log("Error en updatePass:", error.message);
-    }
-};
-
-export const updateUser = async (req, res) => {
-    const { correo } = req.params; 
-    const { nombre, telefono, direccion } = req.body;
-    try {
-        const usuario = await Usuario.findOne({ Correo: correo });
-        if (!usuario) return res.status(404).json({ message: 'Usuario no encontrado' });
-
-        if (nombre) usuario.Nombre = nombre;
-        if (telefono) usuario.Telefono = telefono;
-        if (direccion) usuario.Direccion = direccion;
-        await usuario.save();
-        ChangeMail({ email: correo });
-        res.json({ message: 'Datos actualizados con éxito' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-const ChangeMail = async ({email}) => {
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        service: 'gmail',
-        port: 465,
-        secure: true, 
-        auth: {
-            user: 'librosmaldonado68@gmail.com',       
-            pass: 'xzym wpfq kwms gbdj'     
+        const { email } = req.body;
+        if(!email)  return res.status(400).json({ message: 'Información no válida' })
+        const user = await User.findOne({ Email: email })
+        if(!user) return res.status(404).json({ message: 'Usuario no encontrado' })
+        let curp = null;
+        if(user.CURP && user.CURP.iv && user.CURP.content) {
+            try {
+                curp = decryptCurp(user.CURP)
+            } catch (decryptError) {
+                console.error('Error desencriptando CURP:', decryptError)
+            }
         }
-    });
-
-
-    const mailOptions = {
-        from: {
-            name: 'Libros Maldonado',
-            address: 'librosmaldonado68@gmail.com',
-        },
-        to: email,
-        subject: `Sistema de registro Libros Maldonado`,
-        html: `
-        <article style="display: flex; flex-direction: column; align-items: center; font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-            <div style="border: solid #000; padding: 0.5em;">
-                <header style="border-bottom: 0.2em solid #ddd; margin: 0; padding: 0;">
-                    <h1 style="color: #042479; border-bottom: 0.2em solid #ddd; margin-bottom: 0.5em;">
-                        El equipo técnico de <a title="librosmaldonado.shop" href="librosmaldonado.shop" style="color: #042479;">Libros Maldonado</a> le manda un cordial saludo.
-                    </h1>
-                    <h2 style="margin: 0; margin-bottom: 0.5em; padding: 0; color: #999;">
-                        Asunto: <p style="margin: 0; padding: 0; color: #000; text-indent: 2em;">AVISO: Cambio de información de su cuenta</p>
-                    </h2>
-                </header>
-                <main style="margin: 0; padding: 0.3em; font-size: 1.5em; color: #000; border-bottom: 0.2em solid #ddd; margin-bottom: 0.5em;">
-                    <p>Desde <strong><a title="librosmaldonado.shop" href="librosmaldonado.shop" style="color: #042479;">Libros Maldonado</a></strong> esperamos que te encuentres bien.</p>
-                    <p>El motivo de este correo es informarle del cambio de inormacion de su cuenta, si fue usted ignore este correo.</p>
-                    <p>En caso contrario le sugerimos tomar acciones como cambiar su contraseña.</p>
-                    <p>Atentamente, <strong>El equipo de atención al cliente de <a title="librosmaldonado.shop" href="librosmaldonado.shop" style="color: #042479;">Libros Maldonado</a>.</strong></p>
-                </main>
-                <footer style="border: 0.2em solid #ddd;">
-                    <p style="margin: 0.3em; width: fit-content; font-size: 1.3em; color: #555;">Este es un mensaje automático.</p>
-                    <p style="margin: 0.3em; width: fit-content; font-size: 1.3em; color: #555;">No responda a este correo.</p>
-                </footer>
-            </div>
-        </article>
-        `
-    };
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Correo enviado:', info.response);
-    } catch (error) {
-        console.log(`Error al enviar el correo: ${error}`);
+        const { Pass, CURP, ...userData } = user.toObject()
+        return res.status(200).json({ 
+            ...userData,
+            CURP: curp, 
+            status: 200
+        });
+    } catch(error) {
+        return res.status(500).json({ message: error.message })
     }
-
-};
-
-export const DropCount = async (req, res) => {
-    try {
-        const usuario = await Usuario.findById(req.params.id);
-        if (!usuario) return res.status(404).json({ message: 'Usuario no encontrado' });
-        await Usuario.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Usuario eliminado exitosamente' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const ChangeCount = async (req, res) => {
-    const { nombre, correo, telefono, direccion } = req.body; 
-    try {
-        const usuario = await Usuario.findById(req.params.id);
-        if (!usuario) return res.status(404).json({ message: 'Usuario no encontrado' });
-        if (nombre) usuario.Nombre = nombre;
-        if (correo) usuario.Correo = correo;
-        if (telefono) usuario.Telefono = telefono;
-        if (direccion) usuario.Direccion = direccion;
-        await usuario.save(); 
-        res.json({ message: 'Datos actualizados con éxito' });
-    } catch (error) {
-        res.status(500).json({ message: error.message }); 
-    }
-};
-
-export const allUsers = async (res) => {
-    try {
-        const users = await Usuario.find();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ message: error.message})
-    }
-};
-*/
+}

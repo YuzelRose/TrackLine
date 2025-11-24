@@ -1,0 +1,70 @@
+#hg {
+    width: 15em;
+    height: fit-content;
+    padding: 0.5em;
+    background-color: var(--card);
+    border: solid 0.125em var(--border);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+#main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#id {
+    cursor: pointer;
+    color: var(--muted-foreground);
+}
+#id:hover {
+    text-decoration: underline;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    gap: 1em;
+}
+#userProfile {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    width: 80%;
+    height: fit-content;
+    justify-content: space-between;
+    align-items: center;
+    border: solid var(--foreground) 0.125em;
+    border-radius: 1.5em;
+    -webkit-border-radius: 1.5em;
+    -moz-border-radius: 1.5em;
+    -ms-border-radius: 1.5em;
+    -o-border-radius: 1.5em;
+}
+#userProfile > div {
+    padding: 1em;
+    margin: 0 1em;
+}
+#profileMark {
+    height: 100%;
+    width: auto;
+    border: solid var(--foreground) 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+#profileInfo {
+}
+.ID {
+    width: fit-content;
+    cursor: pointer;
+    color: var(--ring);
+}
+.ID:hover {
+    text-decoration: underline;
+}

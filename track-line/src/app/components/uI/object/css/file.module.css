@@ -1,6 +1,6 @@
 .file {
     cursor: pointer;
-    max-width: 20em;
+    width: 20em;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -21,7 +21,7 @@
     border: solid 0.125em var(--ring);
     color: var(--ring);
 }
-.f:hover .Name {
+.f:hover .Name1 {
     border-top: solid 0.125em var(--ring);
 }
 .file2 {
@@ -45,6 +45,8 @@
     -o-border-radius: 1em;
 }
 .Name {
+    width: 90%;
+}
+.Name1 {
     border-top: solid 0.125em var(--foreground);
-    
 }

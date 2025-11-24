@@ -102,28 +102,28 @@ export default function StudentConfirm({funtion = () => {}}) {
         } 
     }
 
-    return(
-        <>
-            {wait ?
-                <div id={styles.wait} className='group'>
-                    <HgWait/>
+    if(wait){
+        return(
+            <div id={styles.wait} className='group'>
+                <HgWait/>
+            </div>
+        )
+    } else {
+        return(                
+            <form onSubmit={endRegister} id={styles.form}>
+                <div id={styles.passConfirm} className={`group ${styles.bg}`}>
+                    <p>Realice el registro en compañía de tu tutor:</p>
+                    <div>
+                        <PassInput name="Pass"/>
+                        <PassInput name='PassConfirm' placeholder='Confirme su contraseña'/>
+                    </div>
                 </div>
-                :
-                <form onSubmit={endRegister} id={styles.form}>
-                    <div id={styles.passConfirm} className={`group ${styles.bg}`}>
-                        <p>Realice el registro en compañía de tu tutor:</p>
-                        <div>
-                            <PassInput name="Pass"/>
-                            <PassInput name='PassConfirm' placeholder='Confirme su contraseña'/>
-                        </div>
-                    </div>
-                    <div className={`group ${styles.bg} ${styles.fromContent}`}>
-                        <h4>Sus datos:</h4>
-                        <TextInput content={base} width={"50%"}/> 
-                    </div>
-                    <button type='submit' className='button'>Terminar</button>
-                </form>
-            }
-        </>
-    )
+                <div className={`group ${styles.bg} ${styles.fromContent}`}>
+                    <h4>Sus datos:</h4>
+                    <TextInput content={base} width={"50%"}/> 
+                </div>
+                <button type='submit' className='button'>Terminar</button>
+            </form>
+        )
+    }
 }

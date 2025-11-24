@@ -179,9 +179,15 @@ export const sendHw = async (req, res) => {
         if (!studentSubmission) 
             return res.status(404).json({ message: "No se encontró la submission del estudiante" })
         const submittedWorkIds = []
+        let ind = 0
         for (const file of workFiles) {
+            const originalName = file.originalname;
+            const lastDotIndex = originalName.lastIndexOf('.');
+            const fileExtension = lastDotIndex !== -1 ? originalName.substring(lastDotIndex + 1) : '';
+            const newFileName = `file${StudentID}ind${ind}.${fileExtension}`;
+
             const contentData = await Content.create({
-                Name: file.originalname,     
+                Name: newFileName,     
                 size: file.size,             
                 data: file.buffer,           
                 contentType: file.mimetype,  
@@ -189,6 +195,7 @@ export const sendHw = async (req, res) => {
             });
 
             submittedWorkIds.push({ file: contentData._id })
+            ind++
         }
         studentSubmission.SubmittedWork = submittedWorkIds
         const currentDate = new Date()

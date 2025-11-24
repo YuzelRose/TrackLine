@@ -177,9 +177,9 @@ p { font-size: 1.125rem; }
 }
 
 @media (max-width: 425px) {
-    .button {
-        font-size: 0.875rem;
-    }
+  .button {
+    font-size: 0.875rem;
+  }
 }
 
 .pointer:hover {
@@ -197,7 +197,9 @@ p { font-size: 1.125rem; }
 }
 
 #track-line-icon {
-  padding: 0.5em,0em,0.5em,0em;
+  padding: 0.5em 0em;
+  max-width: 25vh;
+  max-height: 25vh;
 }
 
 header {

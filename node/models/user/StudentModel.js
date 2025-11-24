@@ -17,6 +17,11 @@ const studentSchema = new mongoose.Schema({
     RelatedEmail: {
         type: String,
     },
+    Badges: [{
+        refId: {
+            type: String
+        }
+    }],
     Tabloids: [{
         refId: {
             type: mongoose.Schema.Types.ObjectId, 

@@ -4,32 +4,28 @@ import {
     getAll, 
     getById, 
     update, 
-    deleteStudent, 
-    getByEmail,
-    getByKardex 
-} from '../controllers/StudentCrudController.js';
+    deleteUser, 
+    getByEmail 
+} from '../controllers/CrudController.js';
 
 const router = express.Router();
 
-// CREATE - Crear nuevo estudiante
-router.post('/students', create);
+// CREATE - Crear nuevo usuario
+router.post('/users', create);
 
-// READ - Obtener todos los estudiantes
-router.get('/students', getAll);
+// READ - Obtener todos los usuarios 
+router.get('/users', getAll);
 
-// READ - Obtener estudiante por ID
-router.get('/students/:id', getById);
+// READ - Obtener usuario por ID
+router.get('/users/:id', getById);
 
-// READ - Obtener estudiante por email
-router.get('/students/email/:email', getByEmail);
+// READ - Obtener usuario por email
+router.get('/users/email/:email', getByEmail);
 
-// READ - Obtener estudiante por kardex
-router.get('/students/kardex/:kardex', getByKardex);
+// UPDATE - Actualizar usuario por ID
+router.put('/users/:id', update);
 
-// UPDATE - Actualizar estudiante por ID
-router.put('/students/:id', update);
-
-// DELETE - Eliminar estudiante por ID
-router.delete('/students/:id', deleteStudent);
+// DELETE - Eliminar usuario por ID
+router.delete('/users/:id', deleteUser);
 
 export default router;

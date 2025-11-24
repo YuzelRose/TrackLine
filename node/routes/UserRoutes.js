@@ -1,6 +1,7 @@
 import express from 'express';
 
 import { 
+    getUser,
     login, 
     MailRegister, 
     registerStudent, 
@@ -15,5 +16,6 @@ router.post('/frst-register', MailRegister);
 router.post('/register-student', registerStudent);
 router.post('/register-tutor', registerTutor);
 router.post('/register-tutor-student', registerTutorStudent);
+router.post('/get-user', getUser)
 
 export default router;

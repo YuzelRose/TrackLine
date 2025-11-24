@@ -8,10 +8,6 @@ export default function TrackLineSVG({dim='95%'}){
          version="1.1"
          className="svg"
          viewBox="0 0 23.944 23.944"
-         style={{
-            maxWidth: "25vh",
-            maxHeight: "25vh"
-         }}
       >
          <g
             id="layer3"

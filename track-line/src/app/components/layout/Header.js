@@ -1,12 +1,16 @@
 'use client'
-import Profile from '../uI/Profile.js'
 import TrackLine from '../../media/Track-lineSVG.js'
-import { useEffect, useState } from 'react'
 import styles from './css/header.module.css'
+import { useEffect, useState } from 'react'
+import { useRouter, usePathname  } from "next/navigation"
+import { getSession, NUKE } from '@/app/utils/JsonManage.js'
+import UserIconSVG from '@/app/media/DefaultUserSVG.js'
 export default function Header() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const router = useRouter()
+    const pathname = usePathname()
     const [lastScrollTop, setLastScrollTop] = useState(0);
     const [headerVisible, setHeaderVisible] = useState(true);
+    const [session, setSession] = useState([])
 
     const handleScroll = () => {
         const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -26,15 +30,30 @@ export default function Header() {
         };
     });
 
+    const handleNavigate = () => {
+        router.push('/profile')
+    }
+
     useEffect (() =>{
-        //setIsLoggedIn= "Completa la peticion despues"
-    }, [])
+        const session = getSession()
+        if(session) setSession(session)
+        else NUKE()
+    }, [pathname])
 
     return (
         <header id={`${headerVisible ? styles.visible : styles.hidden}`}>
-            <div id={styles.icon}> <TrackLine dim="10em" style="pointer" /> </div>
+            <div id={styles.icon}> 
+                <TrackLine dim="10em" style="pointer" /> 
+            </div>
             <div id={styles.space}/>
-            <div id={styles.user}> {isLoggedIn ? <Profile /> : <></> } </div>
+            <div id={styles.user}> 
+                {session.Email? 
+                <figure onClick={handleNavigate} id={styles.profile}>
+                    <UserIconSVG clname={styles.userIcon}/>
+                    <p>{session.Email}</p>
+                </figure>
+                : null } 
+            </div>
         </header>
-  )
+    )
 }

@@ -20,24 +20,22 @@ export default function FileOBJ({data, type=1}) {
                     title={file.file.Name}
                 >
                     <FileSVG clname={styles.fileSVG} width={"40"}/>            
-                    <span>{file.file.Name}</span>
+                    <span className={styles.Name}>{file.file.Name}</span>
                 </article>
             ))
         )
     } else {
         return(
             data.map(file => (  
-                <>
-                    <article 
-                        key={file.file._id}
-                        className={`${styles.file2} ${styles.f}`} 
-                        onClick={() => Download(file.file._id, file.file.Name)} 
-                        title={file.file.Name}
-                    >
-                        <FileSVG clname={styles.fileSVG} width={"60"}/>
-                        <span className={styles.Name}>{file.file.Name}</span>
-                    </article>
-                </>
+                <article 
+                    key={file.file._id}
+                    className={`${styles.file2} ${styles.f}`} 
+                    onClick={() => Download(file.file._id, file.file.Name)} 
+                    title={file.file.Name}
+                >
+                    <FileSVG clname={styles.fileSVG} width={"60"}/>
+                    <span className={styles.Name1}>{file.file.Name}</span>
+                </article>
             ))
         )
     }
