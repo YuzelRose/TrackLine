@@ -1,4 +1,46 @@
-export const academicBadges = [
+export const getMatchingBadges = (userBadges) => {
+    const categorizedUserBadges = reedData(userBadges)
+    const allBadgeDefinitions = {
+        academicBadges,
+        techBadges, 
+        progressBadges
+    }
+    const matchingBadges = categorizedUserBadges.map(userBadge => {
+        const badgeDefinition = allBadgeDefinitions[userBadge.component]?.find(
+            def => def.id === userBadge.refId
+        )
+        if (badgeDefinition) {
+            return {
+                ...userBadge,        
+                ...badgeDefinition   
+            }
+        }
+        return null
+    }).filter(badge => badge !== null)
+    return matchingBadges
+}
+
+const reedData = (data) => {
+    return data.map(badge => {
+        const prefix = badge.refId.split('-')[0]
+        switch(prefix) {
+            case 'aca':
+                return { ...badge, component: 'academicBadges' }
+            case 'tech':
+                return { ...badge, component: 'techBadges' }
+            case 'soc':
+                return { ...badge, component: 'socialBadges' }
+            case 'pro': 
+                return { ...badge, component: 'progressBadges' }
+            case 'fun':
+                return { ...badge, component: 'funBadges' }
+            default:
+                return { ...badge, component: 'generalBadges' }
+        }
+    })
+}
+
+const academicBadges = [
     {
         id: "aca-Badg1",
         name: "Primer lugar",
@@ -24,7 +66,7 @@ export const academicBadges = [
         criteria: "Participar en clase 5 días consecutivos"
     }
 ]
-export const techBadges = [
+const techBadges = [
     {
         id: "tech-Badg1",
         name: "Bug Hunter",
@@ -44,7 +86,7 @@ export const techBadges = [
         criteria: "Ser de los primeros en usar nueva funcionalidad"
     }
 ]
-export const progressBadges = [
+const progressBadges = [
     {
         id: "pro-Badg1",
         name: "Novato",

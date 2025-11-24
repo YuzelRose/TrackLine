@@ -13,6 +13,7 @@ export default function Profile(){
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState(null)
     const [showID, setShowID] = useState(false)
+    const [session, setSession] = useState([])
 
     useEffect(() => {
         const getProfile = async () => {
@@ -20,7 +21,10 @@ export default function Profile(){
                 const session = getSession()
                 if(!!session) {
                     const result = await peticion('user/get-user', {email: session.Email})
-                    if(result.httpStatus === 200) setData(result.data)
+                    if(result.httpStatus === 200) {
+                        setData(result.data)
+                        setSession(session)
+                    }
                     else router.push('/main')
                 } else {
                     NUKE()
@@ -91,7 +95,7 @@ export default function Profile(){
                         <p>CURP: {data.CURP}</p>
                     </div>
                 </section>
-                <BadgeOBJ />
+                <BadgeOBJ session={data.Badges}/>
             </main>
         )
     }

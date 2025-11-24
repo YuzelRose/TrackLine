@@ -2,11 +2,16 @@ import mongoose from 'mongoose';
 import User from './UserModel.js';
 
 const studentSchema = new mongoose.Schema({
-    Pays: [{
-        NRef: {
+    payments: [{
+        payRef: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Pay', 
+            required: true
+        },
+        status: {
             type: String,
-            required: true,
-            unique: true
+            enum: ['pending', 'paid', 'failed', 'refunded'],
+            default: 'pending'
         }
     }],
     kardex: {

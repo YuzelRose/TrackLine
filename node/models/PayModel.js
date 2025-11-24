@@ -1,24 +1,32 @@
 import mongoose from 'mongoose';
 
 const PayModel = new mongoose.Schema({
-    NRef: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
-    },
-    Amaunt: [{
+    amount: { 
         type: Number,
         required: true
-    }],
-    Date: [{
+    },
+    date: {   
         type: Date,
         default: Date.now
-    }],
-    State: [{
+    },
+    status: {  
         type: String,
-        enum: ['pendiente', 'completado', 'fallido'],
-        default: 'pendiente'
-    }],
-}, { collection: 'Pay' });
+        enum: ['pending', 'paid', 'failed', 'refunded'],
+        default: 'pending'
+    },
+    userId: {  
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    description: {  
+        type: String,
+        required: true
+    }
+}, { 
+    collection: 'Pay',
+    timestamps: true 
+});
 
-const Pay = mongoose.model('Pay',PayModel);
+const Pay = mongoose.model('Pay', PayModel);
 export default Pay;

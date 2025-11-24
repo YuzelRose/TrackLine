@@ -49,3 +49,35 @@
     width: 100%;
     border-bottom: solid var(--foreground) 0.125em; 
 }
+
+.badgesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.badge {
+    cursor: pointer;
+    text-align: center;
+    padding: 0.5rem;
+    border: solid var(--foreground) 0.125em;
+    background: var(--muted);
+    border-radius: 0.75em;
+    -webkit-border-radius: 0.75em;
+    -moz-border-radius: 0.75em;
+    -ms-border-radius: 0.75em;
+    -o-border-radius: 0.75em;
+}
+
+.badgeIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.badgeName {
+    font-size: 0.8rem;
+    margin: 0;
+    color: var(--foreground);
+
+}
