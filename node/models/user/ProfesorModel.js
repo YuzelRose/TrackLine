@@ -20,7 +20,8 @@ const profesorSchema = new mongoose.Schema({
         NTabloid:{
             type: String,
             unique: true
-        }
+        
+    },
     }]
 });
 

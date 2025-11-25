@@ -13,7 +13,7 @@ export const create = async (req, res) => {
                 message: 'Sin información en el cuerpo de la petición'
             });
         }
-
+            
         // Validar campos requeridos
         const requiredFields = ['Name', 'Email', 'Pass', 'CURP', 'Birth', 'RFC', 'NCount', 'Cedula'];
         const missingFields = requiredFields.filter(field => !data[field]);
@@ -251,32 +251,17 @@ export const deleteProfesor = async (req, res) => {
 };
 
 // Búsqueda de profesor por email
-export const getByEmail = async (req, res) => {
-    try {
-        const { email } = req.params;
-        
-        const profesor = await Profesor.findOne({ Email: email.toLowerCase() }).select('-Pass');
-        
-        if (!profesor) {
-            return res.status(404).json({
-                success: false,
-                message: 'Profesor no encontrado'
-            });
-        }
-        
-        res.status(200).json({
-            success: true,
-            data: profesor
-        });
-        
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al buscar profesor',
-            error: error.message
-        });
+const searchByEmail = async (req, res) => {
+    try{
+        const { email } = req.body
+        if(!email) return res.status(400).json({message: "correo no valido"})
+        const user = await Profesor.findOne({Email: email})
+        if(!user) return res.status(404).json({message: "No se encontraron Tutores"})
+        res.status(200).json({user, status:200})
+    } catch(error){
+        console.error(error)
     }
-};
+}
 
 // Búsqueda de profesor por RFC
 export const getByRFC = async (req, res) => {

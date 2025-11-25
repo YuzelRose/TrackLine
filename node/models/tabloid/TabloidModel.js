@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-
+import mongoose from "mongoose";
 const TabloidModel = new mongoose.Schema({
     Name: {
         type: String,
@@ -23,8 +22,16 @@ const TabloidModel = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId, 
             ref: 'assigment' 
         }
-    }]
-}, { collection: 'tabloid' });
+    }],
+        requiredPayment: [{
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Pay', 
+            required: true
+        }]
+}, { 
+    collection: 'tabloid',
+});
+
 
 const Tabloid = mongoose.model('Tabloid', TabloidModel);
 export default Tabloid;

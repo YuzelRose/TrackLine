@@ -2,6 +2,7 @@
 import ProfesorSVG from '../media/ProfesorSVG';
 import TutorSVG from '../media/TutorSVG';
 import UsuariosSVG from '../media/UsuariosSVG';
+import TabloidSVG from '../media/TabloidSVG';
 import { useRouter } from 'next/navigation';
 import styles from './css/dashboardCss.css';
 
@@ -13,7 +14,7 @@ export default function Dashboard(){
     <div className="dashboard">
       <div className="header">
         <h1>Sistema Escolar</h1>
-        <p>Gestiona estudiantes, profesores y tutores</p>
+        <p>Gestiona estudiantes, profesores, tutores y tabloides</p>
       </div>
 
       <div className="crud-grid">
@@ -50,6 +51,18 @@ export default function Dashboard(){
             onClick={() => router.push('./dashboard/user/tutor')}
           >
             Administrar Tutores
+          </button>
+        </div>
+
+        <div className="crud-card tabloid">
+          <TabloidSVG className="crud-icon tabloid"></TabloidSVG>
+          <h2>Gestión de Tabloides</h2>
+          <p>Administra los tabloides y materiales educativos</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => router.push('./dashboard/tabloid')}
+          >
+            Administrar Tabloides
           </button>
         </div>
       </div>

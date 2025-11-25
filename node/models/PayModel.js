@@ -22,7 +22,12 @@ const PayModel = new mongoose.Schema({
     description: {  
         type: String,
         required: true
-    }
+    },
+    tabloidId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tabloid',
+        required: true
+    },
 }, { 
     collection: 'Pay',
     timestamps: true 

@@ -27,7 +27,7 @@ export default function TeachersPage() {
   const fetchTeachers = async () => {
     setLoading(true);
     try {
-      const response = await peticion('crudProfe/profesors', null, 'GET');
+      const response = await ProfesorSVG.find('crudProfe/profesors', null, 'GET');
       
       if (response.status) {
         setTeachers(response.data.data || []);
