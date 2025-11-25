@@ -5,7 +5,7 @@ import {
     getById, 
     update, 
     deleteProfesor, 
-    //getByEmail,
+    searchByEmail,
     getByRFC
 } from '../controllers/ProfesorCrudController.js';
 
@@ -21,7 +21,7 @@ router.get('/profesors', getAll);
 router.get('/profesors/:id', getById);
 
 // READ - Obtener profesor por email
-// router.get('/profesors/email/:email', getByEmail);
+router.get('/profesors/email/:email', searchByEmail);
 
 // READ - Obtener profesor por RFC
 router.get('/profesors/rfc/:rfc', getByRFC);

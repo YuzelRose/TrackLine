@@ -8,49 +8,48 @@ import { sendConfStudentMail, sendConfTutorMail, sendRegMail, sendTutorToStudent
 export const comparePasswords = async (plainPassword, hashedPassword) => {
     return await bcrypt.compare(plainPassword, hashedPassword);
 }
-const genTok = () => crypto.randomBytes(32).toString('hex');
+const genTok = () => crypto.randomBytes(32).toString('hex')
 
 const isUserAvailable = async (email) => { // true si está disponible, false si existe
     try {
-        const existingUser = await User.findOne({ Email: email });
-        return !existingUser; 
+        const existingUser = await User.findOne({ Email: email })
+        return !existingUser
     } catch (error) {
-        return false; 
+        return false
     }
 }
 
 const hashData = async ({ curp, pass }) => {
     try {
-        const result = {};
+        const result = {}
         if (pass) {
-            const salt = await bcrypt.genSalt(10);
-            const hashPass = await bcrypt.hash(pass, salt);
+            const salt = await bcrypt.genSalt(10)
+            const hashPass = await bcrypt.hash(pass, salt)
             result.pass = hashPass;
         }
         if (curp) {
-            const iv = crypto.randomBytes(16);
+            const iv = crypto.randomBytes(16)
             const cipher = crypto.createCipheriv(
                 process.env.ALGORITHM, 
                 Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), 
                 iv 
-            );
-            let encrypted = cipher.update(curp, 'utf8', 'hex');
-            encrypted += cipher.final('hex');
+            )
+            let encrypted = cipher.update(curp, 'utf8', 'hex')
+            encrypted += cipher.final('hex')
             const authTag = cipher.getAuthTag();
             
             result.CURP = {
                 iv: iv.toString('hex'),        
                 content: encrypted,
                 authTag: authTag.toString('hex')
-            };
+            }
         }
         return result;
     } catch(error) {
-        console.error('Error en hashData:', error);
-        return null;
+        console.error('Error en hashData:', error)
+        return null
     }
 }
-
 
 const decryptCurp = (encryptedData) => {
     try {
@@ -60,23 +59,21 @@ const decryptCurp = (encryptedData) => {
             Buffer.from(encryptedData.iv, 'hex') 
         )
         if (encryptedData.authTag) 
-            decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
-        let decrypted = decipher.update(encryptedData.content, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
+            decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'))
+        let decrypted = decipher.update(encryptedData.content, 'hex', 'utf8')
+        decrypted += decipher.final('utf8')
         return decrypted;
     } catch(error) {
-        console.error('Error al desencriptar CURP:', error);
+        console.error('Error al desencriptar CURP:', error)
         return null;
     }
 }
-
-
 
 export const MailRegister = async (req, res) => {
     try {
         const { email } = req.body
         if(!(await isUserAvailable(email))) {
-            return  res.status(409).json({ message: 'Usuario ya registrado' });
+            return  res.status(409).json({ message: 'Usuario ya registrado' })
         } else {
             const mail = await sendRegMail(email)
             if(mail.status === 200) {
@@ -95,9 +92,9 @@ export const MailRegister = async (req, res) => {
 export const registerTutor = async (req, res) => {
     try {
         const { data } = req.body;
-        if(!data) return res.status(400).json({ message: 'Sin información' });
+        if(!data) return res.status(400).json({ message: 'Sin infrmación' })
         const available = await isUserAvailable(data.email);
-        if(!available) return res.status(409).json({ message: 'Usuario existente' });
+        if(!available) return res.status(409).json({ message: 'Usuario existente' })
         const hash = await hashData({
             curp: data.curp,
             pass: data.pass
@@ -133,9 +130,9 @@ export const registerTutor = async (req, res) => {
                     status: 201
                 })
             }
-        } else return res.status(400).json({ message: 'Las contraseñas no coinciden' });
+        } else return res.status(400).json({ message: 'Las contraseñas no coinciden' })
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message })
     }
 }
 
@@ -159,27 +156,24 @@ export const registerTutorStudent = async (req, res) => {
                 CURP: hash.CURP,
                 Birth: data.birth,
                 UserType: "student",
-                Pays: [
-                    { NRef: "REF123456" },
-                    { NRef: "REF789012" }
-                ],
+                Pays: [],
                 kardex: `KARDEX${data.email}`,
                 RelatedEmail: data.relatedEmail,
                 Tabloids: [],
                 Badges: []
             }
-            const userData = await Student.create(registerData);
-            tutor.RelatedEmail = data.email;
+            const userData = await Student.create(registerData)
+            tutor.RelatedEmail = data.email
             await tutor.save()
             if(userData) {
-                await sendConfTutorMail(data.relatedEmail);
-                await sendConfStudentMail(data.email);
+                await sendConfTutorMail(data.relatedEmail)
+                await sendConfStudentMail(data.email)
                 return res.status(201).json({
                     message: "Usuario creado correctamente", 
                     status: 201
                 })
             }
-        } else  return res.status(400).json({ message: 'Las contraseñas no coinciden' });
+        } else  return res.status(400).json({ message: 'Las contraseñas no coinciden' })
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }
@@ -188,9 +182,9 @@ export const registerTutorStudent = async (req, res) => {
 export const registerStudent = async (req, res) => {
     try {
         const { data } = req.body;
-        if(!data) return res.status(400).json({ message: 'Sin información' });
-        const available = await isUserAvailable(data.email);
-        if(!available) return res.status(409).json({ message: 'Usuario existente' });
+        if(!data) return res.status(400).json({ message: 'Sin información' })
+        const available = await isUserAvailable(data.email)
+        if(!available) return res.status(409).json({ message: 'Usuario existente' })
         const hash = await hashData({
             curp: data.curp,
             pass: data.pass
@@ -203,24 +197,21 @@ export const registerStudent = async (req, res) => {
                 CURP: hash.CURP,
                 Birth: data.birth,
                 UserType: "student",
-                Pays: [
-                    { NRef: "REF123456" },
-                    { NRef: "REF789012" }
-                ],
+                Pays: [],
                 kardex: `KARDEX${data.email}`,
                 RelatedEmail: null,
                 Tabloids: [],
                 Badges: []
             };
-            const userData = await Student.create(registerData);
+            const userData = await Student.create(registerData)
             if(userData) {
-                await sendConfStudentMail(data.email);
+                await sendConfStudentMail(data.email)
                 return res.status(201).json({
                     message: "Usuario creado correctamente", 
                     status: 201
                 });
             }
-        } else return res.status(400).json({ message: 'Las contraseñas no coinciden' });
+        } else return res.status(400).json({ message: 'Las contraseñas no coinciden' })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -228,28 +219,28 @@ export const registerStudent = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { data } = req.body;
-        const user = await User.findOne({ Email: data.email });
-        if (!user) return res.status(404).json({ message: 'Correo no válido' });
-        const contrasenaValida = await comparePasswords(data.pass, user.Pass);
-        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
-        const { Pass, ...userData} = user.toObject();
+        const { data } = req.body
+        const user = await User.findOne({ Email: data.email })
+        if (!user) return res.status(404).json({ message: 'Correo no válido' })
+        const contrasenaValida = await comparePasswords(data.pass, user.Pass)
+        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' })
+        const { Pass, ...userData} = user.toObject()
         res.json({ 
             ...userData,
             Token: genTok()
-        });
+        })
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message })
     }
 }
 
 export const getUser = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email } = req.body
         if(!email)  return res.status(400).json({ message: 'Información no válida' })
         const user = await User.findOne({ Email: email })
         if(!user) return res.status(404).json({ message: 'Usuario no encontrado' })
-        let curp = null;
+        let curp = null
         if(user.CURP && user.CURP.iv && user.CURP.content) {
             try {
                 curp = decryptCurp(user.CURP)
@@ -262,7 +253,7 @@ export const getUser = async (req, res) => {
             ...userData,
             CURP: curp, 
             status: 200
-        });
+        })
     } catch(error) {
         return res.status(500).json({ message: error.message })
     }
@@ -270,7 +261,7 @@ export const getUser = async (req, res) => {
 
 export const changeData = async (req, res) => {
     try {
-        const { data, changes } = req.body;
+        const { data, changes } = req.body
         if (!data || !data.email || !data.pass)
             return res.status(400).json({ message: 'Datos incompletos' })
         const user = await User.findOne({ Email: data.email })

@@ -251,7 +251,7 @@ export const deleteProfesor = async (req, res) => {
 };
 
 // Búsqueda de profesor por email
-const searchByEmail = async (req, res) => {
+export const searchByEmail = async (req, res) => {
     try{
         const { email } = req.body
         if(!email) return res.status(400).json({message: "correo no valido"})
