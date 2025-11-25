@@ -361,3 +361,7 @@ footer { background-color: var(--muted); }
   color: var(--ring);
   border: solid 0.125em var(--ring);
 }
+
+.rotated {
+  transform: rotate(180deg);
+}

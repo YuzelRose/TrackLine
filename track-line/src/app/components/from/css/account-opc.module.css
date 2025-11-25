@@ -66,6 +66,52 @@
     margin-bottom: 0.5em;
 }
 
+#hgWrapper {
+    padding: 1em;
+    margin-bottom: 0.5em;
+    width: 20%;
+    display: flex;
+    justify-content: space-between;
+    color: var(--foreground);
+    border: solid var(--accent) 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+#form {
+    padding: 1em;
+    margin-bottom: 0.5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: var(--accent) solid 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+#form > h4 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin: 0 0 0.5em 0;
+    padding-bottom: 0.25em;
+    cursor: pointer;
+    border-bottom: solid var(--foreground) 0.125em;
+}
+#form > h4:hover{
+    color: var(--ring);
+    border-bottom: solid var(--ring) 0.125em;
+}
+#form > span {
+    margin: 0.5em 0;
+}
+
 @media (max-width: 425px) {
     .button {
         font-size: 0.875rem;

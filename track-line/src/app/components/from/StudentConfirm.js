@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { STUDENTS } from '../uI/inputs/jasonContentemts'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
-import { doRegisterNoPass } from '@/app/utils/JsonManage'
+import { doRegisterNoPass, EndRegister } from '@/app/utils/JsonManage'
 import { peticion } from '@/app/utils/Funtions'
 
 export default function StudentConfirm({funtion = () => {}}) {

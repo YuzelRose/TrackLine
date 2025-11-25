@@ -8,8 +8,10 @@ import TrackLineSVG from "../media/Track-lineSVG"
 import { peticion } from "../utils/Funtions"
 import { getSession } from "../utils/JsonManage"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
-export default function Profile(){
+export default function Profile() { 
+    const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState(null)
     const [showID, setShowID] = useState(false)
@@ -113,15 +115,26 @@ export default function Profile(){
                             }
                         </div>
                     </section>
-                    {data?    
+                    {data.UserType === "student"?    
                         <BadgeOBJ session={data.Badges}/>
                     : null }
-                    {data.UserType === "student" ?
-                        <section>
-                            
+                    {(data.UserType === "student" || data.UserType === "tutor") && (
+                        <section className={styles.content}>
+                            {(data.UserType === "student" && data.RelatedEmail === null) || data.UserType === "tutor" ? (
+                                <p
+                                    onClick={() => router.push(`/profile/payment?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
+                                >
+                                    Consultar adeudos
+                                </p>
+                            ) : null}
+                            <p
+                                onClick={() => router.push(`/profile/kardex?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
+                            >
+                                Consultar Kardex
+                            </p>
                         </section>
-                    : null }
-                    {!data.RelatedEmail || data.UserType !== "student" ?
+                    )}
+                    {!data.RelatedEmail || data.UserType !== "student" ? 
                         <AccountOPC data={data}/>
                     : null }
                 </div>

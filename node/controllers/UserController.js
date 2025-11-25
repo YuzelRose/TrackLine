@@ -19,32 +19,38 @@ const isUserAvailable = async (email) => { // true si está disponible, false si
     }
 }
 
-const hashData = async ({curp, pass}) => {
+const hashData = async ({ curp, pass }) => {
     try {
-        const salt = await bcrypt.genSalt(10)
-        const hashPass = await bcrypt.hash(pass, salt)
-        const iv = crypto.randomBytes(16)
-        const cipher = crypto.createCipheriv(
-            process.env.ALGORITHM, 
-            Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), 
-            iv 
-        )
-        let encrypted = cipher.update(curp, 'utf8', 'hex')
-        encrypted += cipher.final('hex')
-        const authTag = cipher.getAuthTag()
-        return {
-            pass: hashPass,
-            CURP: {
+        const result = {};
+        if (pass) {
+            const salt = await bcrypt.genSalt(10);
+            const hashPass = await bcrypt.hash(pass, salt);
+            result.pass = hashPass;
+        }
+        if (curp) {
+            const iv = crypto.randomBytes(16);
+            const cipher = crypto.createCipheriv(
+                process.env.ALGORITHM, 
+                Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), 
+                iv 
+            );
+            let encrypted = cipher.update(curp, 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            const authTag = cipher.getAuthTag();
+            
+            result.CURP = {
                 iv: iv.toString('hex'),        
                 content: encrypted,
                 authTag: authTag.toString('hex')
-            }
+            };
         }
+        return result;
     } catch(error) {
-        console.error('Error en hashData:', error)
-        return null
+        console.error('Error en hashData:', error);
+        return null;
     }
 }
+
 
 const decryptCurp = (encryptedData) => {
     try {
@@ -260,4 +266,71 @@ export const getUser = async (req, res) => {
     } catch(error) {
         return res.status(500).json({ message: error.message })
     }
+}
+
+export const changeData = async (req, res) => {
+    try {
+        const { data, changes } = req.body;
+        if (!data || !data.email || !data.pass)
+            return res.status(400).json({ message: 'Datos incompletos' })
+        const user = await User.findOne({ Email: data.email })
+        if (!user) return res.status(404).json({ message: 'Correo no válido' })
+        const contrasenaValida = await comparePasswords(data.pass, user.Pass);
+        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
+        if (changes && changes.data) {
+            console.log("Recabando cambios")
+            const updateFields = {} // ← Declarar updateFields aquí
+            if (changes.data.name) updateFields.Name = changes.data.name;
+            if (changes.data.curp) updateFields.CURP = changes.data.curp;
+            if (changes.data.birth) updateFields.Birth = changes.data.birth;
+            if (changes.data.phone) updateFields.Phone = changes.data.phone;
+            if (changes.data.pass) {
+                const hashedPass = await hashData({ pass: changes.data.pass })
+                updateFields.Pass = hashedPass.pass
+            }
+            if (Object.keys(updateFields).length > 0) {
+                await User.findByIdAndUpdate(user._id, { $set: updateFields })
+            }
+            return res.status(200).json({ 
+                message: 'Datos actualizados exitosamente',
+                updatedFields: Object.keys(updateFields),
+                status: 200
+            });
+        }
+        return res.status(200).json({ 
+            message: 'No se realizaron cambios',
+            updatedFields: [],
+            status: 200
+        })
+    } catch (error) {
+        console.error('Error en changeData:', error)
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const dropUser = async(req, res) =>{
+    try {
+        const { data } = req.body
+        if (!data || !data.email || !data.pass)
+            return res.status(400).json({ message: 'Datos incompletos' })
+        
+        const user = await User.findOne({ Email: data.email })
+        if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
+        
+        const contrasenaValida = await comparePasswords(data.pass, user.Pass)
+        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' })
+        
+        // Eliminar el usuario
+        await User.findByIdAndDelete(user._id)
+        
+        return res.status(200).json({ 
+            message: 'Cuenta eliminada exitosamente',
+            status: 200
+        })
+
+    } catch (error) {
+        console.error('Error en drop:', error)
+        res.status(500).json({ message: error.message })
+    }
+
 }

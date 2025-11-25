@@ -74,6 +74,37 @@
 #form {
     padding: 0 1em;
 }
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5em;
+    padding: 1em;
+    gap: 0.5em;
+    border: solid var(--foreground) 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+.content > p {
+    width: 100%;
+    cursor: pointer;
+    text-align: center;
+    border: solid var(--background) 0.125em;
+    padding: 0.25em 0;
+}
+
+.content > p:hover {
+    border-top: solid var(--muted-foreground) 0.125em;
+    border-bottom: solid var(--muted-foreground) 0.125em;
+}
+
 @media (max-width: 1024px) {
     #content {
         width: 80%;
