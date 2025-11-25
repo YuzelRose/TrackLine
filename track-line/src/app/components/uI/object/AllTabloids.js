@@ -9,7 +9,7 @@ export default function AllTabloids() {
     useEffect(() => {
         const getTabloids = async () => {
             try {
-                const response = await peticion('tabloids/get-all')
+                const response = await peticion('tabloids/get-all') // falta dar de alta
                 if(response.httpStatus === 200) setData(response.data)
             } catch(error){
                 alert(error)
