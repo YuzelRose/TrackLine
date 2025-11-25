@@ -33,7 +33,7 @@ export default function AllTabloids() {
                         </div>
                     </div>
                 })
-            :null}
+            : <p>Sin cursos disponibles</p>}
         </section>
     )
 }

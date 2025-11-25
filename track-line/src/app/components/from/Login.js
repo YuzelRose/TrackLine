@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { keepSession, session } from '@/app/utils/JsonManage'
 import { motion, AnimatePresence } from 'framer-motion'
+import { HttpStatusCode } from 'axios'
 
 export default function Login({ onWaitingChange }){
     const navigate = useRouter();
@@ -33,12 +34,14 @@ export default function Login({ onWaitingChange }){
                     pass: formData.get('pass')
                 }
             })
-            if (check) {
-                keepSession({AuthUserEmail: response.data.Email, Token: response.data.Token})
-            } else {
-                session({AuthUserEmail: response.data.Email, Token: response.data.Token})
-            }
-            navigate.push('/main');
+            if(response.httpStatus === 200) {
+                if (check) keepSession({AuthUserEmail: response.data.Email, Token: response.data.Token})
+                else session({AuthUserEmail: response.data.Email, Token: response.data.Token})
+                navigate.push('/main')
+            } else setError({
+                message: response.message,
+                state: true
+            })
         } catch (exError) {
             console.error("Error al iniciar sesión:", exError);
             if (exError.response) {

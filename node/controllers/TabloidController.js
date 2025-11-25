@@ -214,6 +214,17 @@ export const sendHw = async (req, res) => {
     }
 }
 
+export const getAll = async(res) => {
+    try {
+        const data = await Tabloid.find({})
+        if(!data) return res.status(404).json({menssage: "No se encontraron tabloides"})
+        res.status(200).json({data, message: "Recuperados", status: 200})
+    } catch (error) {
+        console.error(`Error al subir la tarea: ${error.message}`)
+        res.status(500).json({ message: error.message, place: "Try-catch" })
+    }
+}
+
 // generar registro temporal:
 /*export const postNewUser = async (req, res) => {
     try {

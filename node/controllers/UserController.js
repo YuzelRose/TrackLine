@@ -227,7 +227,8 @@ export const login = async (req, res) => {
         const { Pass, ...userData} = user.toObject()
         res.json({ 
             ...userData,
-            Token: genTok()
+            Token: genTok(),
+            status: 200
         })
     } catch (error) {
         res.status(500).json({ message: error.message })

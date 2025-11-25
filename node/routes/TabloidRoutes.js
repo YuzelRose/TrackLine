@@ -6,7 +6,8 @@ import {
     getCourses, 
     getData, 
     getHw,
-    sendHw
+    sendHw,
+    getAll
 } from '../controllers/TabloidController.js'
 
 const router = express.Router()
@@ -16,5 +17,6 @@ router.post('/add-user', addCoursesToUser)
 router.post('/get-data', getData)
 router.post('/get-hw', getHw)
 router.post('/send-hw', upload.array('workFiles'), sendHw);
+router.post('/get-all', getAll)
 
 export default router
