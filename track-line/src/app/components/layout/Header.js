@@ -11,6 +11,7 @@ export default function Header() {
     const [lastScrollTop, setLastScrollTop] = useState(0);
     const [headerVisible, setHeaderVisible] = useState(true);
     const [session, setSession] = useState([])
+    const [isMain, setIsMain] = useState(true)
 
     const handleScroll = () => {
         const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -38,12 +39,20 @@ export default function Header() {
         const session = getSession()
         if(session) setSession(session)
         else NUKE()
+    }, [])
+
+    useEffect(() => {
+        if(pathname === '/') setIsMain(false)
+        else setIsMain(true)
     }, [pathname])
 
     return (
         <header id={`${headerVisible ? styles.visible : styles.hidden}`}>
-            <div id={styles.icon}> 
-                <TrackLine dim="10em" style="pointer" /> 
+            <div 
+                id={styles.icon}
+                onClick={() => {isMain? router.push('/main') : null}}
+            > 
+                <TrackLine dim="10em"/>  
             </div>
             <div id={styles.space}/>
             <div id={styles.user}> 

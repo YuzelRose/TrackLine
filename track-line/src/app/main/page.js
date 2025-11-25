@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
 import { getSession, NUKE } from '../utils/JsonManage';
 import { peticion } from '../utils/Funtions';
+import AllTabloids from '../components/uI/object/AllTabloids';
 
 export default function Main() { 
    const router = useRouter();
@@ -26,6 +27,7 @@ export default function Main() {
             } catch (error) {
                 alert(`Error inesperado intentelo despues: ${error}`)
                 NUKE()
+                window.location.reload()
                 window.location.href = '/'
             }
         }
@@ -54,7 +56,9 @@ export default function Main() {
                     </div>
                 </aside>
             </article>
-            {/* Aqui */}
+            {data.UserType === "tutor" || data.RelatedEmail === null?
+                <AllTabloids/>
+            : null}
         </main>
     )
 }

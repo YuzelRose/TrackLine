@@ -81,7 +81,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top: 0.5em;
+    margin: 1em 0;
     padding: 1em;
     gap: 0.5em;
     border: solid var(--foreground) 0.125em;
@@ -103,6 +103,71 @@
 .content > p:hover {
     border-top: solid var(--muted-foreground) 0.125em;
     border-bottom: solid var(--muted-foreground) 0.125em;
+}
+
+.ret {
+   display: flex;
+   align-items: center; 
+   margin: 1em 0;
+   width: fit-content;
+   cursor: pointer;
+}
+
+.ret:hover {
+    color: var(--ring);
+    text-decoration: underline;
+}
+
+.editOpc {
+    padding: 0.5em;
+    margin: 1em 0;
+    border: solid var(--foreground) 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+    text-align: center;
+}
+
+.editOpc > h4 {
+    margin-bottom: 0.25em;
+}
+
+
+.editOpc > p {
+    cursor: pointer;
+    padding: 0.25em 0;
+    margin-bottom: 0.5em;
+    border: var(--background) solid 0.125em;
+}
+
+.editOpc > p:hover {
+    border-top: var(--muted-foreground) solid 0.125em;
+    border-bottom: var(--muted-foreground) solid 0.125em;
+}
+
+#endSession {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#endSession > h6 {
+    cursor: pointer;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border: solid 0.125em var(--accent);
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+
+
+#endSession > h6:hover {
+    border: solid var(--ring) 0.125em;
 }
 
 @media (max-width: 1024px) {

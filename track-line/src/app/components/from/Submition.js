@@ -35,6 +35,7 @@ export default function Submition({data, DueDate, hwID}) {
                 alert('Archivos subidos correctamente');
                 setFiles([]);
                 setButton(false);
+                window.location.reload();
             } else {
                 alert('Error: ' + response.message);
             }

@@ -6,9 +6,11 @@ import BadgeOBJ from "../components/uI/badge/BadgeOBJ"
 import AccountOPC from "../components/from/AccountOPC"
 import TrackLineSVG from "../media/Track-lineSVG"
 import { peticion } from "../utils/Funtions"
-import { getSession } from "../utils/JsonManage"
+import { getSession, NUKE } from "../utils/JsonManage"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import ArrowSVG from "../media/ArrowSVG"
+import LogoutSVG from "../media/LogoutSVG"
 
 export default function Profile() { 
     const router = useRouter()
@@ -16,6 +18,13 @@ export default function Profile() {
     const [data, setData] = useState(null)
     const [showID, setShowID] = useState(false)
     const [showCURP, setShowCURP] = useState(false)
+    const [select, setSelect] = useState("")
+
+    const enSession = () => {
+        NUKE()
+        
+        router.push('/')
+    }
 
     useEffect(() => {
         const getProfile = async () => {
@@ -47,6 +56,37 @@ export default function Profile() {
         }
     }
 
+    const tutorReturn = () => {
+        switch(select) {
+            case 'Tutor':
+                return (
+                    <>
+                        <h4 onClick={() => setSelect("")} className={styles.ret}>
+                            <ArrowSVG rot={true}/> Regresar
+                        </h4>
+                        <AccountOPC type={data.UserType} email={data.Email}/>
+                    </>
+                )
+            case 'Student':
+                return (
+                    <>
+                        <h4 onClick={() => setSelect("")} className={styles.ret}>
+                            <ArrowSVG rot={true}/> Regresar
+                        </h4>
+                        <AccountOPC type={"student"} email={data.RelatedEmail} relatedEmail={data.Email}/>
+                    </>
+                )
+            default:
+                return(
+                    <div className={styles.editOpc}>
+                        <h4>Modificar cuenta:</h4>
+                        <p onClick={() => setSelect("Tutor")}>Tutor</p>
+                        <p onClick={() => setSelect("Student")}>Studiante</p>
+                    </div>
+                )
+        }
+    }
+
     if(loading){
         return(
             <main id={styles.main}>
@@ -55,90 +95,95 @@ export default function Profile() {
                 </div>
             </main>
         )
-    } else {
-        return(
-            <main id={styles.main}>
-                <div id={styles.content}>
-                    <section id={styles.userProfile}>
-                        <div id={styles.profileMark}>
-                            <TrackLineSVG dim={"6em"}/>
-                        </div>
-                        <div id={styles.profileInfo}>
-                            <div className={styles.row}>
-                                <h5 className={styles.text}>{data.Name}</h5>
-                            </div>
-                            {showID? 
-                                <p 
-                                    className={styles.ID}
-                                    onClick={() => {
-                                        setShowID(!showID)
-                                        copyToClipboard(data._id)
-                                    }}
-                                    title={"Copiar y ocultar"} 
-                                >
-                                    ID: {data._id}
-                                </p> 
-                            :
-                                <h6 
-                                    onClick={() => setShowID(!showID)}
-                                    id={styles.id}
-                                    title={showID? "Ocultar ID" : "Mostrar ID"}
-                                >
-                                    ID
-                                </h6> 
-                            }
-                            <p>
-                                Fecha de nacimiento: {(() => {
-                                    const [year, month, day] = data.Birth.split('-')
-                                    return `${day}/${month}/${year}`
-                                })()}
-                            </p>
-                            {showCURP? 
-                                <p 
-                                    className={styles.ID}
-                                    onClick={() => {
-                                        setShowCURP(!showCURP)
-                                        copyToClipboard(data.CURP,)
-                                    }}
-                                    title={"Copiar y ocultar"} 
-                                >
-                                    {data.CURP}
-                                </p> 
-                            :
-                                <h6 
-                                    onClick={() => setShowCURP(!showCURP)}
-                                    id={styles.id}
-                                    title={showCURP? "Ocultar CURP" : "Mostrar CURP"}
-                                >
-                                    CURP
-                                </h6> 
-                            }
-                        </div>
-                    </section>
-                    {data.UserType === "student"?    
-                        <BadgeOBJ session={data.Badges}/>
-                    : null }
-                    {(data.UserType === "student" || data.UserType === "tutor") && (
-                        <section className={styles.content}>
-                            {(data.UserType === "student" && data.RelatedEmail === null) || data.UserType === "tutor" ? (
-                                <p
-                                    onClick={() => router.push(`/profile/payment?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
-                                >
-                                    Consultar adeudos
-                                </p>
-                            ) : null}
-                            <p
-                                onClick={() => router.push(`/profile/kardex?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
-                            >
-                                Consultar Kardex
-                            </p>
-                        </section>
-                    )}
-                    {!data.RelatedEmail || data.UserType !== "student" ? 
-                        <AccountOPC data={data}/>
-                    : null }
-                </div>
-            </main>
-        )
     }
-}
+
+    return(
+        <main id={styles.main}>
+            <div id={styles.content}>
+                <section id={styles.userProfile}>
+                    <div id={styles.profileMark}>
+                        <TrackLineSVG dim={"6em"}/>
+                    </div>
+                    <div id={styles.profileInfo}>
+                        <div className={styles.row}>
+                            <h5 className={styles.text}>{data.Name}</h5>
+                        </div>
+                        {showID? 
+                            <p 
+                                className={styles.ID}
+                                onClick={() => {
+                                    setShowID(!showID)
+                                    copyToClipboard(data._id)
+                                }}
+                                title={"Copiar y ocultar"} 
+                            >
+                                ID: {data._id}
+                            </p> 
+                        :
+                            <h6 
+                                onClick={() => setShowID(!showID)}
+                                id={styles.id}
+                                title={showID? "Ocultar ID" : "Mostrar ID"}
+                            >
+                                ID
+                            </h6> 
+                        }
+                        <p>
+                            Fecha de nacimiento: {(() => {
+                                const [year, month, day] = data.Birth.split('-')
+                                return `${day}/${month}/${year}`
+                            })()}
+                        </p>
+                        {showCURP? 
+                            <p 
+                                className={styles.ID}
+                                onClick={() => {
+                                    setShowCURP(!showCURP)
+                                    copyToClipboard(data.CURP,)
+                                }}
+                                title={"Copiar y ocultar"} 
+                            >
+                                Curp: {data.CURP}
+                            </p> 
+                        :
+                            <h6 
+                                onClick={() => setShowCURP(!showCURP)}
+                                id={styles.id}
+                                title={showCURP? "Ocultar CURP" : "Mostrar CURP"}
+                            >
+                                CURP
+                            </h6> 
+                        }
+                    </div>
+                </section>
+                {data.UserType === "student"?    
+                    <BadgeOBJ session={data.Badges}/>
+                : null }
+                {(data.UserType === "student" || data.UserType === "tutor") && (
+                    <section className={styles.content}>
+                        {(data.UserType === "student" && data.RelatedEmail === null) || data.UserType === "tutor" ? (
+                            <p
+                                onClick={() => router.push(`/profile/payment?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
+                            >
+                                Consultar adeudos
+                            </p>
+                        ) : null}
+                        <p
+                            onClick={() => router.push(`/profile/kardex?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
+                        >
+                            Consultar Kardex
+                        </p>
+                    </section>
+                )} 
+                {data.UserType === "student" && !data.RelatedEmail ? (
+                    <AccountOPC type={data.UserType} email={data.Email}/>
+                ) : data.UserType === "tutor" ? (
+                    tutorReturn()
+                ) : null}
+                <div onClick={enSession} id={styles.endSession}>
+                    <h6 title="Cerrar sesión"><LogoutSVG/> Cerrar sesión</h6>
+                </div>
+            </div>
+        </main>
+    )  
+} 

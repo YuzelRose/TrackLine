@@ -4,6 +4,7 @@ import PayPalLogoSVG from '../../media/PaypalSVG.js'
 import TrackLineSVG from '../../media/Track-lineSVG.js'
 import EmailButton from '../from/Mailconsult.js'
 import styles from './css/footer.module.css'
+import BreadcrumbNav from '../uI/object/Navigation.js'
 export default function Footer(){
     const router = useRouter()
     const handleTerminos = () => {
@@ -11,7 +12,9 @@ export default function Footer(){
     }
     return(
         <footer>
-            <section id={styles.space}/> 
+            <section id={styles.space}>
+                <BreadcrumbNav/>
+            </section> 
             <section id={styles.info}>
                 <figure>
                     <TrackLineSVG dim="80%"/>
@@ -19,8 +22,7 @@ export default function Footer(){
                 </figure>
                 <article>
                     <div id={styles.reg}>
-                        <p>¿Quiere saber mas de nosotros?</p>
-                        <EmailButton children='Contactanos' />
+                        <EmailButton />
                     </div>
                     <PayPalLogoSVG />
                 </article>

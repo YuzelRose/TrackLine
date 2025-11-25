@@ -8,9 +8,9 @@ import { peticion } from '@/app/utils/Funtions'
 import { useState } from 'react'
 import HgWait from '../uI/HgWait'
 import ArrowSVG from '@/app/media/ArrowSVG'
-import { NUKE } from '@/app/utils/JsonManage'
+import { getSession, NUKE } from '@/app/utils/JsonManage'
 
-export default function AccountOPC({data}) {
+export default function AccountOPC({type, email, relatedEmail=null}) {
     const [form, setForm] = useState(false)
     const [wait, setWait] = useState(false)
     const [formData, setFormData] = useState(null)
@@ -69,7 +69,7 @@ export default function AccountOPC({data}) {
                     birth: formDataObj.get('Birth')
                 }
             }
-            if (data.UserType === "tutor") {
+            if (type === "tutor") {
                 changes.data.phone = formDataObj.get('Phone')
             }
             setFormData(changes)
@@ -85,26 +85,43 @@ export default function AccountOPC({data}) {
         try {
             setWait(true)
             const logData = new FormData(e.target)
-
-            const requestData = {
-                data: {
-                    email: logData.get('user'),
-                    pass: logData.get('pass')
-                },
-                changes: formData
+            const userEmail = logData.get('user')
+            const session = getSession()
+            const isValidStundent = relatedEmail && relatedEmail === session.Email
+            const isValidTutor = !relatedEmail && session.Email === email
+            const isValidUser =  isValidStundent || isValidTutor              
+            if(!isValidUser) {
+                alert("Ingrese el correo correcto para esta cuenta")
+                return
             }
-
+            let requestData = null
+            if(isValidTutor) {
+                requestData = {
+                    data: {
+                        email: userEmail,
+                        pass: logData.get('pass')
+                    },
+                    changes: formData
+                }
+            } else {
+                requestData = {
+                    data: {
+                        email: userEmail,
+                        pass: logData.get('pass')
+                    },
+                    changes: formData
+                }
+            }
             let URI = 'user/change-data'
-            let successMessage = "Sus datos han sido actualizados"
-            if (actionType === 'drop') {
-                URI = 'user/drop'
-                successMessage = "Cuenta eliminada exitosamente"
-            }
+            if (actionType === 'drop')  URI = 'user/drop'
+
             const response = await peticion(URI, requestData)
+            
             if(response.httpStatus === 200) {
-                alert(successMessage)
                 if (actionType === 'drop') {
-                    NUKE()
+                    if (session.Email === userEmail) {
+                        NUKE()
+                    }
                     window.location.href = '/'
                 } else {
                     setForm(false)
@@ -116,7 +133,8 @@ export default function AccountOPC({data}) {
                 alert(response.message || "Error al realizar la operación")
             }
         } catch (error) {
-            console.log(error.message || "Error inesperado")
+            console.error('Error:', error)
+            alert(error.message || "Error inesperado")
         } finally {
             setWait(false)
         }
@@ -143,6 +161,7 @@ export default function AccountOPC({data}) {
                     >
                         <ArrowSVG rot={true}/> Volver
                     </h4>
+                    <h5>Ingrese sus credenciales:</h5>
                     <TextForm content={MAIN} width={"100%"}/>
                     <PassInput />
                     <button type='submit' className='button'>
@@ -154,7 +173,7 @@ export default function AccountOPC({data}) {
     }
 
     const render = () => {
-        switch(data.UserType) {
+        switch(type) {
             case 'student':
                 return <TextForm content={CHGSTUDENTS} width={"60%"}/>
             case 'tutor':
@@ -181,6 +200,16 @@ export default function AccountOPC({data}) {
                     Cambiar Informacion
                 </button>
             </form>
+            
+            <form className={`${styles.in2} ${styles.in}`} onSubmit={changeMail}>
+                <div>
+                    <TextForm content={MAIN} width={"100%"}/>
+                </div>
+                <button className={`${styles.button} ${styles.inbtn}`} type='submit'>
+                    Cambiar correo
+                </button>
+            </form>
+            
             <form className={`${styles.in2} ${styles.in}`} onSubmit={changePass}>
                 <div>
                     <PassInput />
@@ -189,6 +218,7 @@ export default function AccountOPC({data}) {
                     Cambiar contraseña
                 </button>
             </form>
+            
             <form id={styles.Drop} className={styles.in} onSubmit={dropAcount}>
                 <button className={styles.button} type='submit'>
                     Eliminar cuenta

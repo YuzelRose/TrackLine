@@ -275,15 +275,18 @@ export const changeData = async (req, res) => {
             return res.status(400).json({ message: 'Datos incompletos' })
         const user = await User.findOne({ Email: data.email })
         if (!user) return res.status(404).json({ message: 'Correo no válido' })
-        const contrasenaValida = await comparePasswords(data.pass, user.Pass);
-        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' });
+        const contrasenaValida = await comparePasswords(data.pass, user.Pass)
+        if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' })
         if (changes && changes.data) {
             console.log("Recabando cambios")
-            const updateFields = {} // ← Declarar updateFields aquí
-            if (changes.data.name) updateFields.Name = changes.data.name;
-            if (changes.data.curp) updateFields.CURP = changes.data.curp;
-            if (changes.data.birth) updateFields.Birth = changes.data.birth;
-            if (changes.data.phone) updateFields.Phone = changes.data.phone;
+            const updateFields = {} 
+            if (changes.data.name) updateFields.Name = changes.data.name
+            if (changes.data.birth) updateFields.Birth = changes.data.birth
+            if (changes.data.phone) updateFields.Phone = changes.data.phone
+            if (changes.data.curp) {
+                const hashedCurp = await hashData({ curp: changes.data.curp })
+                updateFields.CURP = hashedCurp.CURP
+            }
             if (changes.data.pass) {
                 const hashedPass = await hashData({ pass: changes.data.pass })
                 updateFields.Pass = hashedPass.pass
@@ -313,21 +316,16 @@ export const dropUser = async(req, res) =>{
         const { data } = req.body
         if (!data || !data.email || !data.pass)
             return res.status(400).json({ message: 'Datos incompletos' })
-        
         const user = await User.findOne({ Email: data.email })
         if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
-        
         const contrasenaValida = await comparePasswords(data.pass, user.Pass)
         if (!contrasenaValida) return res.status(401).json({ message: 'Error al iniciar sesión' })
-        
-        // Eliminar el usuario
         await User.findByIdAndDelete(user._id)
         
         return res.status(200).json({ 
             message: 'Cuenta eliminada exitosamente',
             status: 200
         })
-
     } catch (error) {
         console.error('Error en drop:', error)
         res.status(500).json({ message: error.message })

@@ -20,7 +20,7 @@ export default function HomeWorkPage() {
                     const session =  getSession()
                     if(!!session) {
                         const urlId = searchParams.get('id')
-                        if(!!urlId){
+                        if(!!urlId) {
                             const result = await peticion('tabloid/get-hw',{ 
                                 data: {
                                     urlId: urlId,

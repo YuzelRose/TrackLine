@@ -104,6 +104,9 @@
     cursor: pointer;
     border-bottom: solid var(--foreground) 0.125em;
 }
+#form > h5 {
+    margin: 0 0 0.5em 0;
+}
 #form > h4:hover{
     color: var(--ring);
     border-bottom: solid var(--ring) 0.125em;

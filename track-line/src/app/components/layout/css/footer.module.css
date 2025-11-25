@@ -1,5 +1,8 @@
 
 #space { 
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
     border-bottom: 0.25em solid var(--border);
     border-top: 0.25em solid var(--border);
     padding: 0;
