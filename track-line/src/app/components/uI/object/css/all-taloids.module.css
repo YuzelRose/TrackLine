@@ -1,0 +1,63 @@
+#conteiner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: 100%;
+    margin-top: 1em;
+}
+.tabloid {
+    text-align: start;
+    width: 60%;
+    padding: 0.5em 1em;
+    background-color: var(--card);
+    border: solid var(--foreground) 0.125em;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+    -moz-border-radius: 1em;
+    -ms-border-radius: 1em;
+    -o-border-radius: 1em;
+}
+.drop {
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5em;
+    border: solid var(--foreground) 0.125em;
+    border-radius: 0 0 1em 1em;
+    -webkit-border-radius: 0 0 1em 1em;
+    -moz-border-radius: 0 0 1em 1em;
+    -ms-border-radius: 0 0 1em 1em;
+    -o-border-radius: 0 0 1em 1em;
+}
+.drop:hover{
+    color: var(--ring);
+    border: solid var(--ring) 0.125em;
+}
+.dropContent {
+    margin-top: 0.5em;
+    padding: 0.5em 0;
+    border-bottom: solid var(--muted-foreground) 0.125em;
+    border-top: solid var(--muted-foreground) 0.125em;
+    border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -ms-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
+}
+#noData {
+    margin: 1em 0;
+}
+.title {
+    width: 100%;
+    text-align: center;
+    border-bottom: solid var(--border) 0.125em;
+    padding-bottom: 1em;
+}
+@media (max-width: 768px) {
+    .tabloid {
+        width: 80%;
+    }
+}

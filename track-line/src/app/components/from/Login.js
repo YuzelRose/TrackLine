@@ -8,13 +8,10 @@ import CheckBoxButton from '../uI/inputs/CheckBoxButton'
 import { MAIN } from '../uI/inputs/jasonContentemts'
 import { peticion } from '@/app/utils/Funtions'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { keepSession, session } from '@/app/utils/JsonManage'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HttpStatusCode } from 'axios'
 
 export default function Login({ onWaitingChange }){
-    const navigate = useRouter();
     const [check, setCheck] = useState(false)
     const [watingStatus, setWatingStatus] = useState(true)
     const [error, setError] = useState({
@@ -37,7 +34,8 @@ export default function Login({ onWaitingChange }){
             if(response.httpStatus === 200) {
                 if (check) keepSession({AuthUserEmail: response.data.Email, Token: response.data.Token})
                 else session({AuthUserEmail: response.data.Email, Token: response.data.Token})
-                navigate.push('/main')
+                window.location.reload()
+                window.location.href = '/main'
             } else setError({
                 message: response.message,
                 state: true

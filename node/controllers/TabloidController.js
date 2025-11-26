@@ -214,14 +214,26 @@ export const sendHw = async (req, res) => {
     }
 }
 
-export const getAll = async(res) => {
+export const getAll = async (req, res) => { // ← Agregar req si es necesario
     try {
         const data = await Tabloid.find({})
-        if(!data) return res.status(404).json({menssage: "No se encontraron tabloides"})
-        res.status(200).json({data, message: "Recuperados", status: 200})
+        if (!data || data.length === 0) {
+            return res.status(404).json({ 
+                message: "No se encontraron tabloides",
+                status: 404 
+            })
+        }
+        res.status(200).json({ 
+            data, 
+            message: "Tabloides recuperados exitosamente", 
+            status: 200,
+        })
     } catch (error) {
-        console.error(`Error al subir la tarea: ${error.message}`)
-        res.status(500).json({ message: error.message, place: "Try-catch" })
+        console.error(`Error al obtener tabloides: ${error.message}`)
+        res.status(500).json({ 
+            message: "Error interno del servidor", 
+            error: error.message 
+        })
     }
 }
 
