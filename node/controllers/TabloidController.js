@@ -213,11 +213,15 @@ export const sendHw = async (req, res) => {
         studentSubmission.Status = currentDate <= dueDate ? "Entregado" : "Tarde"
         studentSubmission.SubmittedAt = currentDate
         await consultData.save()
-        await hwConf(hwID)
+        
+        // Lógica para agregar badges al estudiante
+        
+
+
         res.status(200).json({ 
             message: "Tarea enviada correctamente",
             filesReceived: workFiles.length,
-            status: 200 
+            status: 200,
         });
     } catch (error) {
         console.error(`Error al subir la tarea: ${error.message}`)

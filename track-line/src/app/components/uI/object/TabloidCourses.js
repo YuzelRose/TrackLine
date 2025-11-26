@@ -61,11 +61,6 @@ export default function TabloidCourses() {
                     <div>
                         <h6 className={styles.itemHeader}>
                             {course.refId.Name || 'Sin nombre'} 
-                            <span 
-                                className={styles.dotConteiner} 
-                            >
-                                <DotsSVG url={course.refId._id}/>
-                            </span>
                         </h6>
                         <p>{course.refId.description}</p>
                     </div>

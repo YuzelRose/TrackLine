@@ -67,6 +67,29 @@ export const peticion = async (endpoint, data = null, method = 'POST') => {
     }
 }
 
+// Esta función es para SUBIR archivos (POST)
+// En utils/Funtiones.js
+export const uploadFiles = async (endpoint, formData) => {
+    const URI = `${URI_START}/trckln/${endpoint}`;
+    try {
+        const response = await fetch(URI, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
+        }
+
+        return await response.json();
+        
+    } catch(exError) {
+        console.error('Error en petición de subida:', exError);
+        throw new Error(exError.message || 'Error al subir los archivos');
+    }
+}
+
 export const fetchData = async (endpoint, fileName) => {
     const URI = `${URI_START}/trckln/${endpoint}`
     try {

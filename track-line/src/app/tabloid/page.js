@@ -51,7 +51,7 @@ export default function Tabloid() {
         return(
             <main id={styles.main}>
                 <div id={styles.header}>
-                    <h3>{data.Name}  <DotsSVG url={data._id} height="0.75em"/></h3>
+                    <h3>{data.Name} </h3>
                 </div>
                 <div id={styles.data}>
                     <h5>NDM: {data._id} {data.Owner? data.Owner : null}</h5>

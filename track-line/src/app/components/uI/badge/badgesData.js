@@ -3,7 +3,10 @@ export const getMatchingBadges = (userBadges) => {
     const allBadgeDefinitions = {
         academicBadges,
         techBadges, 
-        progressBadges
+        progressBadges,
+        funBadges,
+        socialBadges, // Añadido para completar
+        generalBadges // Añadido para completar
     }
     const matchingBadges = categorizedUserBadges.map(userBadge => {
         const badgeDefinition = allBadgeDefinitions[userBadge.component]?.find(
@@ -66,6 +69,7 @@ const academicBadges = [
         criteria: "Participar en clase 5 días consecutivos"
     }
 ]
+
 const techBadges = [
     {
         id: "tech-Badg1",
@@ -86,6 +90,7 @@ const techBadges = [
         criteria: "Ser de los primeros en usar nueva funcionalidad"
     }
 ]
+
 const progressBadges = [
     {
         id: "pro-Badg1",
@@ -111,4 +116,52 @@ const progressBadges = [
         image: "🔥",
         criteria: "Acceder al sistema 7 días seguidos"
     }
+]
+
+const funBadges = [
+    {
+        id: "fun-Badg1",
+        name: "Primer buen trabajo",
+        image: "🎉",
+        criteria: "Entrega tu primer trabajo"
+    },
+    {
+        id: "fun-Badg2",
+        name: "Explorador",
+        image: "🧭",
+        criteria: "Completar tu primer recorrido por la plataforma"
+    },
+    {
+        id: "fun-Badg3",
+        name: "Coleccionista",
+        image: "🃏",
+        criteria: "Obtener 5 badges diferentes"
+    },
+    {
+        id: "fun-Badg4",
+        name: "Estratega",
+        image: "♟️",
+        criteria: "Planificar y completar un objetivo semanal"
+    },
+    {
+        id: "fun-Badg5",
+        name: "Socializador",
+        image: "🤝",
+        criteria: "Interactuar con 3 compañeros diferentes"
+    },
+    {
+        id: "fun-Badg6",
+        name: "Creativo",
+        image: "🎨",
+        criteria: "Personalizar tu perfil por primera vez"
+    }
+]
+
+// Añadí estas definiciones vacías para evitar errores
+const socialBadges = [
+    // Puedes añadir badges sociales aquí
+]
+
+const generalBadges = [
+    // Puedes añadir badges generales aquí
 ]

@@ -1,11 +1,11 @@
 'use client'
-import { peticion } from '@/app/utils/Funtions';
+import { uploadFiles } from '@/app/utils/Funtions'; // Cambiar por uploadFiles
 import FileDropZone from '../uI/inputs/FileDropZone';
 import styles from './css/submition.module.css'
 import { useState } from "react";
 import FileOBJ from '../uI/object/FileOBJ';
 
-export default function Submition({data, DueDate, hwID}) {
+export default function Submition({data, DueDate, hwID, studentId}) {
     const [files, setFiles] = useState([]);
     const [button, setButton] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -29,9 +29,11 @@ export default function Submition({data, DueDate, hwID}) {
         formData.append('StudentID', data.Student);
 
         try {
-            const response = await peticion('tabloid/send-hw', formData);
+            // USAR uploadFiles EN LUGAR DE peticion
+            const response = await uploadFiles('tabloid/send-hw', formData);
             
-            if (response.httpStatus === 200) {
+            // Cambiar la verificación del status
+            if (response.status === 200) {
                 alert('Archivos subidos correctamente');
                 setFiles([]);
                 setButton(false);
@@ -40,7 +42,7 @@ export default function Submition({data, DueDate, hwID}) {
                 alert('Error: ' + response.message);
             }
         } catch (error) {
-            alert('Error al subir archivos');
+            alert('Error al subir archivos: ' + error.message);
         } finally {
             setUploading(false);
         }
@@ -63,13 +65,13 @@ export default function Submition({data, DueDate, hwID}) {
                     </div>
                 : null}
                 {!button?
-                    <button className='button' onClick={() => setButton(true)}>
+                    <button type="button" className='button' onClick={() => setButton(true)}>
                         {data.SubmittedWork? "Modificar envio" : "+ cargar archivos"}
                     </button>
                 : 
                     <>
                         <FileDropZone onFilesSelected={handleFilesSelected} />
-                        <button className='button' onClick={()=>setButton(false)}>
+                        <button type="button" className='button' onClick={() => setButton(false)}>
                             Cancelar
                         </button>
                         <button type="submit" disabled={uploading} className='button'>
