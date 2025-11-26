@@ -214,8 +214,11 @@ export const sendHw = async (req, res) => {
         studentSubmission.SubmittedAt = currentDate
         await consultData.save()
         
-        // Lógica para agregar badges al estudiante
-        
+        const student = await Student.findById(StudentID);
+        if (student && !student.Badges.some(badge => badge.refId === 'fun-Badg1')) {
+            student.Badges.push({ refId: 'fun-Badg1' });
+            await student.save();
+        }
 
 
         res.status(200).json({ 
