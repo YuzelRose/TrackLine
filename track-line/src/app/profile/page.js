@@ -159,20 +159,15 @@ export default function Profile() {
                     <BadgeOBJ session={data.Badges}/>
                 : null }
                 {(data.UserType === "student" || data.UserType === "tutor") && (
-                    <section className={styles.content}>
-                        {(data.UserType === "student" && data.RelatedEmail === null) || data.UserType === "tutor" ? (
-                            <p
-                                onClick={() => router.push(`/profile/payment?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
-                            >
-                                Consultar adeudos
-                            </p>
-                        ) : null}
-                        <p
-                            onClick={() => router.push(`/profile/kardex?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
-                        >
-                            Consultar Kardex
-                        </p>
-                    </section>
+                        (data.UserType === "student" && data.RelatedEmail === null) || data.UserType === "tutor" ? (
+                            <section className={styles.content}>
+                                <p
+                                    onClick={() => router.push(`/profile/payment?id=${data.UserType === "student" ? data.Email : data.RelatedEmail}`)}
+                                >
+                                    Consultar adeudos
+                                </p>
+                            </section>
+                        ) : null
                 )} 
                 {data.UserType === "student" && !data.RelatedEmail ? (
                     <AccountOPC type={data.UserType} email={data.Email}/>
