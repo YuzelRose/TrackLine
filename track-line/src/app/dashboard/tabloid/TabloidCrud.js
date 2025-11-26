@@ -10,7 +10,7 @@ export default function TabloidCrud() {
   const [professors, setProfessors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
-  const [form, setForm] = useState({ Name: '', Owner: '', description: '' });
+  const [form, setForm] = useState({ Name: '', Owner: '', description: '', amaunt: 0 });
 
   // Cargar datos - CON MÁS DEBUG
   const loadData = async () => {
@@ -184,6 +184,30 @@ export default function TabloidCrud() {
               {safeProfessors.length} profesores disponibles
             </div>
           </div>
+
+          <div className={styles.inputGroup}>
+            <label>Costo:</label>
+            <input
+                type="number"
+                placeholder="Costo default: $0"
+                value={form.amaunt ?? 0}  // ← Nullish coalescing
+                onChange={(e) => {
+                    const value = e.target.value;
+                    setForm(prev => ({ 
+                        ...prev, 
+                        amaunt: value === '' ? 0 : Number(value) 
+                    }));
+                }}
+                min="0"
+                step="0.01"
+                className={styles.input}
+            />
+            {form.amaunt > 0 && (
+                <div className={styles.helperText}>
+                    ${form.amaunt.toFixed(2)}
+                </div>
+            )}
+        </div>
 
           <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
             <label>Descripción</label>

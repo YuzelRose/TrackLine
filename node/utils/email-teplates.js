@@ -626,3 +626,87 @@ export const tokenTemplate = async (templateData) => {
         throw error
     }
 }
+
+export const hwTutorNotiTemplate = async (templateData) => {
+    const MJML_TEMPLATE =
+    `<mjml>
+        <mj-head>
+            <mj-title>Track-Line - Registro En Proceso</mj-title>
+            <mj-preview>Bienvenido a Track-Line - Tu plataforma educativa</mj-preview>
+            <mj-style>
+            .text-primary { color: #2b6cb0 !important; }
+            .text-secondary { color: #22543d !important; }
+            .bg-primary { background-color: #2b6cb0 !important; }
+            .bg-secondary { background-color: #c6f6d5 !important; }
+            .bg-card { background-color: #e6f0fa !important; }
+            .border-color { border-color: #cbd5e0 !important; }
+            </mj-style>
+        </mj-head>
+
+        <mj-body background-color="#f0f4f8">
+            <!-- Header -->
+            <mj-section background-color="#060b41" padding="40px 0">
+            <mj-column>
+                <mj-text align="center" color="#ffffff" font-size="28px" font-weight="bold" font-family="Arial, sans-serif">
+                Track-Line
+                </mj-text>
+                <mj-text align="center" color="#ebf8ff" font-size="16px" padding-top="10px">
+                LA PLATAFORMA EDUCATIVA A TU SERVICIO
+                </mj-text>
+            </mj-column>
+            </mj-section>
+
+            <!-- Main Content -->
+            <mj-section background-color="#ffffff" padding="40px 0">
+            <mj-column>
+                <mj-text color="#1a365d" font-size="24px" font-weight="bold" align="center" padding="0 0 20px 0">
+                Token para inicio de dashboard
+                </mj-text>
+
+                
+                <!-- Info Card - CORREGIDO: mj-section en lugar de mj-wrapper -->
+                <mj-section background-color="#e6f0fa" padding="20px" border="2px solid #cbd5e0" border-radius="8px">
+                    <mj-column>
+                        <mj-text color="#2d3748" font-size="14px" font-weight="bold" padding="0 0 10px 0">
+                        
+                        </mj-text>
+                        <mj-text color="#4a5568" font-size="14px" padding="5px 0">
+                        • Token: <strong>{{token}}</strong>
+                        </mj-text>
+                        
+            </mj-column>
+            </mj-section>
+
+            <mj-section background-color="#060b41" padding="30px 0">
+            <mj-column>
+                <mj-text color="#ebf8ff" font-size="14px" align="center" line-height="1.5">
+                <strong>Track-Line</strong><br />
+                Siguiendo tu aprendizaje para brindar orientación
+                </mj-text>
+
+                <mj-divider border-color="#2b6cb0" border-width="1px" padding="15px 0"></mj-divider>
+
+                <mj-text color="#90cdf4" font-size="12px" align="center" line-height="1.4">
+                Este es un mensaje automático. Por favor no respondas a este correo.<br />
+                Si tienes alguna pregunta, contacta a nuestro equipo de soporte.
+                </mj-text>
+
+                <mj-text color="#63b3ed" font-size="11px" align="center" padding="15px 0 0 0">
+                © 2025 Track-Line. Todos los derechos reservados.
+                </mj-text>
+            </mj-column>
+            </mj-section>
+        </mj-body>
+    </mjml>`
+    try {        
+        const compiledMjml = MJML_TEMPLATE.replace(/{{token}}/g, templateData.token)
+        const { html, errors } = mjml2html(compiledMjml)
+        if (errors?.length > 0) {
+            console.warn('MJML errors:', errors)
+        }
+        return html
+    } catch (error) {
+        console.error('Error al compilar el template:', error)
+        throw error
+    }
+}

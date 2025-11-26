@@ -23,11 +23,11 @@ const TabloidModel = new mongoose.Schema({
             ref: 'assigment' 
         }
     }],
-        requiredPayment: [{
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'Pay', 
-            required: true
-        }]
+    requiredPayment: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Pay', 
+        required: true
+    }]
 }, { 
     collection: 'tabloid',
 });

@@ -14,11 +14,6 @@ const PayModel = new mongoose.Schema({
         enum: ['pending', 'paid', 'failed', 'refunded'],
         default: 'pending'
     },
-    userId: {  
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
     description: {  
         type: String,
         required: true
@@ -26,7 +21,6 @@ const PayModel = new mongoose.Schema({
     tabloidId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tabloid',
-        required: true
     },
 }, { 
     collection: 'Pay',

@@ -246,6 +246,69 @@ export const getAll = async (req, res) => {
     }
 }
 
+export const addPay = async (req, res) => {
+    try {
+        const { data } = req.body;
+        
+        if (!data?.course || !data?.email) {
+            return res.status(400).json({ message: "Datos incompletos" });
+        }
+
+        const [tabloid, requestingUser] = await Promise.all([
+            Tabloid.findById(data.course).select('_id Name requiredPayment'),
+            User.findOne({ Email: data.email })
+        ]);
+
+        if (!tabloid) return res.status(404).json({ message: "Curso no encontrado" });
+        if (!requestingUser) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        const studentEmail = requestingUser.UserType === "student" 
+            ? data.email 
+            : requestingUser.RelatedEmail;
+
+        if (!studentEmail) {
+            return res.status(400).json({ message: "No se puede determinar el estudiante objetivo" });
+        }
+
+        // Verificar que el tabloide tenga pagos
+        if (!tabloid.requiredPayment || tabloid.requiredPayment.length === 0) {
+            return res.status(400).json({ 
+                message: `El curso "${tabloid.Name}" no tiene pagos requeridos` 
+            });
+        }
+
+        // Tomar solo el PRIMER pago del array
+        const firstPaymentId = tabloid.requiredPayment[0];
+
+        // Agregar solo el primer pago al estudiante
+        const result = await Student.updateOne(
+            { Email: studentEmail },
+            { 
+                $addToSet: { 
+                    payments: { 
+                        payRef: firstPaymentId,
+                        status: 'pending'
+                    } 
+                } 
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: "Estudiante no encontrado" });
+        }
+
+        const response = result.modifiedCount === 0
+            ? { status: 200, message: `Ya tiene el pago para "${tabloid.Name}"` }
+            : { status: 201, message: `Pago agregado correctamente para "${tabloid.Name}"` };
+
+        res.status(response.status).json(response);
+
+    } catch (error) {
+        console.error(`Error al agregar pago: ${error.message}`);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+}
+
 // generar registro temporal:
 /*export const postNewUser = async (req, res) => {
     try {

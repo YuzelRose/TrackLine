@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import Notice from '../models/tabloid/NoticeModel.js';
 import Assigment from '../models/tabloid/AssigmentModel.js';
 import Content from '../models/tabloid/ContentModel.js'
+import Pay from '../models/PayModel.js'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 
@@ -292,40 +293,32 @@ export const drop = async (req, res) => {
 }
 
 //tabloid
-
-// Crear tabloide - VERSIÓN CORREGIDA
 export const createTabloid = async (req, res) => {
     try {
         const { data } = req.body;
-        if (!data) return res.status(400).json({ message: "Sin información", success: false });
-
-        console.log('📝 Datos recibidos para crear tabloide:', data);
-
-        // Validar campos requeridos
-        if (!data.Name || !data.Owner || !data.description) {
+        
+        console.log('📦 Datos recibidos:', JSON.stringify(data, null, 2));
+        
+        // Validaciones básicas
+        if (!data || !data.Name || !data.Owner || !data.description) {
             return res.status(400).json({ 
-                message: "Nombre, propietario y descripción son requeridos", 
+                message: "Faltan campos obligatorios", 
                 success: false 
             });
         }
 
-        // Verificar que el profesor exista
-        const professor = await mongoose.model('User').findById(data.Owner);
+        // Verificar que el profesor existe
+        const professor = await User.findOne({ 
+            _id: data.Owner, 
+            UserType: 'profesor' 
+        });
+        
         if (!professor) {
-            return res.status(404).json({ 
-                message: "Profesor no encontrado", 
-                success: false 
-            });
-        }
-
-        if (professor.UserType !== 'profesor') {
             return res.status(400).json({ 
-                message: "El propietario debe ser un profesor", 
+                message: "Profesor no válido", 
                 success: false 
             });
         }
-
-        console.log('✅ Profesor válido encontrado:', professor._id);
 
         // Verificar si ya existe un tabloide con ese nombre
         const existingTabloid = await Tabloid.findOne({ Name: data.Name });
@@ -336,53 +329,108 @@ export const createTabloid = async (req, res) => {
             });
         }
 
-        console.log('✅ Nombre de tabloide disponible');
+        let pay = null;
+        
+        // Crear pago si hay monto - CON CREATE()
+        const amount = Number(data.amaunt);
+        console.log('💰 Monto procesado:', amount, 'Tipo:', typeof amount);
+        
+        if (amount > 0) {
+            console.log('🔄 Creando pago con create()...');
+            
+            try {
+                // ✅ USANDO CREATE() en lugar de new + save()
+                pay = await Pay.create({
+                    amount: amount,
+                    description: `Pago requerido para: ${data.Name}`,
+                });
+                
+                console.log('✅ Pago creado con ID:', pay._id);
+                console.log('📋 Pago completo:', JSON.stringify(pay, null, 2));
+                
+                // Verificar inmediatamente si se guardó
+                const verifyPay = await Pay.findById(pay._id);
+                console.log('🔍 Pago verificado en BD:', verifyPay ? 'EXISTE' : 'NO EXISTE');
+                
+            } catch (payError) {
+                console.error('❌ Error creando pago:', payError);
+                // Continuar sin pago si falla
+                pay = null;
+            }
+        } else {
+            console.log('ℹ️  No se creó pago (monto 0 o inválido)');
+        }
 
-        // Crear y guardar el tabloide
-        const newTabloid = new Tabloid({
+        // Crear tabloide
+        console.log('🔄 Creando tabloide...');
+        const newTabloid = await Tabloid.create({
             Name: data.Name,
             Owner: data.Owner,
             description: data.description,
             HomeWork: [],
-            requiredPayment: []
+            requiredPayment: pay ? [pay._id] : []
         });
+        
+        console.log('✅ Tabloide creado:', newTabloid._id);
+        console.log('📋 requiredPayment del tabloide:', newTabloid.requiredPayment);
 
-        await newTabloid.save();
-        console.log('✅ Tabloide guardado en base de datos:', newTabloid._id);
+        // Actualizar pago con tabloidId si existe
+        if (pay) {
+            console.log('🔄 Actualizando pago con tabloidId...');
+            try {
+                await Pay.findByIdAndUpdate(pay._id, { tabloidId: newTabloid._id });
+                console.log('✅ Pago actualizado con tabloidId');
+                
+                // Verificar la actualización
+                const updatedPay = await Pay.findById(pay._id);
+                console.log('🔍 Pago después de actualizar:', updatedPay ? 'ACTUALIZADO' : 'NO ENCONTRADO');
+            } catch (updateError) {
+                console.error('❌ Error actualizando pago:', updateError);
+            }
+        }
 
-        // ACTUALIZAR EL PROFESOR - AGREGAR EL TABLOIDE A SU LISTA CON refId
+        // Actualizar profesor
+        console.log('🔄 Actualizando profesor...');
         if (!professor.Tabloids) {
             professor.Tabloids = [];
         }
-        
-        // Agregar el nuevo tabloide como objeto con refId
-        professor.Tabloids.push({
-            refId: newTabloid._id
-        });
-        
-        // Guardar el profesor actualizado
+        professor.Tabloids.push({ refId: newTabloid._id });
         await professor.save();
-        console.log('✅ Profesor actualizado con el nuevo tabloide');
+        console.log('✅ Profesor actualizado');
 
-        // Respuesta simplificada sin populate
-        res.status(201).json({ 
-            message: 'Tabloide creado exitosamente', 
-            data: {
-                _id: newTabloid._id,
-                Name: newTabloid.Name,
-                Owner: data.Owner,
-                description: newTabloid.description,
-                homeworkCount: 0,
-                paymentCount: 0
-            },
-            success: true,
-            status: 201 
+        // VERIFICACIÓN FINAL EXTENDIDA
+        console.log('🔍 VERIFICACIÓN FINAL EXTENDIDA:');
+        if (pay) {
+            const finalPayCheck = await Pay.findById(pay._id);
+            console.log('💰 Pago final en BD:', finalPayCheck ? 'EXISTE' : 'NO EXISTE');
+            if (finalPayCheck) {
+                console.log('📋 Datos finales del pago:', JSON.stringify(finalPayCheck, null, 2));
+            }
+        }
+
+        // Verificar todos los pagos en la base de datos
+        const allPays = await Pay.find({});
+        console.log(`📊 Total de pagos en BD: ${allPays.length}`);
+        allPays.forEach(p => {
+            console.log(`   - ${p._id}: ${p.description} - $${p.amount}`);
         });
-        
+
+        res.status(201).json({
+            message: "Tabloide creado exitosamente",
+            success: true,
+            tabloid: {
+                id: newTabloid._id,
+                name: newTabloid.Name,
+                paymentId: pay?._id || null,
+                hasPayment: !!pay
+            }
+        });
+
     } catch (error) {
         console.error('❌ Error en createTabloid:', error);
+        console.error('🔍 Stack trace completo:', error.stack);
         res.status(500).json({ 
-            message: error.message, 
+            message: "Error interno del servidor", 
             success: false 
         });
     }

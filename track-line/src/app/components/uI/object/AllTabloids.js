@@ -29,9 +29,19 @@ export default function AllTabloids() { // si da el tiempo agregar un buscador
         getTabloids()
     }, [])
 
-    const addPay = async() => {
+    const addPay = async(id) => {
         try {
             const session = getSession()
+            if(!session) router.push('/')
+            else {
+                const response = await peticion("tabloid/add-pay", {
+                    data: {
+                        course: id,
+                        email: session.Email
+                    }
+                })
+                alert(response.message)
+            }
         } catch (error) {
             console.error('Error:', error)
             alert(error)
@@ -87,7 +97,7 @@ export default function AllTabloids() { // si da el tiempo agregar un buscador
                         </div>
                         <div className={styles.buttonDiv}>
                             {tab.requiredPayment?.length > 0 ? 
-                                <button className="button">
+                                <button className="button" onClick={()=>addPay(tab._id)}>
                                     Agregar Pago
                                 </button>
                                 : 
