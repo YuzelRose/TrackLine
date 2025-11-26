@@ -219,8 +219,14 @@ export const sendHw = async (req, res) => {
             student.Badges.push({ refId: 'fun-Badg1' });
             await student.save();
         }
-
-
+        if(student.RelatedEmail){
+            hwConf({
+                data: {
+                    _id: hwID,
+                    mail: student.RelatedEmail
+                }
+            })
+        }
         res.status(200).json({ 
             message: "Tarea enviada correctamente",
             filesReceived: workFiles.length,
