@@ -60,7 +60,7 @@ export default function AllTabloids() {
                     </div>
                 ))
             ) : (
-                <p id={styles.n}>Sin tabloides disponibles</p>
+                <p id={styles.noData}>Sin tabloides disponibles</p>
             )}
         </section>
     )
