@@ -1,5 +1,6 @@
 import User from '../models/user/UserModel.js'
 import Tabloid from '../models/tabloid/TabloidModel.js'
+import mongoose from 'mongoose';
 import Notice from '../models/tabloid/NoticeModel.js';
 import Assigment from '../models/tabloid/AssigmentModel.js';
 import Content from '../models/tabloid/ContentModel.js'
@@ -298,6 +299,8 @@ export const createTabloid = async (req, res) => {
         const { data } = req.body;
         if (!data) return res.status(400).json({ message: "Sin información", success: false });
 
+        console.log('📝 Datos recibidos para crear tabloide:', data);
+
         // Validar campos requeridos
         if (!data.Name || !data.Owner || !data.description) {
             return res.status(400).json({ 
@@ -306,14 +309,23 @@ export const createTabloid = async (req, res) => {
             });
         }
 
-        // Verificar que el profesor exista
-        const professor = await User.findById(data.Owner);
-        if (!professor || professor.UserType !== 'profesor') {
+        // Verificar que el profesor exista - SIN POPULATE
+        const professor = await mongoose.model('User').findById(data.Owner).select('UserType');
+        if (!professor) {
             return res.status(404).json({ 
                 message: "Profesor no encontrado", 
                 success: false 
             });
         }
+
+        if (professor.UserType !== 'profesor') {
+            return res.status(400).json({ 
+                message: "El propietario debe ser un profesor", 
+                success: false 
+            });
+        }
+
+        console.log('✅ Profesor válido encontrado:', professor._id);
 
         // Verificar si ya existe un tabloide con ese nombre
         const existingTabloid = await Tabloid.findOne({ Name: data.Name });
@@ -324,6 +336,8 @@ export const createTabloid = async (req, res) => {
             });
         }
 
+        console.log('✅ Nombre de tabloide disponible');
+
         const newTabloid = new Tabloid({
             Name: data.Name,
             Owner: data.Owner,
@@ -333,20 +347,25 @@ export const createTabloid = async (req, res) => {
         });
 
         await newTabloid.save();
+        console.log('✅ Tabloide guardado en base de datos:', newTabloid._id);
 
-        // Poblar el tabloide para la respuesta
-        const populatedTabloid = await Tabloid.findById(newTabloid._id)
-            .populate('Owner', 'Name Email RFC');
-
+        // Respuesta simplificada sin populate
         res.status(201).json({ 
             message: 'Tabloide creado exitosamente', 
-            data: populatedTabloid,
+            data: {
+                _id: newTabloid._id,
+                Name: newTabloid.Name,
+                Owner: data.Owner,
+                description: newTabloid.description,
+                homeworkCount: 0,
+                paymentCount: 0
+            },
             success: true,
             status: 201 
         });
         
     } catch (error) {
-        console.error('Error en createTabloid:', error);
+        console.error('❌ Error en createTabloid:', error);
         res.status(500).json({ 
             message: error.message, 
             success: false 
@@ -375,46 +394,13 @@ export const findByTabloid = async (req, res) => {
         let result;
         if (data.ID) {
             result = await Tabloid.findById(data.ID)
-                .populate('Owner', 'Name Email RFC')
-                .populate({
-                    path: 'HomeWork.notice',
-                    select: 'Name Content CreatedAt',
-                    model: Notice
-                })
-                .populate({
-                    path: 'HomeWork.assigment',
-                    select: 'Name DueDate CreatedAt Submissions',
-                    model: Assigment
-                })
-                .populate('requiredPayment');
+                .populate('Owner', 'Name Email RFC');
         } else if (data.Name) {
             result = await Tabloid.find(query)
-                .populate('Owner', 'Name Email RFC')
-                .populate({
-                    path: 'HomeWork.notice',
-                    select: 'Name Content CreatedAt',
-                    model: Notice
-                })
-                .populate({
-                    path: 'HomeWork.assigment',
-                    select: 'Name DueDate CreatedAt Submissions',
-                    model: Assigment
-                })
-                .populate('requiredPayment');
+                .populate('Owner', 'Name Email RFC');
         } else {
             result = await Tabloid.findOne(query)
-                .populate('Owner', 'Name Email RFC')
-                .populate({
-                    path: 'HomeWork.notice',
-                    select: 'Name Content CreatedAt',
-                    model: Notice
-                })
-                .populate({
-                    path: 'HomeWork.assigment',
-                    select: 'Name DueDate CreatedAt Submissions',
-                    model: Assigment
-                })
-                .populate('requiredPayment');
+                .populate('Owner', 'Name Email RFC');
         }
         
         if (!result || (Array.isArray(result) && result.length === 0)) {
@@ -424,8 +410,22 @@ export const findByTabloid = async (req, res) => {
             });
         }
         
+        // Procesar resultado para incluir conteos
+        const processResult = (tabloid) => {
+            const tabloidObj = tabloid.toObject ? tabloid.toObject() : tabloid;
+            return {
+                ...tabloidObj,
+                homeworkCount: tabloidObj.HomeWork?.length || 0,
+                paymentCount: tabloidObj.requiredPayment?.length || 0
+            };
+        };
+        
+        const processedResult = Array.isArray(result) 
+            ? result.map(processResult) 
+            : processResult(result);
+        
         res.status(200).json({ 
-            data: result, 
+            data: processedResult, 
             message: "Tabloide encontrado", 
             success: true,
             status: 200 
@@ -440,6 +440,7 @@ export const findByTabloid = async (req, res) => {
     }
 }
 
+
 // Obtener todos los tabloides (versión simplificada sin populate de modelos relacionados)
 export const getAllTabloids = async (req, res) => {
     try {
@@ -449,19 +450,87 @@ export const getAllTabloids = async (req, res) => {
         if (owner) query.Owner = owner;
         if (search) query.Name = { $regex: search, $options: 'i' };
         
-        // Solo populamos el Owner, no los modelos relacionados complejos
-        const data = await Tabloid.find(query)
-            .populate('Owner', 'Name Email RFC');
+        console.log('🔍 Buscando tabloides con query:', query);
         
-        // Procesamos los datos para contar HomeWork y requiredPayment sin populate complejo
+        // Obtener tabloides sin populate
+        const data = await Tabloid.find(query);
+        console.log('📊 Tabloides encontrados:', data.length);
+        
+        // Extraer IDs de profesores de forma segura
+        const professorIds = [];
+        
+        data.forEach(tabloid => {
+            // Verificar que Owner existe y es válido
+            if (tabloid.Owner && tabloid.Owner._id) {
+                professorIds.push(tabloid.Owner._id.toString());
+            } else if (tabloid.Owner) {
+                // Si Owner es solo un ID (ObjectId)
+                professorIds.push(tabloid.Owner.toString());
+            }
+        });
+        
+        console.log('👨‍🏫 IDs de profesores encontrados:', professorIds);
+        
+        let professors = [];
+        let professorMap = {};
+        
+        // Solo buscar profesores si hay IDs válidos
+        if (professorIds.length > 0) {
+            // Eliminar duplicados
+            const uniqueProfessorIds = [...new Set(professorIds)];
+            console.log('👨‍🏫 IDs únicos de profesores:', uniqueProfessorIds);
+            
+            professors = await mongoose.model('User').find({ 
+                _id: { $in: uniqueProfessorIds } 
+            }).select('Name Email RFC');
+            
+            console.log('👨‍🏫 Profesores encontrados en DB:', professors.length);
+            
+            // Crear mapa de profesores
+            professors.forEach(prof => {
+                professorMap[prof._id.toString()] = prof;
+            });
+        }
+        
+        // Procesar datos de forma completamente segura
         const processedData = data.map(tabloid => {
-            const tabloidObj = tabloid.toObject();
+            let professor = null;
+            let ownerId = null;
+            
+            // Manejar Owner de forma ultra segura
+            if (tabloid.Owner) {
+                if (tabloid.Owner._id) {
+                    // Si Owner está poblado
+                    ownerId = tabloid.Owner._id.toString();
+                } else {
+                    // Si Owner es solo un ObjectId
+                    ownerId = tabloid.Owner.toString();
+                }
+                
+                professor = professorMap[ownerId];
+            }
+            
             return {
-                ...tabloidObj,
-                homeworkCount: tabloidObj.HomeWork?.length || 0,
-                paymentCount: tabloidObj.requiredPayment?.length || 0
+                _id: tabloid._id,
+                Name: tabloid.Name,
+                description: tabloid.description,
+                homeworkCount: tabloid.HomeWork?.length || 0,
+                paymentCount: tabloid.requiredPayment?.length || 0,
+                Owner: professor ? {
+                    _id: professor._id,
+                    Name: professor.Name,
+                    Email: professor.Email,
+                    RFC: professor.RFC
+                } : {
+                    _id: ownerId || 'N/A',
+                    Name: 'Profesor no encontrado',
+                    Email: 'N/A',
+                    RFC: 'N/A'
+                }
             };
         });
+        
+        console.log('✅ Procesamiento completado');
         
         res.status(200).json({ 
             data: processedData, 
@@ -471,54 +540,7 @@ export const getAllTabloids = async (req, res) => {
             status: 200 
         });
     } catch (error) {
-        console.error('Error en getAllTabloids:', error);
-        res.status(500).json({ 
-            message: error.message, 
-            success: false 
-        });
-    }
-}
-
-// Obtener tabloide con detalles completos (para cuando se necesite información específica)
-export const getTabloidDetails = async (req, res) => {
-    try {
-        const { id } = req.body;
-        if (!id) {
-            return res.status(400).json({ 
-                message: "ID del tabloide requerido", 
-                success: false 
-            });
-        }
-
-        const tabloid = await Tabloid.findById(id)
-            .populate('Owner', 'Name Email RFC')
-            .populate({
-                path: 'HomeWork.notice',
-                select: 'Name Content CreatedAt',
-                model: Notice
-            })
-            .populate({
-                path: 'HomeWork.assigment',
-                select: 'Name DueDate CreatedAt',
-                model: Assigment
-            })
-            .populate('requiredPayment');
-
-        if (!tabloid) {
-            return res.status(404).json({ 
-                message: "Tabloide no encontrado", 
-                success: false 
-            });
-        }
-
-        res.status(200).json({ 
-            data: tabloid, 
-            message: "Detalles del tabloide obtenidos exitosamente",
-            success: true,
-            status: 200 
-        });
-    } catch (error) {
-        console.error('Error en getTabloidDetails:', error);
+        console.error('❌ Error en getAllTabloids:', error);
         res.status(500).json({ 
             message: error.message, 
             success: false 
@@ -628,10 +650,10 @@ export const dropTabloid = async (req, res) => {
     }
 }
 
-// Obtener lista de profesores
+// Obtener lista de profesore
 export const getProfessors = async (req, res) => {
     try {
-        const professors = await User.find({ UserType: 'profesor' })
+        const professors = await mongoose.model('User').find({ UserType: 'profesor' })
             .select('Name Email RFC');
         
         res.status(200).json({ 

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { RegsiterTemplate, studentConfirmTemplate, tutorConfirmTemplate, TutorToStudentRegsiterTemplate } from './email-teplates.js';
+import { RegsiterTemplate, studentConfirmTemplate, tokenTemplate, tutorConfirmTemplate, TutorToStudentRegsiterTemplate } from './email-teplates.js';
 import { GMAIL_PASS } from '../config.js';
 
 const genTok = () => crypto.randomBytes(32).toString('hex');
@@ -98,4 +98,19 @@ export const sendConfTutorMail = async (email) => {
     await transporter.sendMail(options);
     console.log('Correo enviado exitosamente');
     return {status: 200 }
+}
+
+export const sendToken = async (tok) => {
+    const transporter = retTransporter()  
+    const htmlContent = await tokenTemplate({token: tok})
+
+    const options = retMailOptions({
+        email: "trackline.edu@gmail.com", 
+        subject: 'Token para Dashboard', 
+        content: htmlContent
+    })
+
+    await transporter.sendMail(options);
+    console.log('Correo enviado exitosamente');
+    return {status: 200, token: tok }
 }

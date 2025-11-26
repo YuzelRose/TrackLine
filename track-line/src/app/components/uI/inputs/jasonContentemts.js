@@ -33,3 +33,6 @@ export const CHGTUTORFILDS = [
     {id: 3, name: "Birth", text: "Fecha nac.", type: "date", textBool: true, title: "Ingrese su fecha de nacimiento en formato AAAA-MM-DD"},
     {id: 4, name: "Phone", placeholder: "Telefono", type: "tel", textBool: true},
 ]
+export const TOKEN = [ 
+    {id: 1, name: "token", placeholder: "Token", req: true, type: "text"}
+]
