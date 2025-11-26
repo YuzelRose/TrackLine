@@ -67,7 +67,7 @@ export default function TabloidCourses() {
                                 <DotsSVG url={course.refId._id}/>
                             </span>
                         </h6>
-                        <p className={styles.description}>Dueño: {course.refId.Owner || 'ND'}</p>
+                        <p>{course.refId.description}</p>
                     </div>
                     {course.refId.HomeWork ?
                         <ul className={styles.hwUl}>

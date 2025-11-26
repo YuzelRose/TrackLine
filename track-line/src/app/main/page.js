@@ -11,6 +11,7 @@ import AllTabloids from '../components/uI/object/AllTabloids';
 export default function Main() { 
    const router = useRouter();
    const [data, setData] = useState([])
+   const [type, setType] = useState("")
      
     useEffect(()=> {
         const getData = async() => {
@@ -18,7 +19,10 @@ export default function Main() {
                 const session = getSession()
                 if(session) {
                     const resp = await peticion('user/get-user', {email: session.Email})
-                    if(resp.httpStatus === 200) setData(resp.data)
+                    if(resp.httpStatus === 200) {
+                        setData(resp.data)
+                        setType(resp.data.UserType)
+                    }
                 } else {
                     NUKE()
                     router.push('/')
@@ -33,10 +37,19 @@ export default function Main() {
         getData()
     }, [])
 
-    return(
-        <main id={styles.main}>
-            <article id={styles.mainContent}>
-                {data.UserType === "student"?
+    const render = () => {
+        switch(type){
+            case "tutor":
+                return(
+                    <section className={styles.welcomeSection}>
+                        <div className={styles.welcomeCard}>
+                            <h3>¡Bienvenido Tutor!</h3>
+                            <p>En Track-Line estamos para servirlo, puede contactarnos mediante el boton al final de la pagina.</p>
+                        </div>
+                    </section>
+                )
+            default:
+                return(
                     <section id={styles.mainSection}>
                         <div className={styles.title}>
                             <h3>Cursos:</h3>
@@ -45,7 +58,14 @@ export default function Main() {
                             <TabloidCourses />
                         </div>
                     </section>
-                : null }
+                )
+        }
+    }
+
+    return(
+        <main id={styles.main}>
+            <article id={styles.mainContent}>
+                {render()}
                 <aside id={styles.aside}>
                     <div className={styles.title}>
                         <h3>Calendario:</h3>

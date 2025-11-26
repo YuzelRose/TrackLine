@@ -7,7 +7,7 @@ import {
     getData, 
     getHw,
     sendHw,
-    getAll
+    getAll,
 } from '../controllers/TabloidController.js'
 
 const router = express.Router()

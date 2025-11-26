@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 
 const getUserCourses = async (email) => {
     try {
-        const user = await Student.findOne({ Email: email })
+        const user = await User.findOne({ Email: email })
             .populate({
                 path: 'Tabloids.refId',
                 populate: [
@@ -67,39 +67,48 @@ export const getCourses = async (req, res) => {
 export const addCoursesToUser = async (req, res) => {
     try {
         const { data } = req.body;
-        const tabloid = await Tabloid.findById(data.course).select('_id Name');
-        if (!tabloid) 
-            return res.status(400).json({message: "No se encontró el curso"});
-        await Student.updateOne(
-            { Email: data.email },
-            { $pull: { Tabloids: null } }
-        );
+        
+        if (!data?.course || !data?.email) {
+            return res.status(400).json({ message: "Datos incompletos" });
+        }
+
+        // Ejecutar ambas consultas en paralelo
+        const [tabloid, requestingUser] = await Promise.all([
+            Tabloid.findById(data.course).select('_id Name'),
+            User.findOne({ Email: data.email })
+        ]);
+
+        if (!tabloid) return res.status(404).json({ message: "Curso no encontrado" });
+        if (!requestingUser) return res.status(404).json({ message: "Usuario no encontrado" });
+
+        // Determinar el estudiante objetivo
+        const studentEmail = requestingUser.UserType === "student" 
+            ? data.email 
+            : requestingUser.RelatedEmail;
+
+        if (!studentEmail) {
+            return res.status(400).json({ message: "No se puede determinar el estudiante objetivo" });
+        }
+
+        // Agregar curso al estudiante
         const result = await Student.updateOne(
-            { Email: data.email },
-            { 
-                $addToSet: { 
-                    Tabloids: { 
-                        refId: tabloid._id 
-                    } 
-                } 
-            }
+            { Email: studentEmail },
+            { $addToSet: { Tabloids: { refId: tabloid._id } } }
         );
+
         if (result.matchedCount === 0) {
-            return res.status(404).json({message: "Usuario no encontrado"});
+            return res.status(404).json({ message: "Estudiante no encontrado" });
         }
-        if (result.modifiedCount === 0) {
-            return res.status(200).json({
-                status: 200,
-                message: `El usuario ya está registrado en el curso "${tabloid.Name}"`
-            });
-        }
-        res.status(201).json({
-            status: 201,
-            message: `${tabloid.Name} se agregó correctamente al usuario`,
-        });
+
+        const response = result.modifiedCount === 0
+            ? { status: 200, message: `Ya está registrado en "${tabloid.Name}"` }
+            : { status: 201, message: `"${tabloid.Name}" agregado correctamente` };
+
+        res.status(response.status).json(response);
+
     } catch (error) {
-        console.error(`Error al cargar cursos al usuario: ${error.message}`)
-        res.status(500).json({ message: error.message, place: "Try-catch" })
+        console.error(`Error al agregar curso: ${error.message}`);
+        res.status(500).json({ message: "Error interno del servidor" });
     }
 }
 

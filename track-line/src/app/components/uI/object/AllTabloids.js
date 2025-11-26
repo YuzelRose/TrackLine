@@ -4,8 +4,11 @@ import DropSVG from "@/app/media/DropSVG"
 import styles from './css/all-taloids.module.css'
 import { peticion } from "@/app/utils/Funtions"
 import { useEffect, useState } from "react"
+import { getSession } from "@/app/utils/JsonManage"
+import { useRouter } from "next/navigation"
 
 export default function AllTabloids() { // si da el tiempo agregar un buscador
+    const router = useRouter()
     const [data, setData] = useState([])
     const [drop, setDrop] = useState({})
 
@@ -25,6 +28,34 @@ export default function AllTabloids() { // si da el tiempo agregar un buscador
         }
         getTabloids()
     }, [])
+
+    const addPay = async() => {
+        try {
+            const session = getSession()
+        } catch (error) {
+            console.error('Error:', error)
+            alert(error)
+        }
+    }
+
+    const addtab = async(id) => {
+        try {
+            const session = getSession()
+            if(!session) router.push('/')
+            else {
+                const response = await peticion("tabloid/add-user", {
+                    data: {
+                        course: id,
+                        email: session.Email
+                    }
+                })
+                alert(response.message)
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            alert(error)
+        }
+    }
 
     const toggleDrop = (tabId) => {
         setDrop(prev => ({
@@ -54,8 +85,16 @@ export default function AllTabloids() { // si da el tiempo agregar un buscador
                         >
                             <DropSVG style={{transform: drop[tab._id] ? 'rotate(180deg)' : 'rotate(0deg)'}}/>
                         </div>
-                        <div>
-                            oz aqui va el boton para agregar el pago al usuario en este caso al ser gratuito se añade directo
+                        <div className={styles.buttonDiv}>
+                            {tab.requiredPayment?.length > 0 ? 
+                                <button className="button">
+                                    Agregar Pago
+                                </button>
+                                : 
+                                <button className="button" onClick={()=>addtab(tab._id)}>
+                                    Ingresar al Curso
+                                </button>
+                            }
                         </div>
                     </div>
                 ))

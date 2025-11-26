@@ -16,12 +16,12 @@ const profesorSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    Tabloid:[{
-        NTabloid:{
-            type: String,
-            unique: true
-        
-    },
+    Tabloids:[{
+        refId:{
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Tabloid', 
+            required: true
+        },
     }]
 });
 

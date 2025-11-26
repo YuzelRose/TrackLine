@@ -293,7 +293,7 @@ export const drop = async (req, res) => {
 
 //tabloid
 
-// Crear tabloide
+// Crear tabloide - VERSIÓN CORREGIDA
 export const createTabloid = async (req, res) => {
     try {
         const { data } = req.body;
@@ -309,8 +309,8 @@ export const createTabloid = async (req, res) => {
             });
         }
 
-        // Verificar que el profesor exista - SIN POPULATE
-        const professor = await mongoose.model('User').findById(data.Owner).select('UserType');
+        // Verificar que el profesor exista
+        const professor = await mongoose.model('User').findById(data.Owner);
         if (!professor) {
             return res.status(404).json({ 
                 message: "Profesor no encontrado", 
@@ -338,6 +338,7 @@ export const createTabloid = async (req, res) => {
 
         console.log('✅ Nombre de tabloide disponible');
 
+        // Crear y guardar el tabloide
         const newTabloid = new Tabloid({
             Name: data.Name,
             Owner: data.Owner,
@@ -348,6 +349,20 @@ export const createTabloid = async (req, res) => {
 
         await newTabloid.save();
         console.log('✅ Tabloide guardado en base de datos:', newTabloid._id);
+
+        // ACTUALIZAR EL PROFESOR - AGREGAR EL TABLOIDE A SU LISTA CON refId
+        if (!professor.Tabloids) {
+            professor.Tabloids = [];
+        }
+        
+        // Agregar el nuevo tabloide como objeto con refId
+        professor.Tabloids.push({
+            refId: newTabloid._id
+        });
+        
+        // Guardar el profesor actualizado
+        await professor.save();
+        console.log('✅ Profesor actualizado con el nuevo tabloide');
 
         // Respuesta simplificada sin populate
         res.status(201).json({ 
