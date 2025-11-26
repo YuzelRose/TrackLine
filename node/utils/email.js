@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { RegsiterTemplate, studentConfirmTemplate, tokenTemplate, tutorConfirmTemplate, TutorToStudentRegsiterTemplate } from './email-teplates.js';
+import { clientTemolate, hwTutorNotiTemplate, RegsiterTemplate, studentConfirmTemplate, tokenTemplate, tutorConfirmTemplate, TutorToStudentRegsiterTemplate } from './email-teplates.js';
 import { GMAIL_PASS } from '../config.js';
 
 const genTok = () => crypto.randomBytes(32).toString('hex');
@@ -113,4 +113,34 @@ export const sendToken = async (tok) => {
     await transporter.sendMail(options);
     console.log('Correo enviado exitosamente');
     return {status: 200, token: tok }
+}
+
+export const help = async (mail) => {
+    const transporter = retTransporter()  
+    const htmlContent = await clientTemolate()
+
+    const options = retMailOptions({
+        email: mail, 
+        subject: 'Servicio al cliente', 
+        content: htmlContent
+    })
+
+    await transporter.sendMail(options);
+    console.log('Correo enviado exitosamente');
+    return {status: 200}
+}
+
+export const hwConf = async ({data}) => {
+    const transporter = retTransporter()  
+    const htmlContent = await hwTutorNotiTemplate(data._id)
+
+    const options = retMailOptions({
+        email: data.mail, 
+        subject: 'Servicio al cliente', 
+        content: htmlContent
+    })
+
+    await transporter.sendMail(options);
+    console.log('Correo enviado exitosamente');
+    return {status: 200}
 }

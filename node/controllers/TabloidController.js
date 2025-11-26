@@ -5,6 +5,7 @@ import Notice from '../models/tabloid/NoticeModel.js';
 import Assigment from '../models/tabloid/AssigmentModel.js';
 import Content from '../models/tabloid/ContentModel.js'
 import mongoose from 'mongoose';
+import { hwConf } from '../utils/email.js';
 
 const getUserCourses = async (email) => {
     try {
@@ -212,6 +213,7 @@ export const sendHw = async (req, res) => {
         studentSubmission.Status = currentDate <= dueDate ? "Entregado" : "Tarde"
         studentSubmission.SubmittedAt = currentDate
         await consultData.save()
+        await hwConf(hwID)
         res.status(200).json({ 
             message: "Tarea enviada correctamente",
             filesReceived: workFiles.length,
