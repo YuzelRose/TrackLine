@@ -1,0 +1,403 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--background);
+  min-height: 100vh;
+}
+
+.title {
+  color: var(--foreground);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+/* Mensajes */
+.message {
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid;
+}
+
+.messageSuccess {
+  background-color: var(--green-100);
+  color: var(--green-800);
+  border-color: var(--green-300);
+}
+
+.messageError {
+  background-color: var(--red-100);
+  color: var(--red-800);
+  border-color: var(--red-300);
+}
+
+/* Filtros */
+.filterSection {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+}
+
+.filterSection h3 {
+  color: var(--card-foreground);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.filterOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.typeFilter {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.typeButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--input);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.typeButton:hover {
+  border-color: var(--ring);
+  color: var(--ring);
+}
+
+.typeButtonActive {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+
+/* Formulario */
+.form {
+  background: var(--card);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+}
+
+.form h2 {
+  color: var(--card-foreground);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup label {
+  color: var(--card-foreground);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.input {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  background: var(--input);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px var(--ring) / 20;
+}
+
+.input::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* Búsqueda */
+.searchSection {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+}
+
+.searchSection h3 {
+  color: var(--card-foreground);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.searchOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* Lista */
+.listSection {
+  background: var(--card);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.listHeader h2 {
+  color: var(--card-foreground);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.countBadge {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Tabla */
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.table thead {
+  background: var(--blue-800);
+}
+
+.table th {
+  color: var(--blue-50);
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.3s ease;
+}
+
+.table tbody tr:hover {
+  background-color: var(--muted);
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: var(--background);
+}
+
+.table tbody tr:nth-child(even):hover {
+  background-color: var(--muted);
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.curpCell {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+/* Botones */
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonPrimary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background: var(--green-600);
+  transform: translateY(-1px);
+}
+
+.buttonDanger {
+  background: var(--red-500);
+  color: white;
+}
+
+.buttonDanger:hover:not(:disabled) {
+  background: var(--red-600);
+  transform: translateY(-1px);
+}
+
+.buttonSecondary {
+  background: var(--blue-500);
+  color: white;
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background: var(--blue-600);
+  transform: translateY(-1px);
+}
+
+.buttonOutline {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.buttonOutline:hover:not(:disabled) {
+  background: var(--muted);
+  transform: translateY(-1px);
+}
+
+.buttonSmall {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+}
+
+/* Estados */
+.loading {
+  text-align: center;
+  padding: 2.5rem;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1.25rem;
+  color: var(--muted-foreground);
+  font-size: 1.125rem;
+  background-color: var(--muted);
+  border-radius: 0.5rem;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Campos específicos por tipo */
+.studentFields,
+.teacherFields,
+.tutorFields {
+  display: contents;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .searchOptions {
+    grid-template-columns: 1fr;
+  }
+  
+  .filterOptions {
+    grid-template-columns: 1fr;
+  }
+  
+  .listHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .form,
+  .searchSection,
+  .listSection {
+    padding: 1.25rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .actionButtons {
+    flex-direction: column;
+  }
+  
+  .buttonSmall {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+  
+  .typeFilter {
+    justify-content: center;
+  }
+}

@@ -22,7 +22,6 @@ export default function Profile() {
 
     const enSession = () => {
         NUKE()
-        
         router.push('/')
     }
 
