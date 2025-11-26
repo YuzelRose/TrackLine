@@ -12,7 +12,6 @@ export default function Main() {
    const router = useRouter();
    const [data, setData] = useState([])
      
-    // solo falta agregar en la parte inferior un buscador de cursos
     useEffect(()=> {
         const getData = async() => {
             try {

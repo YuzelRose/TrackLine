@@ -5,9 +5,9 @@ import styles from './css/all-taloids.module.css'
 import { peticion } from "@/app/utils/Funtions"
 import { useEffect, useState } from "react"
 
-export default function AllTabloids() {
+export default function AllTabloids() { // si da el tiempo agregar un buscador
     const [data, setData] = useState([])
-    const [drop, setDrop] = useState({}) // Para manejar qué tabloides están expandidos
+    const [drop, setDrop] = useState({})
 
     useEffect(() => {
         const getTabloids = async () => {

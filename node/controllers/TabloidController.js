@@ -214,7 +214,7 @@ export const sendHw = async (req, res) => {
     }
 }
 
-export const getAll = async (req, res) => { // ← Agregar req si es necesario
+export const getAll = async (req, res) => {
     try {
         const data = await Tabloid.find({})
         if (!data || data.length === 0) {

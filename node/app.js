@@ -5,11 +5,8 @@ import './database/MongoConex.js';
 import ContentRoutes from './routes/ContentRoutes.js';
 import PayRoutes from './routes/PayRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
-import ProfesorRoutes from './routes/ProfesorRoutes.js';
 import TabloidRoutes from './routes/TabloidRoutes.js';
 import CrudRoutes from './routes/CrudRoutes.js';
-import TabloidCrudRoutes from './routes/TutorCrudRoutes.js'
-import ProfesorCrudRoutes from './routes/ProfesorCrudRoutes.js'
 
 import { REQUEST_URL, BACK_POT, WWW_TRACT_ORIGIN, TRACT_ORIGIN } from './config.js';
 
@@ -28,16 +25,13 @@ app.use(cors({
 app.use(express.json());
 
 app.use(`${REQUEST_URL}/pay`, PayRoutes)
-app.use(`${REQUEST_URL}/user`, UserRoutes);
-app.use(`${REQUEST_URL}/profesor`, ProfesorRoutes);
-app.use(`${REQUEST_URL}/tabloid`, TabloidRoutes);
+app.use(`${REQUEST_URL}/user`, UserRoutes)
+app.use(`${REQUEST_URL}/tabloid`, TabloidRoutes)
 app.use(`${REQUEST_URL}/content`, ContentRoutes)
 app.use(`${REQUEST_URL}/crud`, CrudRoutes)
-app.use(`${REQUEST_URL}/crudTablo`, TabloidCrudRoutes)
-app.use(`${REQUEST_URL}/crudProfe`, ProfesorCrudRoutes)
 
 app.listen(BACK_POT, '0.0.0.0', () => {
-    console.log(`Servidor en ejecución, puerto: ${BACK_POT}`);
-    console.log(`Resiviendo peticiones de: ${WWW_TRACT_ORIGIN} y ${TRACT_ORIGIN}`);  
-    console.log(`Con subfijo: ${REQUEST_URL}`);    
+    console.log(`Servidor en ejecución, puerto: ${BACK_POT}`)
+    console.log(`Resiviendo peticiones de: ${WWW_TRACT_ORIGIN} y ${TRACT_ORIGIN}`)
+    console.log(`Con subfijo: ${REQUEST_URL}`)  
 });

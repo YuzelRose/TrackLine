@@ -1,250 +1,162 @@
-import User from '../models/user/UserModel.js'
-import Student from '../models/user/StudentModel.js'
-import Tutor from '../models/user/TutorModel.js'
-import Profesor from '../models/user/ProfesorModel.js'
-import Tabloid from '../models/tabloid/TabloidModel.js'
-import Notice from '../models/tabloid/NoticeModel.js';
-import Assigment from '../models/tabloid/AssigmentModel.js';
-import Content from '../models/tabloid/ContentModel.js'
-import bcrypt from 'bcrypt'
-import crypto from 'crypto'
-export const comparePasswords = async (plainPassword, hashedPassword) => {
-    return await bcrypt.compare(plainPassword, hashedPassword);
-};
-const genTok = () => crypto.randomBytes(32).toString('hex');
+import User from '../models/user/UserModel.js';
+import bcrypt from 'bcrypt';
 
-//const salt = await bcrypt.genSalt(10); para hasheo
-//await bcrypt.hash(dato, salt),
+const isUserAvailable = async (email) => { // true si está disponible, false si existe
+    try {
+        const existingUser = await User.findOne({ Email: email })
+        return !existingUser
+    } catch (error) {
+        return false
+    }
+}
 
-// CREATE - Crear un nuevo usuario según su tipo
+const hashData = async ({ curp, pass }) => {
+    try {
+        const result = {}
+        if (pass) {
+            const salt = await bcrypt.genSalt(10)
+            const hashPass = await bcrypt.hash(pass, salt)
+            result.pass = hashPass;
+        }
+        if (curp) {
+            const iv = crypto.randomBytes(16)
+            const cipher = crypto.createCipheriv(
+                process.env.ALGORITHM, 
+                Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), 
+                iv 
+            )
+            let encrypted = cipher.update(curp, 'utf8', 'hex')
+            encrypted += cipher.final('hex')
+            const authTag = cipher.getAuthTag();
+            
+            result.CURP = {
+                iv: iv.toString('hex'),        
+                content: encrypted,
+                authTag: authTag.toString('hex')
+            }
+        }
+        return result;
+    } catch(error) {
+        console.error('Error en hashData:', error)
+        return null
+    }
+}
+
+const decryptCurp = (encryptedData) => {
+    try {
+        const decipher = crypto.createDecipheriv(
+            process.env.ALGORITHM,
+            Buffer.from(process.env.ENCRYPTION_KEY, 'hex'),
+            Buffer.from(encryptedData.iv, 'hex') 
+        )
+        if (encryptedData.authTag) 
+            decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'))
+        let decrypted = decipher.update(encryptedData.content, 'hex', 'utf8')
+        decrypted += decipher.final('utf8')
+        return decrypted;
+    } catch(error) {
+        console.error('Error al desencriptar CURP:', error)
+        return null;
+    }
+}
+
 export const create = async (req, res) => {
     try {
-        const { UserType, ...userData } = req.body;
-        
-        let newUser;
-        
-        switch (UserType) {
-            case 'student':
-                newUser = Student.create(userData);
-                break;
-            case 'profesor':
-                newUser = Profesor.create(userData);
-                break;
-            case 'tutor':
-                newUser = Tutor.create(userData);
-                break;
-            default:
-                return res.status(400).json({
-                    success: false,
-                    message: 'Tipo de usuario no válido'
-                });
-        }
-        
-        const savedUser = await newUser.save();
-        
-        res.status(201).json({
-            success: true,
-            message: 'Usuario creado exitosamente',
-            data: savedUser
-        });
-        
+        const { data } = req.body
+        if(!data) return res.status(400).json({message: "Sin informacion"})
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al crear usuario',
-            error: error.message
-        });
+        console.error('Error en drop:', error)
+        res.status(500).json({ message: error.message })
     }
-};
+}
 
-// READ - Obtener todos los usuarios o por tipo
+export const findBy = async (req, res) => {
+    try {
+        const { data } = req.body;
+        if (!data) return res.status(400).json({ message: "Sin información" })
+        let query = {}
+        if (data.ID) query._id = data.ID
+        if (data.Email) query.Email = data.Email
+        if (data.Name) query.Name = { $regex: data.Name, $options: 'i' }
+        if (Object.keys(query).length === 0) return res.status(400).json({ message: "No se proporcionaron campos de búsqueda válidos" })
+        let result
+        if (data.ID) result = await User.findById(data.ID)
+        else if (data.Name) result = await User.find(query)
+        else result = await User.findOne(query)
+        try {
+            curp = decryptCurp(user.CURP)
+        } catch (decryptError) {
+            console.error('Error desencriptando CURP:', decryptError)
+        }
+        const { Pass, CURP, ...userData } = user.toObject()
+        if (!result || (Array.isArray(result) && result.length === 0))  
+            return res.status(404).json({ message: "No se encontró ningún usuario" })
+        res.status(200).json({ data: result, message: "Usuario encontrado", status: 200 })
+    } catch (error) {
+        console.error('Error en findBy:', error)
+        res.status(500).json({ message: error.message })
+    }
+}
+
 export const getAll = async (req, res) => {
     try {
-        const { type } = req.query;
-        let users;
-        
-        if (type) {
-            switch (type) {
-                case 'student':
-                    users = await Student.find();
-                    break;
-                case 'profesor':
-                    users = await Profesor.find();
-                    break;
-                case 'tutor':
-                    users = await Tutor.find();
-                    break;
-                default:
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Tipo de usuario no válido'
-                    });
-            }
-        } else {
-            users = await User.find();
-        }
-        
-        res.status(200).json({
-            success: true,
-            data: users
-        });
-        
+        const data = await User.find({})
+        res.status(200).json({ data: data, status: 200 })
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener usuarios',
-            error: error.message
-        });
+        console.error('Error en drop:', error)
+        res.status(500).json({ message: error.message })
     }
-};
+}
 
-// READ - Obtener usuario por ID
-export const getById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        
-        const user = await User.findById(id);
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado'
-            });
-        }
-        
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-        
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener usuario',
-            error: error.message
-        });
-    }
-};
-
-// UPDATE - Actualizar usuario por ID
 export const update = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updateData = req.body;
-        
-        // Buscar el usuario primero para saber su tipo
-        const existingUser = await User.findById(id);
-        
-        if (!existingUser) {
-            return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado'
+        const { changes } = req.body
+        const user = await User.findOne({ Email: changes.email })
+        if (!user) return res.status(404).json({ message: 'Correo no válido' })
+        if (changes && changes.data) {
+            const updateFields = {} 
+            if (changes.name) updateFields.Name = changes.name
+            if (changes.birth) updateFields.Birth = changes.birth
+            if (changes.RFC) updateFields.RFC = changes.RFC
+            if (changes.NCount) updateFields.NCount = changes.NCount
+            if (changes.Phone) updateFields.Phone = changes.Phone
+            if (changes.Cedula) updateFields.Cedula = changes.Cedula
+            if (changes.curp) {
+                const hashedCurp = await hashData({ curp: changes.phone })
+                updateFields.CURP = hashedCurp.CURP
+            }
+            if (changes.pass) {
+                const hashedPass = await hashData({ pass: changes.pass })
+                updateFields.Pass = hashedPass.pass
+            }
+            if (Object.keys(updateFields).length > 0) {
+                await User.findByIdAndUpdate(user._id, { $set: updateFields })
+            }
+            return res.status(200).json({ 
+                message: 'Datos actualizados exitosamente',
+                updatedFields: Object.keys(updateFields),
+                status: 200
             });
         }
-        
-        // No permitir cambiar el tipo de usuario
-        if (updateData.UserType && updateData.UserType !== existingUser.UserType) {
-            return res.status(400).json({
-                success: false,
-                message: 'No se puede cambiar el tipo de usuario'
-            });
-        }
-        
-        // Actualizar según el tipo de usuario
-        let updatedUser;
-        switch (existingUser.UserType) {
-            case 'student':
-                updatedUser = await Student.findByIdAndUpdate(
-                    id, 
-                    updateData, 
-                    { new: true, runValidators: true }
-                );
-                break;
-            case 'profesor':
-                updatedUser = await Profesor.findByIdAndUpdate(
-                    id, 
-                    updateData, 
-                    { new: true, runValidators: true }
-                );
-                break;
-            case 'tutor':
-                updatedUser = await Tutor.findByIdAndUpdate(
-                    id, 
-                    updateData, 
-                    { new: true, runValidators: true }
-                );
-                break;
-        }
-        
-        res.status(200).json({
-            success: true,
-            message: 'Usuario actualizado exitosamente',
-            data: updatedUser
-        });
-        
+        return res.status(200).json({ 
+            message: 'No se realizaron cambios',
+            updatedFields: [],
+            status: 200
+        })
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al actualizar usuario',
-            error: error.message
-        });
+        console.error('Error en drop:', error)
+        res.status(500).json({ message: error.message })
     }
-};
+}
 
-// DELETE - Eliminar usuario por ID
-export const deleteUser = async (req, res) => {
+export const drop = async (req, res) => {
     try {
-        const { id } = req.params;
-        
-        const user = await User.findById(id);
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado'
-            });
-        }
-        
-        await User.findByIdAndDelete(id);
-        
-        res.status(200).json({
-            success: true,
-            message: 'Usuario eliminado exitosamente'
-        });
-        
+        const { id } = req.body
+        if(!id) return res.status(400).json({message: "Sin informacion"})
+        await User.findByIdAndDelete(id)
+        return res.status(200).json({ message: 'Usuario eliminado', status: 200 })
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al eliminar usuario',
-            error: error.message
-        });
+        console.error('Error en drop:', error)
+        res.status(500).json({ message: error.message })
     }
-};
-
-// Búsqueda por email
-export const getByEmail = async (req, res) => {
-    try {
-        const { email } = req.params;
-        
-        const user = await User.findOne({ Email: email.toLowerCase() });
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado'
-            });
-        }
-        
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-        
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al buscar usuario',
-            error: error.message
-        });
-    }
-};
+}
