@@ -67,8 +67,41 @@ export const peticion = async (endpoint, data = null, method = 'POST') => {
     }
 }
 
-// Esta función es para SUBIR archivos (POST)
-// En utils/Funtiones.js
+export const uploadAssignment = async (endpoint, formData) => {
+    const URI = `${URI_START}/trckln/${endpoint}`;
+    try {
+        const response = await fetch(URI, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
+        }
+
+        const responseData = await response.json();
+        
+        return {
+            data: responseData.data,
+            message: responseData.message || 'Tarea creada exitosamente',
+            status: true,
+            httpStatus: response.status
+        };
+        
+    } catch(exError) {
+        console.error('Error en petición de subida de tarea:', exError);
+        
+        return {
+            data: null,
+            message: exError.message || 'Error al subir la tarea',
+            status: false,
+            httpStatus: 500
+        };
+    }
+}
+
+
 export const uploadFiles = async (endpoint, formData) => {
     const URI = `${URI_START}/trckln/${endpoint}`;
     try {

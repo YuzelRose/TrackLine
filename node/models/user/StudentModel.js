@@ -15,9 +15,9 @@ const studentSchema = new mongoose.Schema({
         }
     }],
     kardex: {
-        type: String,
-        required: true,
-        unique: true
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Kardex', 
+        required: true
     },
     RelatedEmail: {
         type: String,

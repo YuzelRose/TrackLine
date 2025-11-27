@@ -1,17 +1,15 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './css/user.module.css';
 import { peticion } from '@/app/utils/Funtions';
 
 export default function UserCrud() {
-  const router = useRouter();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [search, setSearch] = useState({ term: '', field: 'name' });
   const [form, setForm] = useState({
-    name: '', email: '', pass: '', curp: '', birth: '', userType: 'student',
+    name: '', email: '', pass: '', curp: '', birth: '', userType: 'profesor',
     kardex: '', relatedEmail: '', rfc: '', nCount: '', cedula: '', phone: ''
   });
 
@@ -129,23 +127,6 @@ export default function UserCrud() {
     }
   };
 
-  // Campos específicos por tipo
-  const typeFields = {
-    student: [
-      { key: 'kardex', label: 'Kardex', type: 'text', required: true },
-      { key: 'relatedEmail', label: 'Email del Tutor', type: 'email' }
-    ],
-    profesor: [
-      { key: 'rfc', label: 'RFC', type: 'text', required: true },
-      { key: 'nCount', label: 'Número de Cuenta', type: 'text', required: true },
-      { key: 'cedula', label: 'Cédula', type: 'text' }
-    ],
-    tutor: [
-      { key: 'phone', label: 'Teléfono', type: 'tel', required: true },
-      { key: 'relatedEmail', label: 'Email Relacionado', type: 'email' }
-    ]
-  };
-
   const searchFields = [
     { value: 'name', label: 'Nombre' },
     { value: 'email', label: 'Email' }
@@ -166,26 +147,10 @@ export default function UserCrud() {
           {message.text}
         </div>
       )}
-
-      {/* Formulario */}
+      {/* Crear profesor */}
       <form onSubmit={createUser} className={styles.form}>
-        <h2>Agregar Nuevo Usuario</h2>
+        <h2>Crear profesor</h2>
         <div className={styles.formGrid}>
-          {/* Campos base */}
-          <div className={styles.inputGroup}>
-            <label>Tipo de Usuario</label>
-            <select
-              value={form.userType}
-              onChange={(e) => setForm(prev => ({ ...prev, userType: e.target.value }))}
-              className={styles.input}
-              required
-            >
-              <option value="student">Estudiante</option>
-              <option value="profesor">Profesor</option>
-              <option value="tutor">Tutor</option>
-            </select>
-          </div>
-
           <div className={styles.inputGroup}>
             <label>Nombre completo</label>
             <input
@@ -197,7 +162,6 @@ export default function UserCrud() {
               required
             />
           </div>
-
           <div className={styles.inputGroup}>
             <label>Email</label>
             <input
@@ -209,7 +173,6 @@ export default function UserCrud() {
               required
             />
           </div>
-
           <div className={styles.inputGroup}>
             <label>Contraseña</label>
             <input
@@ -221,7 +184,6 @@ export default function UserCrud() {
               required
             />
           </div>
-
           <div className={styles.inputGroup}>
             <label>CURP</label>
             <input
@@ -234,7 +196,6 @@ export default function UserCrud() {
               maxLength={18}
             />
           </div>
-
           <div className={styles.inputGroup}>
             <label>Fecha de Nacimiento</label>
             <input
@@ -245,21 +206,51 @@ export default function UserCrud() {
               required
             />
           </div>
-
-          {/* Campos específicos por tipo */}
-          {typeFields[form.userType] && typeFields[form.userType].map(field => (
-            <div key={field.key} className={styles.inputGroup}>
-              <label>{field.label}</label>
+          <div className={styles.inputGroup}>
+            <label>RFC</label>
+            <input
+              type="text"
+              placeholder="RFC"
+              value={form.rfc}
+              onChange={(e) => setForm(prev => ({ ...prev, rfc: e.target.value }))}
+              className={styles.input}
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>Número de Cuenta</label>
+            <input
+              type="text"
+              placeholder="Número de Cuenta"
+              value={form.nCount}
+              onChange={(e) => setForm(prev => ({ ...prev, nCount: e.target.value }))}
+              className={styles.input}
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>Cédula</label>
+            <input
+              type="text"
+              placeholder="Cédula"
+              value={form.cedula}
+              onChange={(e) => setForm(prev => ({ ...prev, cedula: e.target.value }))}
+              className={styles.input}
+            />
+          </div>
+          {/* Campos específicos para TUTOR */}
+          {form.userType === 'tutor' && (
+            <div className={styles.inputGroup}>
+              <label>Teléfono</label>
               <input
-                type={field.type}
-                placeholder={field.label}
-                value={form[field.key]}
-                onChange={(e) => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
+                type="tel"
+                placeholder="Teléfono"
+                value={form.phone}
+                onChange={(e) => setForm(prev => ({ ...prev, phone: e.target.value }))}
                 className={styles.input}
-                required={field.required}
               />
             </div>
-          ))}
+          )}
         </div>
         
         <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} disabled={loading}>
@@ -322,7 +313,7 @@ export default function UserCrud() {
         </div>
       </div>
 
-      {/* Lista - CORREGIDO: Usar safeUsers en lugar de users */}
+      {/* Lista de usuarios */}
       <div className={styles.listSection}>
         <div className={styles.listHeader}>
           <h2>Lista de Usuarios</h2>

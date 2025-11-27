@@ -176,20 +176,40 @@ export const sendHw = async (req, res) => {
     try {
         const { hwID, StudentID } = req.body
         const workFiles = req.files
+        
         if (!hwID || !StudentID) 
             return res.status(400).json({ message: "Faltan datos requeridos" })
         if (!workFiles || workFiles.length === 0)  
             return res.status(400).json({ message: "No se enviaron archivos" })
+        
         const consultData = await Assigment.findById(hwID)
         if (!consultData) 
             return res.status(404).json({ message: "Tarea no encontrada" })
+        
+        // BUSCAR O CREAR LA SUBMISSION DEL ESTUDIANTE
         let studentSubmission = consultData.Submissions.find(
             submission => submission.Student.toString() === StudentID
         )
-        if (!studentSubmission) 
-            return res.status(404).json({ message: "No se encontró la submission del estudiante" })
+        
+        // SI NO EXISTE, CREAR UNA NUEVA SUBMISSION
+        if (!studentSubmission) {
+            studentSubmission = {
+                Student: StudentID,
+                Status: "No entregado",
+                SubmittedWork: [],
+                Grade: 0,
+                Feedback: "",
+                SubmittedAt: null,
+                GradedAt: null
+            }
+            consultData.Submissions.push(studentSubmission)
+            // Obtener la referencia a la submission recién creada
+            studentSubmission = consultData.Submissions[consultData.Submissions.length - 1]
+        }
+
         const submittedWorkIds = []
         let ind = 0
+        
         for (const file of workFiles) {
             const originalName = file.originalname;
             const lastDotIndex = originalName.lastIndexOf('.');
@@ -207,11 +227,14 @@ export const sendHw = async (req, res) => {
             submittedWorkIds.push({ file: contentData._id })
             ind++
         }
+        
+        // ACTUALIZAR LA SUBMISSION
         studentSubmission.SubmittedWork = submittedWorkIds
         const currentDate = new Date()
         const dueDate = new Date(consultData.DueDate)
         studentSubmission.Status = currentDate <= dueDate ? "Entregado" : "Tarde"
         studentSubmission.SubmittedAt = currentDate
+        
         await consultData.save()
         
         const student = await Student.findById(StudentID);
@@ -219,6 +242,7 @@ export const sendHw = async (req, res) => {
             student.Badges.push({ refId: 'fun-Badg1' });
             await student.save();
         }
+        
         if(student.RelatedEmail){
             hwConf({
                 data: {
@@ -227,6 +251,7 @@ export const sendHw = async (req, res) => {
                 }
             })
         }
+        
         res.status(200).json({ 
             message: "Tarea enviada correctamente",
             filesReceived: workFiles.length,
@@ -324,123 +349,389 @@ export const addPay = async (req, res) => {
     }
 }
 
-// generar registro temporal:
-/*export const postNewUser = async (req, res) => {
+// Controlador para crear notice con texto simple
+export const createTextNotice = async (req, res) => {
     try {
-        const { Nombre, Correo, Contrasena } = req.body;
-        const newUser = new NewUser({Nombre,Correo,Contrasena});
-        const savedUsuario = await newUser.save();
-        await RegisterMail({ email: Correo, key: savedUsuario._id });
-        res.status(201).json({
-            message: 'Usuario en espera',
-            usuario: savedUsuario
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-const RegisterMail = async ({ email, key }) => {
+        const { data } = req.body;
 
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        service: 'gmail',
-        port: 465,
-        secure: true, 
-        auth: {
-            user: 'librosmaldonado68@gmail.com',       
-            pass: 'xzym wpfq kwms gbdj'     
+        if (!data) {
+            return res.status(400).json({ message: "Faltan datos requeridos" });
         }
-    });
 
+        const { Name, textContent, tabloidId } = data;
 
-    const mailOptions = {
-        from: {
-            name: 'Libros Maldonado',
-            address: 'librosmaldonado68@gmail.com',
-        },
-        to: email,
-        subject: `Sistema de de registro al sitio Libros Maldonado`,
-        html: `
-        <article style="display: flex; flex-direction: column; align-items: center; font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-            <div style="border: solid #000; padding: 0.5em;">
-                <header style="border-bottom: 0.2em solid #ddd; margin: 0; padding: 0;">
-                    <h1 style="color: #042479; border-bottom: 0.2em solid #ddd; margin-bottom: 0.5em;">
-                        El equipo técnico de <a title="librosmaldonado.shop" href="librosmaldonado.shop" style="color: #042479;">Libros Maldonado</a> le manda un cordial saludo.
-                    </h1>
-                    <h2 style="margin: 0; margin-bottom: 0.5em; padding: 0; color: #999;">
-                        Asunto: <p style="margin: 0; padding: 0; color: #000; text-indent: 2em;">Solicitud de registro de correo electrónico</p>
-                    </h2>
-                </header>
-                <main style="margin: 0; padding: 0.3em; font-size: 1.5em; color: #000; border-bottom: 0.2em solid #ddd; margin-bottom: 0.5em;">
-                    <p>Desde <strong><a title="librosmaldonado.shop" href="librosmaldonado.shop" style="color: #042479;">Libros Maldonado</a></strong> esperamos que te encuentres bien.</p>
-                    <p>Hemos recibido tu solicitud de registro a nuestro sitio web. Si no hiciste la solicitud, ignora este correo.</p>
-                    <p>En caso contrario ingrese al siguiente link:</p>
-                    <a style="color: #042479; font-size: 2em; border: 0.1em solid #ddd; padding: 0.2em; align-self: center;" href=librosmaldonado.shop/NewUser/${key}>Quiero registrarme</a>
-                    <p>Atentamente, <strong>El equipo tecnico de <a title="librosmaldonado.shop" href="librosmaldonado.shop" style="color: #042479;">Libros Maldonado</a>.</strong></p>
-                </main>
-                <footer style="border: 0.2em solid #ddd;">
-                    <p style="margin: 0.3em; width: fit-content; font-size: 1.3em; color: #555;">Este es un mensaje automático.</p>
-                    <p style="margin: 0.3em; width: fit-content; font-size: 1.3em; color: #555;">No responda a este correo.</p>
-                </footer>
-            </div>
-        </article>
-        `
-    };
+        if (!Name || !textContent || !tabloidId) {
+            return res.status(400).json({ 
+                message: "Faltan campos requeridos: Name, textContent, tabloidId" 
+            });
+        }
 
-    try {
-        await transporter.sendMail(mailOptions);
+        // Verificar si ya existe un notice con ese nombre
+        const existingNotice = await Notice.findOne({ Name });
+        if (existingNotice) {
+            return res.status(409).json({ 
+                message: "Ya existe un notice con este nombre" 
+            });
+        }
+
+        // Verificar si el tabloid existe
+        const tabloid = await Tabloid.findById(tabloidId);
+        if (!tabloid) {
+            return res.status(404).json({ 
+                message: "Tabloid no encontrado" 
+            });
+        }
+
+        const noticeData = {
+            Name: Name.trim(),
+            Content: {
+                contentType: 'text',
+                value: textContent,
+                filename: ''
+            },
+            CreatedAt: new Date()
+        };
+
+        const newNotice = await Notice.create(noticeData);
+
+        // Añadir el notice al array HomeWork del tabloid
+        tabloid.HomeWork.push({ notice: newNotice._id });
+        await tabloid.save();
+
+        res.status(201).json({
+            message: "Notice de texto creado exitosamente",
+            status: 201,
+            data: {
+                _id: newNotice._id,
+                Name: newNotice.Name,
+                Content: newNotice.Content,
+                CreatedAt: newNotice.CreatedAt,
+                tabloidId: tabloidId
+            }
+        });
+
     } catch (error) {
-        console.log("Error al enviar el correo", error );
+        console.error(`Error al crear notice de texto: ${error.message}`);
+        
+        if (error.code === 11000) {
+            return res.status(409).json({ 
+                message: "Ya existe un notice con este nombre" 
+            });
+        }
+
+        res.status(500).json({ 
+            message: error.message, 
+            place: "createTextNotice controller" 
+        });
     }
 };
-// generar registro permanente
-export const getNewUser = async (req, res) => {
-    const key = req.params.key;
+
+// Controlador para eliminar notice
+export const deleteNotice = async (req, res) => {
     try {
-        const newUser = await NewUser.findById(key); 
-        if (!newUser) return res.status(404).json({ message: 'Key no valida' });
+        const { id, tabloidId } = req.body;
 
-        await postCreateUser({
-            Name: newUser.Nombre, 
-            Mail: newUser.Correo, 
-            Pass: newUser.Contrasena
-        });
+        if (!id || !tabloidId) {
+            return res.status(400).json({ 
+                message: "ID de notice y tabloid requeridos" 
+            });
+        }
 
-        const deletedUser = await NewUser.findByIdAndDelete(key);
-        if (!deletedUser) throw new Error('Usuario no encontrado');
+        // Verificar si el tabloid existe
+        const tabloid = await Tabloid.findById(tabloidId);
+        if (!tabloid) {
+            return res.status(404).json({ 
+                message: "Tabloid no encontrado" 
+            });
+        }
 
-        res.status(200).json({ 
-            message: 'Usuario creado y registro eliminado correctamente', 
-            Nombre: newUser.Nombre 
+        // Eliminar el notice del array HomeWork del tabloid
+        tabloid.HomeWork = tabloid.HomeWork.filter(item => 
+            !(item.notice && item.notice.toString() === id)
+        );
+        await tabloid.save();
+
+        // Eliminar el notice de la colección
+        const notice = await Notice.findByIdAndDelete(id);
+        if (!notice) {
+            return res.status(404).json({ 
+                message: "Notice no encontrado" 
+            });
+        }
+
+        res.status(200).json({
+            message: "Notice eliminado exitosamente",
+            status: 200,
+            data: {
+                _id: notice._id,
+                Name: notice.Name,
+                tabloidId: tabloidId
+            }
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(`Error al eliminar notice: ${error.message}`);
+        
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                message: "ID de notice no válido" 
+            });
+        }
+
+        res.status(500).json({ 
+            message: error.message, 
+            place: "deleteNotice controller" 
+        });
     }
 };
 
-
-const postCreateUser = async ({ Name, Mail, Pass }) => {
-    if (!Name || !Mail || !Pass) return { error: true, message: 'Datos vacíos' };
-
-    if (Pass.length < 8) return { error: true, message: 'La contraseña debe contener al menos 8 caracteres' };
-
+export const createAssigment = async (req, res) => {
     try {
-        const user = await Usuario.findOne({ Correo: Mail });
-        if (user) return { error: true, message: 'Usuario existente' };
+         // Obtener datos de req.body directamente en lugar de req.body.data
+        const { Name, Text, DueDate, tabloidId } = req.body;
+        const files = req.files;
 
-        const salt = await bcrypt.genSalt(10);
-        const HashPass = await bcrypt.hash(Pass, salt);
+        // Validar campos obligatorios
+        if (!Name || !Text || !DueDate || !tabloidId) {
+            return res.status(400).json({ 
+                message: "Faltan campos requeridos: Name, Text, DueDate, tabloidId" 
+            });
+        }
 
-        const newUser = new Usuario({
-            Nombre: Name,
-            Correo: Mail,
-            Contrasena: HashPass
+        // El resto del código permanece igual...
+        // Verificar si ya existe un assignment con ese nombre
+        const existingAssigment = await Assigment.findOne({ Name });
+        if (existingAssigment) {
+            return res.status(409).json({ 
+                message: "Ya existe un assignment con este nombre" 
+            });
+        }
+
+        // Verificar si el tabloid existe
+        const tabloid = await Tabloid.findById(tabloidId);
+        if (!tabloid) {
+            return res.status(404).json({ 
+                message: "Tabloid no encontrado" 
+            });
+        }
+
+        // Procesar archivos de contenido
+        const contentIds = [];
+        if (files && files.length > 0) {
+            for (const file of files) {
+                const originalName = file.originalname;
+                const lastDotIndex = originalName.lastIndexOf('.');
+                const fileExtension = lastDotIndex !== -1 ? 
+                    originalName.substring(lastDotIndex + 1) : '';
+                const newFileName = `assignment_${Name}_${Date.now()}_${contentIds.length}.${fileExtension}`;
+
+                const contentDoc = await Content.create({
+                    Name: newFileName,
+                    size: file.size,
+                    data: file.buffer,
+                    contentType: file.mimetype,
+                    uploadDate: new Date()
+                });
+
+                contentIds.push({ file: contentDoc._id });
+            }
+        }
+
+        // Crear el assignment
+        const assignmentData = {
+            Name: Name.trim(),
+            Text: Text.trim(),
+            DueDate: new Date(DueDate),
+            Content: contentIds,
+            CreatedAt: new Date(),
+            Submissions: []
+        };
+
+        const newAssignment = await Assigment.create(assignmentData);
+
+        // Añadir el assignment al array HomeWork del tabloid
+        tabloid.HomeWork.push({ assigment: newAssignment._id });
+        await tabloid.save();
+
+        res.status(201).json({
+            message: "Assignment creado exitosamente",
+            status: 201,
+            data: {
+                _id: newAssignment._id,
+                Name: newAssignment.Name,
+                Text: newAssignment.Text,
+                DueDate: newAssignment.DueDate,
+                ContentCount: newAssignment.Content.length,
+                SubmissionsCount: newAssignment.Submissions.length,
+                tabloidId: tabloidId
+            }
         });
 
-        await newUser.save();
-        return { error: false };
     } catch (error) {
-        throw error;
+        console.error(`Error al crear assignment: ${error.message}`);
+        
+        if (error.code === 11000) {
+            return res.status(409).json({ 
+                message: "Ya existe un assignment con este nombre" 
+            });
+        }
+
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ 
+                message: "Error de validación", 
+                errors 
+            });
+        }
+
+        res.status(500).json({ 
+            message: error.message, 
+            place: "createAssigment controller" 
+        });
     }
-};*/
+};
+
+export const createTextAssigment = async (req, res) => {
+    try {
+        const { data } = req.body;
+
+        if (!data) {
+            return res.status(400).json({ message: "Faltan datos requeridos" });
+        }
+
+        const { Name, Text, DueDate, tabloidId } = data;
+
+        if (!Name || !Text || !DueDate || !tabloidId) {
+            return res.status(400).json({ 
+                message: "Faltan campos requeridos: Name, Text, DueDate, tabloidId" 
+            });
+        }
+
+        // Verificar si ya existe un assignment con ese nombre
+        const existingAssigment = await Assigment.findOne({ Name });
+        if (existingAssigment) {
+            return res.status(409).json({ 
+                message: "Ya existe un assignment con este nombre" 
+            });
+        }
+
+        // Verificar si el tabloid existe
+        const tabloid = await Tabloid.findById(tabloidId);
+        if (!tabloid) {
+            return res.status(404).json({ 
+                message: "Tabloid no encontrado" 
+            });
+        }
+
+        // Crear el assignment sin archivos
+        const assignmentData = {
+            Name: Name.trim(),
+            Text: Text.trim(),
+            DueDate: new Date(DueDate),
+            Content: [], // Array vacío sin archivos
+            CreatedAt: new Date(),
+            Submissions: []
+        };
+
+        const newAssignment = await Assigment.create(assignmentData);
+
+        // Añadir el assignment al array HomeWork del tabloid
+        tabloid.HomeWork.push({ assigment: newAssignment._id });
+        await tabloid.save();
+
+        res.status(201).json({
+            message: "Assignment de texto creado exitosamente",
+            status: 201,
+            data: {
+                _id: newAssignment._id,
+                Name: newAssignment.Name,
+                Text: newAssignment.Text,
+                DueDate: newAssignment.DueDate,
+                ContentCount: 0,
+                SubmissionsCount: 0,
+                tabloidId: tabloidId
+            }
+        });
+
+    } catch (error) {
+        console.error(`Error al crear assignment de texto: ${error.message}`);
+        
+        if (error.code === 11000) {
+            return res.status(409).json({ 
+                message: "Ya existe un assignment con este nombre" 
+            });
+        }
+
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ 
+                message: "Error de validación", 
+                errors 
+            });
+        }
+
+        res.status(500).json({ 
+            message: error.message, 
+            place: "createTextAssigment controller" 
+        });
+    }
+};
+
+// Controlador para eliminar assignment
+export const deleteAssigment = async (req, res) => {
+    try {
+        const { id, tabloidId } = req.body;
+
+        if (!id || !tabloidId) {
+            return res.status(400).json({ 
+                message: "ID de assignment y tabloid requeridos" 
+            });
+        }
+
+        // Verificar si el tabloid existe
+        const tabloid = await Tabloid.findById(tabloidId);
+        if (!tabloid) {
+            return res.status(404).json({ 
+                message: "Tabloid no encontrado" 
+            });
+        }
+
+        // Eliminar el assignment del array HomeWork del tabloid
+        tabloid.HomeWork = tabloid.HomeWork.filter(item => 
+            !(item.assigment && item.assigment.toString() === id)
+        );
+        await tabloid.save();
+
+        // Eliminar el assignment de la colección
+        const assignment = await Assigment.findByIdAndDelete(id);
+        if (!assignment) {
+            return res.status(404).json({ 
+                message: "Assignment no encontrado" 
+            });
+        }
+
+        res.status(200).json({
+            message: "Assignment eliminado exitosamente",
+            status: 200,
+            data: {
+                _id: assignment._id,
+                Name: assignment.Name,
+                tabloidId: tabloidId
+            }
+        });
+
+    } catch (error) {
+        console.error(`Error al eliminar assignment: ${error.message}`);
+        
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                message: "ID de assignment no válido" 
+            });
+        }
+
+        res.status(500).json({ 
+            message: error.message, 
+            place: "deleteAssigment controller" 
+        });
+    }
+};

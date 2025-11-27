@@ -1,14 +1,24 @@
 'use client'
-import { uploadFiles } from '@/app/utils/Funtions'; // Cambiar por uploadFiles
+import { uploadFiles } from '@/app/utils/Funtions';
 import FileDropZone from '../uI/inputs/FileDropZone';
 import styles from './css/submition.module.css'
 import { useState } from "react";
 import FileOBJ from '../uI/object/FileOBJ';
 
-export default function Submition({data, DueDate, hwID, studentId}) {
+export default function Submition({ data, DueDate, hwID, studentId }) {
     const [files, setFiles] = useState([]);
     const [button, setButton] = useState(false);
     const [uploading, setUploading] = useState(false);
+
+    // Validación segura de data - manejar tanto submissions vacías como null
+    const submissionData = data || {};
+    const status = submissionData.Status || 'No entregado';
+    const submittedWork = submissionData.SubmittedWork || [];
+    const feedback = submissionData.Feedback || '';
+    const grade = submissionData.Grade;
+    
+    // Determinar si ya existe una submission
+    const hasExistingSubmission = submissionData.Status && submissionData.Status !== 'No entregado';
 
     const handleFilesSelected = (selectedFiles) => {
         setFiles(selectedFiles);
@@ -26,13 +36,11 @@ export default function Submition({data, DueDate, hwID, studentId}) {
         });
 
         formData.append('hwID', hwID);
-        formData.append('StudentID', data.Student);
+        formData.append('StudentID', studentId); // Usar studentId directamente del prop
 
         try {
-            // USAR uploadFiles EN LUGAR DE peticion
             const response = await uploadFiles('tabloid/send-hw', formData);
             
-            // Cambiar la verificación del status
             if (response.status === 200) {
                 alert('Archivos subidos correctamente');
                 setFiles([]);
@@ -52,40 +60,48 @@ export default function Submition({data, DueDate, hwID, studentId}) {
         <section id={styles.submitions}>
             <form onSubmit={handleSubmit} className={styles.bg} id={styles.form}>
                 <p>
-                    Fecha limite: {new Date(DueDate).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric'
-                    })}
+                    Fecha limite: {DueDate ? 
+                        new Date(DueDate).toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            month: 'long',
+                            day: 'numeric'
+                        }) : 'No especificada'
+                    }
                 </p>
-                <p>Entrega: {data.Status}</p>
-                {data.SubmittedWork && !button?
+                <p>Estado: {status}</p>
+                
+                {submittedWork.length > 0 && !button && (
                     <div id={styles.filesWrapper}>
-                        <FileOBJ data={data.SubmittedWork}/>
+                        <FileOBJ data={submittedWork}/>
                     </div>
-                : null}
-                {!button?
+                )}
+                
+                {!button ? (
                     <button type="button" className='button' onClick={() => setButton(true)}>
-                        {data.SubmittedWork? "Modificar envio" : "+ cargar archivos"}
+                        {hasExistingSubmission ? "Modificar envío" : "+ cargar archivos"}
                     </button>
-                : 
+                ) : (
                     <>
                         <FileDropZone onFilesSelected={handleFilesSelected} />
                         <button type="button" className='button' onClick={() => setButton(false)}>
                             Cancelar
                         </button>
-                        <button type="submit" disabled={uploading} className='button'>
+                        <button type="submit" disabled={uploading || files.length === 0} className='button'>
                             {uploading ? 'Entregando...' : 'Entregar tarea'}
                         </button>
                     </>
-                }
+                )}
             </form>
-            {data.Feedback || data.Grade?
+            
+            {(feedback || grade !== undefined) && (
                 <div className={styles.bg} id={styles.feedback}>
                     <h4>Comentarios:</h4>
-                    <p>{data.Feedback}</p>
+                    {feedback && <p>{feedback}</p>}
+                    {grade !== undefined && (
+                        <p><strong>Calificación:</strong> {grade}</p>
+                    )}
                 </div>
-            : null }
+            )}
         </section>
     )
 }

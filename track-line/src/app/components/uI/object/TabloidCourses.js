@@ -65,25 +65,27 @@ export default function TabloidCourses() {
                         <p>{course.refId.description}</p>
                     </div>
                     {course.refId.HomeWork ?
-                        <ul className={styles.hwUl}>
+                        <>
+                            <p>Tareas:</p>
+                            <ul className={styles.hwUl}>
 
-                            {course.refId.HomeWork
-                                .filter(hw => hw.assigment)
-                                .map(hw => (
-                                <li 
-                                    key={hw.assigment._id} 
-                                    className={styles.hwLi}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <p
-                                        onClick={() => navigate.push(`/tabloid/assigment?id=${hw.assigment._id}`)}
+                                {course.refId.HomeWork
+                                    .filter(hw => hw.assigment)
+                                    .map(hw => (
+                                    <li 
+                                        key={hw.assigment._id} 
+                                        className={styles.hwLi}
+                                        onClick={(e) => e.stopPropagation()}
                                     >
-                                        • {hw.assigment.Name}:
-                                    </p>
-                                </li>
-                                
-                            ))} 
-                        </ul>
+                                        <p
+                                            onClick={() => navigate.push(`/tabloid/assigment?id=${hw.assigment._id}`)}
+                                        >
+                                            • {hw.assigment.Name}:
+                                        </p>
+                                    </li>
+                                    ))} 
+                                </ul>
+                            </>
                     : null}
                 </article>
             ))}

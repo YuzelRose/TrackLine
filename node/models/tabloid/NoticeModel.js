@@ -6,10 +6,16 @@ const NoticeModel = new mongoose.Schema({
         required: true,
         unique: true
     },
+    Files: [{
+        file: {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'content' 
+        },
+    }],
     Content: {
-        contentType: { type: String, enum: ['text', 'file', 'link'] },
-        value: String,
-        filename: String
+        contentType: { type: String, enum: ['text', 'file', 'link'], default: 'text' },
+        value: { type: String, default: '' },
+        filename: { type: String, default: '' }
     },
     CreatedAt: { type: Date, default: Date.now },
 }, { collection: 'notice' });

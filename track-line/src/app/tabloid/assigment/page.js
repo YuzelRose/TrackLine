@@ -14,28 +14,38 @@ export default function HomeWorkPage() {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [user, setUser] = useState(null)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
         const getData = async () => { 
             try {
                 const session = getSession()
-                if(!!session) {
-                    const urlId = searchParams.get('id')
-                    if(!!urlId) {
-                        const result = await peticion('tabloid/get-hw',{ 
-                            data: {
-                                urlId: urlId,
-                                email: session.Email
-                            } 
-                        })
-                        if(!!result && result.httpStatus === 200) {
-                            setData(result.data)
-                        }
-                    } else navigate.push('/main');
-                } else navigate.push('/')
+                if(!session) {
+                    navigate.push('/')
+                    return
+                }
+
+                const urlId = searchParams.get('id')
+                if(!urlId) {
+                    navigate.push('/main')
+                    return
+                }
+
+                const result = await peticion('tabloid/get-hw', { 
+                    data: {
+                        urlId: urlId,
+                        email: session.Email
+                    } 
+                })
+
+                if(result && result.httpStatus === 200) {
+                    setData(result.data)
+                } else {
+                    setError(result?.message || 'No se pudo cargar la información de la tarea')
+                }
             } catch (error) {
-                console.error('Error recuperando informacion:', error)
-                setData(null) // Cambié setCourses([]) por setData(null)
+                console.error('Error recuperando información:', error)
+                setError('Error al cargar los datos de la tarea')
             } finally {
                 setLoading(false)
             }
@@ -48,21 +58,20 @@ export default function HomeWorkPage() {
                     const resp = await peticion('user/get-user', {email: session.Email})
                     if(resp.httpStatus === 200) {
                         setUser(resp.data)
+                    } else {
+                        setError(resp?.message || 'Error al obtener información del usuario')
                     }
                 } else {
-                    NUKE()
-                    router.push('/')
+                    // NUKE() - Comentado ya que no está definido en el código
+                    navigate.push('/')
                 }
             } catch (error) {
-                alert(`Error inesperado intentelo despues: ${error}`)
-                NUKE()
-                window.location.reload()
-                window.location.href = '/'
+                console.error('Error obteniendo usuario:', error)
+                setError('Error al cargar información del usuario')
             }
         }
 
         getUser()
-
         getData() 
     }, [searchParams, navigate])
 
@@ -76,7 +85,14 @@ export default function HomeWorkPage() {
         )
     }
 
-    // Verificar si data existe y tiene la estructura esperada
+    if (error) {
+        return (
+            <main id={styles.main}>
+                <div className={styles.error}>{error}</div>
+            </main>
+        )
+    }
+
     if (!data) {
         return (
             <main id={styles.main}>
@@ -85,21 +101,33 @@ export default function HomeWorkPage() {
         )
     }
 
+    // Validar que user esté cargado antes de renderizar
+    if (!user) {
+        return (
+            <main id={styles.main}>
+                <div>Cargando información del usuario...</div>
+            </main>
+        )
+    }
+
     return(
         <main id={styles.main}>
             <section id={styles.header}>
                 <div>
-                    <h4>{data.Name}</h4>
-                    <p className={styles.muted}>{data.Owner} • {new Date(data.CreatedAt).toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })}</p>
+                    <h4>{data.Name || 'Tarea sin nombre'}</h4>
+                    <p className={styles.muted}>
+                        {data.Owner || 'Sin autor'} • {data.CreatedAt ? 
+                            new Date(data.CreatedAt).toLocaleDateString('es-ES', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            }) : 'Fecha no disponible'
+                        }
+                    </p>
                 </div>
                 <div>
-                    {/* Verificación segura para Submissions */}
-                    <p>Nota: {data.Submissions && data.Submissions[0] && data.Submissions[0].Grade !== undefined 
+                    <p>Nota: {data.Submissions?.[0]?.Grade !== undefined 
                         ? data.Submissions[0].Grade 
                         : 'Sin calificar'}
                     </p>
@@ -107,22 +135,23 @@ export default function HomeWorkPage() {
             </section>
             <section id={styles.content}>
                 <div>
-                    <p>{data.Text}</p>
-                    {data.Content?
+                    <p>{data.Text || 'Sin descripción'}</p>
+                    {data.Content && (
                         <>
                             <p id={styles.pMat}>Materiales:</p>
                             <FileOBJ data={data.Content} type={2}/>
                         </>
-                    : null }
+                    )}
                 </div>
                 <div id={styles.submitionWrapper}>
-                    {/* Verificación segura para pasar submissions a Submition */}
-                    <Submition 
-                        data={data.Submissions && data.Submissions[0] ? data.Submissions[0] : null} 
-                        DueDate={data.DueDate} 
-                        hwID={data._id}
-                        studentId={user._id}
-                    />
+                    {user.UserType === "student" && (
+                        <Submition 
+                            data={data.Submissions?.find(sub => sub.Student === user._id) || null} 
+                            DueDate={data.DueDate} 
+                            hwID={data._id}
+                            studentId={user._id}
+                        /> 
+                    )}
                 </div>
             </section>
         </main>

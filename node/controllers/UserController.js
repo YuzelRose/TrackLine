@@ -1,6 +1,7 @@
 import User from '../models/user/UserModel.js';
 import Student from '../models/user/StudentModel.js'
 import Tutor from '../models/user/TutorModel.js';
+import Kardex from '../models/user/KardexModel.js'
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendConfStudentMail, sendConfTutorMail, sendRegMail, sendTutorToStudentRegMail } from '../utils/email.js';
@@ -149,6 +150,11 @@ export const registerTutorStudent = async (req, res) => {
             pass: data.pass
         })
         if(data.pass === data.passConfirm && !!hash) {
+            const kardexData = await Kardex.create({
+                Courses: [],
+                Average: { sum: 0, count: 0, final: 0 },
+                totalCredits: 0
+            })
             const registerData = {
                 Name: data.name,
                 Email: data.email,
@@ -157,7 +163,7 @@ export const registerTutorStudent = async (req, res) => {
                 Birth: data.birth,
                 UserType: "student",
                 Pays: [],
-                kardex: `KARDEX${data.email}`,
+                kardex: kardexData._id,
                 RelatedEmail: data.relatedEmail,
                 Tabloids: [],
                 Badges: []
@@ -190,6 +196,11 @@ export const registerStudent = async (req, res) => {
             pass: data.pass
         })
         if(data.pass === data.passConfirm && !!hash) {
+            const kardexData = await Kardex.create({
+                Courses: [],
+                Average: { sum: 0, count: 0, final: 0 },
+                totalCredits: 0
+            })
             const registerData = {
                 Name: data.name,
                 Email: data.email,
@@ -198,7 +209,7 @@ export const registerStudent = async (req, res) => {
                 Birth: data.birth,
                 UserType: "student",
                 Pays: [],
-                kardex: `KARDEX${data.email}`,
+                kardex: kardexData._id,
                 RelatedEmail: null,
                 Tabloids: [],
                 Badges: []

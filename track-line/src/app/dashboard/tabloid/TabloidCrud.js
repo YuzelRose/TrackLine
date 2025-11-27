@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './css/tabloids-page.module.css';
 import { peticion } from '@/app/utils/Funtions';
 
 export default function TabloidCrud() {
-  const router = useRouter();
   const [tabloids, setTabloids] = useState([]);
   const [professors, setProfessors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -15,40 +13,31 @@ export default function TabloidCrud() {
   // Cargar datos - CON MÁS DEBUG
   const loadData = async () => {
     setLoading(true);
-    
     try {
-      console.log('🔄 Iniciando carga de datos...');
-      
       const [tabloidsRes, professorsRes] = await Promise.all([
         peticion('crud/tabloid/get-all', null, 'POST'),
         peticion('crud/tabloid/professors', null, 'GET')
       ]);
-
-      console.log('📦 Respuesta tabloides:', tabloidsRes);
-      console.log('👨‍🏫 Respuesta profesores:', professorsRes);
-
       // Asegurar que tabloids sea un array
       if (tabloidsRes.status) {
         const tabloidsData = tabloidsRes.data?.data || [];
-        console.log('📊 Datos de tabloides:', tabloidsData);
         setTabloids(Array.isArray(tabloidsData) ? tabloidsData : [tabloidsData]);
       } else {
-        console.error('❌ Error en tabloides:', tabloidsRes.message);
+        console.error('Error en tabloides:', tabloidsRes.message);
       }
 
       // Asegurar que professors sea un array
       if (professorsRes.status) {
         const professorsData = professorsRes.data?.data || [];
-        console.log('📊 Datos de profesores:', professorsData);
         setProfessors(Array.isArray(professorsData) ? professorsData : [professorsData]);
       } else {
-        console.error('❌ Error en profesores:', professorsRes.message);
+        console.error('Error en profesores:', professorsRes.message);
       }
       
       if (!tabloidsRes.status) setMessage({ text: tabloidsRes.message, type: 'error' });
       if (!professorsRes.status) setMessage({ text: professorsRes.message, type: 'error' });
     } catch (error) {
-      console.error('💥 Error en loadData:', error);
+      console.error('Error en loadData:', error);
       setMessage({ text: 'Error al cargar datos', type: 'error' });
     } finally {
       setLoading(false);
@@ -59,40 +48,29 @@ export default function TabloidCrud() {
   // Crear tabloide - CON MÁS DEBUG
   const createTabloid = async (e) => {
     e.preventDefault();
-    console.log('🔄 Iniciando creación de tabloide...');
-    console.log('📝 Datos del formulario:', form);
-    
     if (!form.Name || !form.Owner || !form.description) {
       const errorMsg = 'Todos los campos son requeridos';
-      console.error('❌ Validación fallida:', errorMsg);
+      console.error('Validación fallida:', errorMsg);
       setMessage({ text: errorMsg, type: 'error' });
       return;
     }
 
     setLoading(true);
     try {
-      console.log('📤 Enviando datos al servidor...', form);
-      
       const response = await peticion('crud/tabloid/create', { data: form }, 'POST');
-      
-      console.log('📨 Respuesta del servidor:', response);
-      
       if (response.status) {
         const successMsg = response.message || 'Tabloide creado exitosamente';
-        console.log('✅ Éxito:', successMsg);
         setMessage({ text: successMsg, type: 'success' });
         setForm({ Name: '', Owner: '', description: '' });
         loadData();
       } else {
-        console.error('❌ Error del servidor:', response.message);
         setMessage({ text: response.message, type: 'error' });
       }
     } catch (error) {
-      console.error('💥 Error en createTabloid:', error);
+      console.error('Error en createTabloid:', error);
       setMessage({ text: 'Error al crear tabloide: ' + error.message, type: 'error' });
     } finally {
       setLoading(false);
-      console.log('🏁 Creación de tabloide finalizada');
     }
   };
 

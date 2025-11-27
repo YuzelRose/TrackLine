@@ -3,7 +3,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
+}
+#add {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
 }
 #conteiner {
     width: 100%;
@@ -71,4 +76,10 @@
     border-bottom: 90%;
     position: relative;
 }
-
+#profBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1em;
+}
